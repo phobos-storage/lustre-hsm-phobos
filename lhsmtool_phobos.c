@@ -103,6 +103,38 @@
 #define LPX64 "%#llx"
 #endif
 
+#include "pho_common.h"
+#include "phobos_store.h"
+
+static int phobos_op_put(char * objid, int fd)
+{
+        struct pho_xfer_desc    xfer = {0};
+        struct pho_attrs        attrs = {0};
+        int rc;
+	struct stat st;
+
+        rc = pho_attr_set(&attrs, "program", "copytool");
+        if (rc)
+            exit(EXIT_FAILURE);
+	xfer.xd_op = PHO_XFER_OP_PUT;
+	xfer.xd_flags = 0;
+	xfer.xd_fd = fd;
+	
+	fstat(fd, &st);
+	xfer.xd_params.put.size = st.st_size;
+
+        xfer.xd_params.put.family = PHO_RSC_DIR;
+        xfer.xd_objid = objid;
+        xfer.xd_attrs = attrs;
+
+        rc = phobos_put(&xfer, 1, NULL, NULL);
+        if (rc)
+                pho_error(rc, "PUT failed");
+
+        exit(rc ? EXIT_FAILURE : EXIT_SUCCESS);
+}
+
+
 
 /** Move HAIs along with a copy of the HAL flags */
 struct hai_desc {
@@ -527,6 +559,40 @@ static GSource *term_subscribe(GMainLoop *loop, GPid pid, GChildWatchFunc func,
 /**
  * Start a new HSM copytool I/O command: archive or restore.
  */
+
+static int phobos_magic(const enum hsm_copytool_action hsma,
+			const struct cmd_cb_args *cb_args,
+			const struct hsm_action_item *hai)
+{
+	int src_fd = -1;
+	int rc = -1;
+        char    txtfid[PATH_MAX];
+	char 	fdpath[PATH_MAX];
+
+        sprintf(txtfid, "x"DFID, PFID(&hai->hai_fid));
+
+	LOG_DEBUG("Text fid is %s", txtfid);
+
+	if (hsma == HSMA_ARCHIVE) { 
+        	src_fd = llapi_hsm_action_get_fd(cb_args->hcp);
+        	if (src_fd < 0) {
+                	rc = src_fd;
+                	LOG_ERROR(rc, "cannot open LUSTRE for read");
+                	goto out;
+        	}
+		close(src_fd);
+		LOG_DEBUG("Lustre archive fd = %d", src_fd);
+
+		sprintf(fdpath, "/proc/self/fd/%d", src_fd);	
+		LOG_DEBUG("fdpath=%s", fdpath);
+
+		rc = phobos_op_put(txtfid, src_fd);
+	}
+
+out:
+	return rc;
+}	
+
 static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 			 const struct hsm_action_item *hai, const long hal_flags)
 {
@@ -601,6 +667,8 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 		goto out;
 	}
 
+	rc = phobos_magic(hsma, cb_args, hai);
+ 
 	ok = g_spawn_async(NULL,		/* working directory */
 			   av,			/* parsed command line */
 			   NULL,		/* environment vars */
@@ -974,6 +1042,13 @@ static int ct_cleanup(void)
 int main(int argc, char **argv)
 {
 	int	rc;
+
+        if (getenv("DEBUG"))
+                pho_log_level_set(PHO_LOG_DEBUG);
+        else
+                pho_log_level_set(PHO_LOG_VERB);
+
+        pho_info("starting");
 
 	strncpy(cmd_name, basename(argv[0]), sizeof(cmd_name) - 1);
 	rc = ct_parseopts(argc, argv);

@@ -1,0 +1,2 @@
+sudo /usr/sbin/lhsmtool_posix -v  --hsm_root /tmp/arch/ /mnt/lustre
+
