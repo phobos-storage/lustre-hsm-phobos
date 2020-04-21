@@ -106,34 +106,6 @@
 #include "pho_common.h"
 #include "phobos_store.h"
 
-static int phobos_op_put(char * objid, int fd)
-{
-        struct pho_xfer_desc    xfer = {0};
-        struct pho_attrs        attrs = {0};
-        int rc;
-	struct stat st;
-
-        rc = pho_attr_set(&attrs, "program", "copytool");
-        if (rc)
-            exit(EXIT_FAILURE);
-	xfer.xd_op = PHO_XFER_OP_PUT;
-	xfer.xd_flags = 0;
-	xfer.xd_fd = fd;
-	
-	fstat(fd, &st);
-	xfer.xd_params.put.size = st.st_size;
-
-        xfer.xd_params.put.family = PHO_RSC_DIR;
-        xfer.xd_objid = objid;
-        xfer.xd_attrs = attrs;
-
-        rc = phobos_put(&xfer, 1, NULL, NULL);
-        if (rc)
-                pho_error(rc, "PUT failed");
-
-        exit(rc ? EXIT_FAILURE : EXIT_SUCCESS);
-}
-
 
 
 /** Move HAIs along with a copy of the HAL flags */
@@ -406,8 +378,8 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	gchar		*res_cmd_fd = NULL;
 	gchar		*res_cmd_fid = NULL;
 	char		 tmpstr[128];
-	GError          *err = NULL;
-	int              rc = 0;
+	GError	  *err = NULL;
+	int	      rc = 0;
 
 	if (cmd_format == NULL)
 		return -ENOSYS;
@@ -420,7 +392,7 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	    rc = -EINVAL;
 	    LOG_ERROR(rc, "Cannot apply FD regex: %s", err->message);
 	    goto out_err;
-        }
+	}
 
 	/* replace all {fid} placeholders by lustre fid */
 	snprintf(tmpstr, sizeof(tmpstr), DFID, PFID(&hai->hai_dfid));
@@ -431,7 +403,7 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	    rc = -EINVAL;
 	    LOG_ERROR(rc, "Cannot apply FID regex: %s", err->message);
 	    goto out_err;
-        }
+	}
 
 	/* replace all {ctdata} placeholders by received data blob */
 	if (hai_data_expandable(hai))
@@ -444,11 +416,11 @@ static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
 	    rc = -EINVAL;
 	    LOG_ERROR(rc, "Cannot apply data regex: %s", err->message);
 	    goto out_err;
-        }
+	}
 
 out_err:
-        if (err != NULL)
-            g_error_free(err);
+	if (err != NULL)
+	    g_error_free(err);
 
 	g_free(res_cmd_fid);
 	g_free(res_cmd_fd);
@@ -560,36 +532,94 @@ static GSource *term_subscribe(GMainLoop *loop, GPid pid, GChildWatchFunc func,
  * Start a new HSM copytool I/O command: archive or restore.
  */
 
+static int phobos_op_put(char * objid, int fd)
+{
+	struct pho_xfer_desc    xfer = {0};
+	struct pho_attrs	attrs = {0};
+	int rc;
+	struct stat st;
+
+	rc = pho_attr_set(&attrs, "program", "copytool");
+	if (rc)
+	    exit(EXIT_FAILURE);
+
+	memset(&xfer, 0, sizeof(xfer));
+	xfer.xd_op = PHO_XFER_OP_PUT;
+	xfer.xd_fd = fd;
+	xfer.xd_flags = 0;
+	
+	/* fstat on lustre fd seems to fail */
+	fstat(xfer.xd_fd, &st);
+	xfer.xd_params.put.size = st.st_size;
+
+	xfer.xd_params.put.family = PHO_RSC_DIR;
+	xfer.xd_objid = objid;
+	xfer.xd_attrs = attrs;
+
+	rc = phobos_put(&xfer, 1, NULL, NULL);
+	if (rc)
+		pho_error(rc, "PUT failed");
+
+	return rc; 
+}
+
+static int phobos_op_get(char * objid, int fd)
+{
+	struct pho_xfer_desc    xfer = {0};
+	int rc;
+
+	memset(&xfer, 0, sizeof(xfer));
+	xfer.xd_op = PHO_XFER_OP_GET;
+	xfer.xd_fd = fd;
+	xfer.xd_flags = 0;
+	xfer.xd_objid = objid;
+
+	rc = phobos_get(&xfer, 1, NULL, NULL);
+	if (rc)
+		pho_error(rc, "PUT failed");
+
+	return rc; 
+}
+
 static int phobos_magic(const enum hsm_copytool_action hsma,
 			const struct cmd_cb_args *cb_args,
 			const struct hsm_action_item *hai)
 {
-	int src_fd = -1;
+	int fd = -1;
 	int rc = -1;
-        char    txtfid[PATH_MAX];
-	char 	fdpath[PATH_MAX];
+	char    txtfid[PATH_MAX];
 
-        sprintf(txtfid, "x"DFID, PFID(&hai->hai_fid));
+	sprintf(txtfid, "D"DFID, PFID(&hai->hai_fid));
 
 	LOG_DEBUG("Text fid is %s", txtfid);
 
 	if (hsma == HSMA_ARCHIVE) { 
-        	src_fd = llapi_hsm_action_get_fd(cb_args->hcp);
-        	if (src_fd < 0) {
-                	rc = src_fd;
-                	LOG_ERROR(rc, "cannot open LUSTRE for read");
-                	goto out;
-        	}
-		close(src_fd);
-		LOG_DEBUG("Lustre archive fd = %d", src_fd);
+		fd = llapi_hsm_action_get_fd(cb_args->hcp);
+		if (fd < 0) {
+			rc = fd;
+			LOG_ERROR(rc, "cannot open LUSTRE fd");
+			goto out;
+		}
+		LOG_DEBUG("Lustre archive fd = %d", fd);
 
-		sprintf(fdpath, "/proc/self/fd/%d", src_fd);	
-		LOG_DEBUG("fdpath=%s", fdpath);
-
-		rc = phobos_op_put(txtfid, src_fd);
+		rc = phobos_op_put(txtfid, fd);
+	} else if (hsma == HSMA_RESTORE) {
+		fd = llapi_hsm_action_get_fd(cb_args->hcp);
+		if (fd < 0) {
+			rc = fd;
+			LOG_ERROR(rc, "cannot open LUSTRE fd");
+			goto out;
+		}	
+	
+		LOG_DEBUG("Lustre restoring fd = %d", fd);
+		rc = phobos_op_get(txtfid, fd);
 	}
 
+
 out:
+	if (!(fd < 0))
+		close(fd);
+
 	return rc;
 }	
 
@@ -1043,12 +1073,12 @@ int main(int argc, char **argv)
 {
 	int	rc;
 
-        if (getenv("DEBUG"))
-                pho_log_level_set(PHO_LOG_DEBUG);
-        else
-                pho_log_level_set(PHO_LOG_VERB);
+	if (getenv("DEBUG"))
+		pho_log_level_set(PHO_LOG_DEBUG);
+	else
+		pho_log_level_set(PHO_LOG_VERB);
 
-        pho_info("starting");
+	pho_info("starting");
 
 	strncpy(cmd_name, basename(argv[0]), sizeof(cmd_name) - 1);
 	rc = ct_parseopts(argc, argv);
