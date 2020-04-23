@@ -585,7 +585,6 @@ static int phobos_magic(const enum hsm_copytool_action hsma,
 			const struct cmd_cb_args *cb_args,
 			const struct hsm_action_item *hai)
 {
-	int fd = -1;
 	int rc = -1;
 	char    txtfid[PATH_MAX];
 
@@ -593,32 +592,12 @@ static int phobos_magic(const enum hsm_copytool_action hsma,
 
 	LOG_DEBUG("Text fid is %s", txtfid);
 
-	if (hsma == HSMA_ARCHIVE) { 
-		fd = llapi_hsm_action_get_fd(cb_args->hcp);
-		if (fd < 0) {
-			rc = fd;
-			LOG_ERROR(rc, "cannot open LUSTRE fd");
-			goto out;
-		}
-		LOG_DEBUG("Lustre archive fd = %d", fd);
-
-		rc = phobos_op_put(txtfid, fd);
-	} else if (hsma == HSMA_RESTORE) {
-		fd = llapi_hsm_action_get_fd(cb_args->hcp);
-		if (fd < 0) {
-			rc = fd;
-			LOG_ERROR(rc, "cannot open LUSTRE fd");
-			goto out;
-		}	
-	
-		LOG_DEBUG("Lustre restoring fd = %d", fd);
-		rc = phobos_op_get(txtfid, fd);
-	}
-
-
-out:
-	if (!(fd < 0))
-		close(fd);
+	if (hsma == HSMA_ARCHIVE)
+		rc = phobos_op_put(txtfid, cb_args->fd);
+	else if (hsma == HSMA_RESTORE) 
+		rc = phobos_op_get(txtfid, cb_args->fd);
+	else
+		rc = 0;
 
 	return rc;
 }	
