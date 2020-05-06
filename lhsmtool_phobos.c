@@ -359,74 +359,6 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 	return rc;
 }
 
-static bool hai_data_expandable(const struct hsm_action_item *hai)
-{
-	size_t	datalen = hai->hai_len - sizeof(*hai);
-	int	i;
-
-	for (i = 0; i < datalen; i++)
-		if (!isprint(hai->hai_data[i]))
-			return false;
-
-	return true;
-}
-
-static int ct_build_cmd(const enum hsm_copytool_action hsma, gchar **cmd,
-			const struct hsm_action_item *hai, int fd)
-{
-	const char	*cmd_format = ct_commands[hsma];
-	gchar		*res_cmd_fd = NULL;
-	gchar		*res_cmd_fid = NULL;
-	char		 tmpstr[128];
-	GError	  *err = NULL;
-	int	      rc = 0;
-
-	if (cmd_format == NULL)
-		return -ENOSYS;
-
-	/* replace all {fd} placeholders by fd number */
-	snprintf(tmpstr, sizeof(tmpstr), "%d", fd);
-	res_cmd_fd = g_regex_replace_literal(fd_regex, cmd_format, -1, 0,
-					     tmpstr, 0, &err);
-	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply FD regex: %s", err->message);
-	    goto out_err;
-	}
-
-	/* replace all {fid} placeholders by lustre fid */
-	snprintf(tmpstr, sizeof(tmpstr), DFID, PFID(&hai->hai_dfid));
-
-	res_cmd_fid = g_regex_replace_literal(fid_regex, res_cmd_fd, -1, 0,
-					      tmpstr, 0, &err);
-	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply FID regex: %s", err->message);
-	    goto out_err;
-	}
-
-	/* replace all {ctdata} placeholders by received data blob */
-	if (hai_data_expandable(hai))
-		*cmd = g_regex_replace_literal(ctdata_regex, res_cmd_fid, -1, 0,
-					       hai->hai_data, 0, &err);
-	else
-		*cmd = g_regex_replace_literal(ctdata_regex, res_cmd_fid, -1, 0,
-					       "", 0, &err);
-	if (err != NULL) {
-	    rc = -EINVAL;
-	    LOG_ERROR(rc, "Cannot apply data regex: %s", err->message);
-	    goto out_err;
-	}
-
-out_err:
-	if (err != NULL)
-	    g_error_free(err);
-
-	g_free(res_cmd_fid);
-	g_free(res_cmd_fd);
-	return rc;
-}
-
 
 struct cmd_cb_args {
 	struct hsm_copyaction_private	*hcp;
@@ -538,13 +470,14 @@ static int phobos_magic(const enum hsm_copytool_action hsma,
 	int rc = -1;
 	char    txtfid[PATH_MAX];
 
-	sprintf(txtfid, "D"DFID, PFID(&hai->hai_fid));
+	sprintf(txtfid, "F"DFID, PFID(&hai->hai_fid));
 
 	LOG_DEBUG("Text fid is %s", txtfid);
 
-	if (hsma == HSMA_ARCHIVE)
+	if (hsma == HSMA_ARCHIVE) {
 		rc = phobos_op_put(txtfid, cb_args->fd);
-	else if (hsma == HSMA_RESTORE) 
+		fsync(cb_args->fd);
+	} else if (hsma == HSMA_RESTORE) 
 		rc = phobos_op_get(txtfid, cb_args->fd);
 	else
 		rc = 0;
@@ -556,14 +489,8 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 			 const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct cmd_cb_args	 *cb_args;
-	GError			 *err;
-	GPid			  pid;
+	GPid			  pid = getpid();
 	GSource			 *term_gsrc;
-	gint			  ac;
-	gchar			**av = NULL;
-	const char		 *hsma_name = hsm_copytool_action2name(hsma);
-	bool			  ok;
-	gchar			 *cmd = NULL;
 	int			  mdt_idx = -1;
 	int			  rc;
 
@@ -610,39 +537,8 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	cb_args->hai = hai;
 	cb_args->fd = llapi_hsm_action_get_fd(cb_args->hcp);
 
-	rc = ct_build_cmd(hsma, &cmd, hai, cb_args->fd);
-	LOG_DEBUG("Running %s command: '%s'", hsma_name, cmd);
-	if (opt.o_dry_run || rc == -ENOSYS) {
-		err_major++;
-		goto out;
-	}
-
-	ok = g_shell_parse_argv(cmd, &ac, &av, &err);
-	if (!ok) {
-		LOG_ERROR(EINVAL, "Invalid cmd '%s': %s", cmd, err->message);
-		g_error_free(err);
-		err_major++;
-		goto out;
-	}
-
 	rc = phobos_magic(hsma, cb_args, hai);
  
-	ok = g_spawn_async(NULL,		/* working directory */
-			   av,			/* parsed command line */
-			   NULL,		/* environment vars */
-			   CMD_EXEC_FLAGS,	/* execution flags */
-			   NULL,		/* child setup function */
-			   NULL,		/* user data pointer */
-			   &pid,		/* child pid address */
-			   &err);		/* error marker */
-
-	if (!ok) {
-		LOG_ERROR(ECHILD, "Cannot spawn subprocess: %s", err->message);
-		g_error_free(err);
-		err_major++;
-		goto out;
-	}
-
 	/* register a subprocess termination callback */
 	term_gsrc = term_subscribe(loop, pid, cmd_termination_cb, cb_args);
 
@@ -655,9 +551,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	g_source_destroy(term_gsrc);
 
 out:
-	g_free(cmd);
-	g_strfreev(av);
-
 	/* Obscure voodoo forces are summoned in this function in the
 	 * restore case. Do not close the volatile before! */
 	rc = ct_fini(&cb_args->hcp, hai, 0,

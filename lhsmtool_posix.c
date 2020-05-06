@@ -56,9 +56,12 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 
-#include <libcfs/util/string.h>
-#include <linux/lustre/lustre_fid.h>
+//#include <libcfs/util/string.h>
+//#include <linux/lustre/lustre_fid.h>
 #include <lustre/lustreapi.h>
+
+#define LL_HSM_ORIGIN_MAX_ARCHIVE    (sizeof(__u32) * 8)
+#define XATTR_TRUSTED_PREFIX    "trusted."
 
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
@@ -433,6 +436,166 @@ repeat:
 
 	return 0;
 }
+
+enum fid_seq {
+        FID_SEQ_OST_MDT0        = 0,
+        FID_SEQ_LLOG            = 1, /* unnamed llogs */
+        FID_SEQ_ECHO            = 2,
+        FID_SEQ_UNUSED_START    = 3,
+        FID_SEQ_UNUSED_END      = 9,
+        FID_SEQ_LLOG_NAME       = 10, /* named llogs */
+        FID_SEQ_RSVD            = 11,
+        FID_SEQ_IGIF            = 12,
+        FID_SEQ_IGIF_MAX        = 0x0ffffffffULL,
+        FID_SEQ_IDIF            = 0x100000000ULL,
+        FID_SEQ_IDIF_MAX        = 0x1ffffffffULL,
+        /* Normal FID sequence starts from this value, i.e. 1<<33 */
+        FID_SEQ_START           = 0x200000000ULL,
+        /* sequence for local pre-defined FIDs listed in local_oid */
+        FID_SEQ_LOCAL_FILE      = 0x200000001ULL,
+        FID_SEQ_DOT_LUSTRE      = 0x200000002ULL,
+        /* sequence is used for local named objects FIDs generated
+         * by local_object_storage library */
+        FID_SEQ_LOCAL_NAME      = 0x200000003ULL,
+        /* Because current FLD will only cache the fid sequence, instead
+	 * of oid on the client side, if the FID needs to be exposed to
+         * clients sides, it needs to make sure all of fids under one
+         * sequence will be located in one MDT. */
+        FID_SEQ_SPECIAL         = 0x200000004ULL,
+        FID_SEQ_QUOTA           = 0x200000005ULL,
+        FID_SEQ_QUOTA_GLB       = 0x200000006ULL,
+        FID_SEQ_ROOT            = 0x200000007ULL,  /* Located on MDT0 */
+        FID_SEQ_LAYOUT_RBTREE   = 0x200000008ULL,
+        /* sequence is used for update logs of cross-MDT operation */
+        FID_SEQ_UPDATE_LOG      = 0x200000009ULL,
+        /* Sequence is used for the directory under which update logs
+         * are created. */
+        FID_SEQ_UPDATE_LOG_DIR  = 0x20000000aULL,
+        FID_SEQ_NORMAL          = 0x200000400ULL,
+        FID_SEQ_LOV_DEFAULT     = 0xffffffffffffffffULL
+};
+
+enum root_oid {
+        FID_OID_ROOT            = 1UL,
+        FID_OID_ECHO_ROOT       = 2UL,
+};
+
+static inline __u64 fid_seq(const struct lu_fid *fid)
+{
+        return fid->f_seq;
+}
+
+static inline __u32 fid_oid(const struct lu_fid *fid)
+{
+        return fid->f_oid;
+}
+
+static inline bool fid_seq_is_norm(__u64 seq)
+{
+        return (seq >= FID_SEQ_NORMAL);
+}
+
+static inline bool fid_seq_is_mdt0(__u64 seq)
+{
+        return seq == FID_SEQ_OST_MDT0;
+}
+
+static inline bool fid_is_mdt0(const struct lu_fid *fid)
+{
+        return fid_seq_is_mdt0(fid_seq(fid));
+}
+
+static inline bool fid_seq_is_igif(__u64 seq)
+{
+        return seq >= FID_SEQ_IGIF && seq <= FID_SEQ_IGIF_MAX;
+}
+
+static inline bool fid_is_igif(const struct lu_fid *fid)
+{
+        return fid_seq_is_igif(fid_seq(fid));
+}
+
+static inline bool fid_is_norm(const struct lu_fid *fid)
+{
+        return fid_seq_is_norm(fid_seq(fid));
+}
+
+static inline int fid_is_root(const struct lu_fid *fid)
+{
+        return (fid_seq(fid) == FID_SEQ_ROOT &&
+                fid_oid(fid) == FID_OID_ROOT);
+}
+
+static inline bool fid_is_md_operative(const struct lu_fid *fid)
+{
+        return fid_is_mdt0(fid) || fid_is_igif(fid) ||
+               fid_is_norm(fid) || fid_is_root(fid);
+}
+
+int llapi_fid_parse(const char *fidstr, struct lu_fid *fid, char **endptr)
+{
+        unsigned long long val;
+        bool bracket = false;
+        char *end = (char *)fidstr;
+        int rc = 0;
+
+        if (!fidstr || !fid) {
+                rc = -EINVAL;
+                goto out;
+        }
+
+        while (isspace(*fidstr))
+                fidstr++;
+        while (*fidstr == '[') {
+                bracket = true;
+                fidstr++;
+        }
+        errno = 0;
+        val = strtoull(fidstr, &end, 0);
+        if ((val == 0 && errno == EINVAL) || *end != ':') {
+                rc = -EINVAL;
+                goto out;
+        }
+        if (val >= UINT64_MAX)
+                rc = -ERANGE;
+        else
+                fid->f_seq = val;
+
+        fidstr = end + 1; /* skip first ':', checked above */
+        errno = 0;
+        val = strtoull(fidstr, &end, 0);
+        if ((val == 0 && errno == EINVAL) || *end != ':') {
+                rc = -EINVAL;
+                goto out;
+        }
+        if (val > UINT32_MAX)
+                rc = -ERANGE;
+        else
+                fid->f_oid = val;
+
+        fidstr = end + 1; /* skip second ':', checked above */
+        errno = 0;
+        val = strtoull(fidstr, &end, 0);
+        if (val == 0 && errno == EINVAL) {
+                rc = -EINVAL;
+                goto out;
+        }
+        if (val > UINT32_MAX)
+                rc = -ERANGE;
+        else
+                fid->f_ver = val;
+
+        if (bracket && *end == ']')
+                end++;
+out:
+        if (endptr)
+                *endptr = end;
+
+        errno = -rc;
+        return rc;
+}
+
+
 
 /* mkdir -p path */
 static int ct_mkdir_p(const char *path)
