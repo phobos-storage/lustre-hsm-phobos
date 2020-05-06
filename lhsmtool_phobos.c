@@ -438,41 +438,6 @@ struct cmd_cb_args {
 	GMainLoop			*loop;
 };
 
-/**
- * Report progress to the coordinator.
- * Sneak into fd, shared with child cmd, to get current position.
- * We only report progress bytes since last report (relative value).
- */
-static gboolean cmd_progress_timer_cb(gpointer ud)
-{
-	struct cmd_cb_args	*args = ud;
-	struct hsm_extent	*phe = &args->he;
-	off_t			 pos;
-	int			 rc;
-
-	pos = lseek(args->fd, 0, SEEK_CUR);
-	if (pos < 0) {
-		rc = -errno;
-		LOG_ERROR(rc, "cmd_progress_timer_cb: lseek failed for "DFID,
-			  PFID(&args->hai->hai_fid));
-		return FALSE;			/* stop progress report */
-	}
-	if (pos > args->last_pos) {
-		phe->length = pos - phe->offset;
-		args->last_pos = pos;
-	}
-
-	rc = llapi_hsm_action_progress(args->hcp, phe, phe->length, 0);
-	if (rc) {
-		LOG_ERROR(rc, "llapi_hsm_action_progress failed for "DFID,
-			  PFID(&args->hai->hai_fid));
-		return FALSE;			/* stop progress report */
-	}
-	phe->offset = pos;
-
-	return TRUE;
-}
-
 static void cmd_termination_cb(GPid pid, gint status, gpointer ud)
 {
 	struct cmd_cb_args	*args = ud;
@@ -495,21 +460,6 @@ static void cmd_termination_cb(GPid pid, gint status, gpointer ud)
 	/* Note that sources that have already been dispatched when
 	 * g_main_loop_quit() is called will still be executed. */
 	g_main_loop_quit(args->loop);
-}
-
-/**
- * Register a periodic timer callback to the thread-local context.
- */
-static GSource *timer_subscribe(GMainLoop *loop, GSourceFunc func,
-				gpointer udata)
-{
-	GSource	*gsrc;
-
-	gsrc = g_timeout_source_new_seconds(opt.o_report_int);
-	g_source_set_callback(gsrc, func, udata, NULL);
-	g_source_attach(gsrc, g_main_loop_get_context(loop));
-	g_source_unref(gsrc);
-	return gsrc;
 }
 
 /**
@@ -608,7 +558,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 	struct cmd_cb_args	 *cb_args;
 	GError			 *err;
 	GPid			  pid;
-	GSource			 *timer_gsrc;
 	GSource			 *term_gsrc;
 	gint			  ac;
 	gchar			**av = NULL;
@@ -694,9 +643,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 		goto out;
 	}
 
-	/* register a periodic timer callback for progress report */
-	timer_gsrc = timer_subscribe(loop, cmd_progress_timer_cb, cb_args);
-
 	/* register a subprocess termination callback */
 	term_gsrc = term_subscribe(loop, pid, cmd_termination_cb, cb_args);
 
@@ -707,7 +653,6 @@ static int ct_hsm_io_cmd(const enum hsm_copytool_action hsma, GMainLoop *loop,
 
 	/* This loop will run again, we need to explicitly destroy sources */
 	g_source_destroy(term_gsrc);
-	g_source_destroy(timer_gsrc);
 
 out:
 	g_free(cmd);
