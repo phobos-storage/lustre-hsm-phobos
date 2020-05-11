@@ -1030,7 +1030,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	size_t				 lov_size = sizeof(lov_buf);
 	int				 rc;
 	int				 hp_flags = 0;
-	int				 src_fd = -1;
 	int				 dst_fd = -1;
 	int				 mdt_index = -1;
 	int				 open_flags = 0;
@@ -1086,13 +1085,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini;
 	}
 
-	src_fd = open(src, O_RDONLY | O_NOATIME | O_NOFOLLOW);
-	if (src_fd < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open '%s' for read", src);
-		goto fini;
-	}
-
 	dst_fd = llapi_hsm_action_get_fd(hcp);
 	if (dst_fd < 0) {
 		rc = dst_fd;
@@ -1121,11 +1113,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 
 fini:
 	rc = ct_fini(&hcp, hai, hp_flags, rc);
-
-	/* object swaping is done by cdt at copy end, so close of volatile file
-	 * cannot be done before */
-	if (!(src_fd < 0))
-		close(src_fd);
 
 	if (!(dst_fd < 0))
 		close(dst_fd);
