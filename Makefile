@@ -10,7 +10,7 @@ lhsmtool_posix: lhsmtool_posix.c Makefile
 	gcc $(CFLAGS) $(INC)  -o  lhsmtool_posix lhsmtool_posix.c -lrt -lglib-2.0 -pthread -lgthread-2.0 -llustreapi
 
 clean:
-	rm -f *.o lhsmtool_phobos lhsm_posix *.tar.gz
+	rm -f *.o lhsmtool_phobos lhsmtool_posix *.tar.gz
 
 new: clean all 
 
