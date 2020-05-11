@@ -895,11 +895,9 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	char				 root[PATH_MAX] = "";
 	int				 rc;
 	int				 rcf = 0;
-	bool				 rename_needed = false;
 	int				 hp_flags = 0;
 	int				 open_flags;
 	int				 src_fd = -1;
-	int				 dst_fd = -1;
 
 	rc = ct_begin(&hcp, hai);
 	if (rc < 0)
@@ -917,7 +915,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 		snprintf(dst, sizeof(dst), "%s_tmp", root);
 		/* we cannot rely on the same test because ct_copy_data()
 		 * updates hai_extent.length */
-		rename_needed = true;
 	} else {
 		snprintf(dst, sizeof(dst), "%s", root);
 	}
@@ -946,17 +943,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	/* If extent is specified, don't truncate an old archived copy */
 	open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
 
-	/* This FD should exist for saving stripe in the POSIX filesystem */
-	dst_fd = open(dst, open_flags, FILE_PERM);
-	if (dst_fd == -1) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open '%s' for write", dst);
-		goto fini_major;
-	}
-
-	if (!(dst_fd < 0))
-		close(dst_fd);
-
 	/* saving stripe is not critical */
 	rc = ct_save_stripe(src_fd, src, dst);
 	if (rc < 0)
@@ -969,28 +955,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	/** @todo make clear rc management */
 
 	CT_TRACE("data archiving for '%s' to '%s' done", src, dst);
-
-	if (rename_needed == true) {
-		char	 tmp_src[PATH_MAX + 8];
-		char	 tmp_dst[PATH_MAX + 8];
-
-		/* atomically replace old archived file */
-		ct_path_archive(src, sizeof(src), opt.o_hsm_root,
-				&hai->hai_fid);
-		rc = rename(dst, src);
-		if (rc < 0) {
-			rc = -errno;
-			CT_ERROR(rc, "cannot rename '%s' to '%s'", dst, src);
-			goto fini_major;
-		}
-		/* rename lov file */
-		snprintf(tmp_src, sizeof(tmp_src), "%s.lov", src);
-		snprintf(tmp_dst, sizeof(tmp_dst), "%s.lov", dst);
-		rc = rename(tmp_dst, tmp_src);
-		if (rc < 0)
-			CT_ERROR(errno, "cannot rename '%s' to '%s'",
-				 tmp_dst, tmp_src);
-	}
 
 	if (rcf)
 		err_minor++;
