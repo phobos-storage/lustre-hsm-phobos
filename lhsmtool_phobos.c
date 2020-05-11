@@ -946,12 +946,16 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	/* If extent is specified, don't truncate an old archived copy */
 	open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
 
+	/* This FD should exist for saving stripe in the POSIX filesystem */
 	dst_fd = open(dst, open_flags, FILE_PERM);
 	if (dst_fd == -1) {
 		rc = -errno;
 		CT_ERROR(rc, "cannot open '%s' for write", dst);
 		goto fini_major;
 	}
+
+	if (!(dst_fd < 0))
+		close(dst_fd);
 
 	/* saving stripe is not critical */
 	rc = ct_save_stripe(src_fd, src, dst);
@@ -963,13 +967,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	rc = phobos_op_put(&hai->hai_fid, src_fd);
 	CT_TRACE("phobos_put (archive): rc=%d", rc);
 	/** @todo make clear rc management */
-
-	rc = fsync(dst_fd);
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot flush '%s' archive file '%s'", src, dst);
-		goto fini_major;
-	}
 
 	CT_TRACE("data archiving for '%s' to '%s' done", src, dst);
 
@@ -1012,9 +1009,6 @@ fini_major:
 out:
 	if (!(src_fd < 0))
 		close(src_fd);
-
-	if (!(dst_fd < 0))
-		close(dst_fd);
 
 	rc = ct_fini(&hcp, hai, hp_flags, rcf);
 
