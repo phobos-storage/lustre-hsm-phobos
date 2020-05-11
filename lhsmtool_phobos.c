@@ -86,13 +86,10 @@ enum ct_action {
 };
 
 struct options {
-	int			 o_copy_attrs;
 	int			 o_daemonize;
 	int			 o_dry_run;
 	int			 o_abort_on_error;
-	int			 o_shadow_tree;
 	int			 o_verbose;
-	int			 o_copy_xattrs;
 	int			 o_archive_id_used;
 	int			 o_archive_id_cnt;
 	int			*o_archive_id;
@@ -110,10 +107,7 @@ struct options {
 
 /* everything else is zeroed */
 struct options opt = {
-	.o_copy_attrs = 1,
-	.o_shadow_tree = 1,
 	.o_verbose = LLAPI_MSG_INFO,
-	.o_copy_xattrs = 1,
 	.o_report_int = REPORT_INTERVAL_DEFAULT,
 	.o_chunk_size = ONE_MB,
 };
@@ -235,18 +229,6 @@ static int ct_parseopts(int argc, char * const *argv)
 	{ .val = 'i',	.name = "import",	.has_arg = no_argument },
 	{ .val = 'M',	.name = "max-sequence",	.has_arg = no_argument },
 	{ .val = 'M',	.name = "max_sequence",	.has_arg = no_argument },
-	{ .val = 0,	.name = "no-attr",	.has_arg = no_argument,
-	  .flag = &opt.o_copy_attrs },
-	{ .val = 0,	.name = "no_attr",	.has_arg = no_argument,
-	  .flag = &opt.o_copy_attrs },
-	{ .val = 0,	.name = "no-shadow",	.has_arg = no_argument,
-	  .flag = &opt.o_shadow_tree },
-	{ .val = 0,	.name = "no_shadow",	.has_arg = no_argument,
-	  .flag = &opt.o_shadow_tree },
-	{ .val = 0,	.name = "no-xattr",	.has_arg = no_argument,
-	  .flag = &opt.o_copy_xattrs },
-	{ .val = 0,	.name = "no_xattr",	.has_arg = no_argument,
-	  .flag = &opt.o_copy_xattrs },
 	{ .val = 'p',	.name = "hsm-root",	.has_arg = required_argument },
 	{ .val = 'p',	.name = "hsm_root",	.has_arg = required_argument },
 	{ .val = 'q',	.name = "quiet",	.has_arg = no_argument },
@@ -816,76 +798,6 @@ static int ct_restore_stripe(const char *src, const char *dst, int dst_fd,
 	return rc;
 }
 
-/* Copy file attributes from file src to file dest */
-static int ct_copy_attr(const char *src, const char *dst, int src_fd,
-			int dst_fd)
-{
-	struct stat	st;
-	struct timeval	times[2];
-	int		rc;
-
-	if (fstat(src_fd, &st) < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot stat '%s'", src);
-		return rc;
-	}
-
-	times[0].tv_sec = st.st_atime;
-	times[0].tv_usec = 0;
-	times[1].tv_sec = st.st_mtime;
-	times[1].tv_usec = 0;
-	if (fchmod(dst_fd, st.st_mode) < 0 ||
-	    fchown(dst_fd, st.st_uid, st.st_gid) < 0 ||
-	    futimes(dst_fd, times) < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot set attributes of '%s'", src);
-		return rc;
-	}
-
-	return 0;
-}
-
-static int ct_copy_xattr(const char *src, const char *dst, int src_fd,
-			 int dst_fd, bool is_restore)
-{
-	char	 list[XATTR_LIST_MAX];
-	char	 value[XATTR_SIZE_MAX];
-	char	*name;
-	ssize_t	 list_len;
-	int	 rc;
-
-	list_len = flistxattr(src_fd, list, sizeof(list));
-	if (list_len < 0)
-		return -errno;
-
-	name = list;
-	while (name < list + list_len) {
-		rc = fgetxattr(src_fd, name, value, sizeof(value));
-		if (rc < 0)
-			return -errno;
-
-		/* when we restore, we do not restore lustre xattr */
-		if (!is_restore ||
-		    (strncmp(XATTR_TRUSTED_PREFIX, name,
-			     sizeof(XATTR_TRUSTED_PREFIX) - 1) != 0)) {
-			rc = fsetxattr(dst_fd, name, value, rc, 0);
-			CT_TRACE("fsetxattr of '%s' on '%s' rc=%d (%s)",
-				 name, dst, rc, strerror(errno));
-			/* lustre.* attrs aren't supported on other FS's */
-			if (rc < 0 && errno != EOPNOTSUPP) {
-				rc = -errno;
-				CT_ERROR(rc, "cannot set extended attribute"
-					 " '%s' of '%s'",
-					 name, dst);
-				return rc;
-			}
-		}
-		name += strlen(name) + 1;
-	}
-
-	return 0;
-}
-
 static int ct_path_lustre(char *buf, int sz, const char *mnt,
 			  const struct lu_fid *fid)
 {
@@ -1061,32 +973,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 
 	CT_TRACE("data archiving for '%s' to '%s' done", src, dst);
 
-	/* attrs will remain on the MDS; no need to copy them, except possibly
-	  for disaster recovery */
-	if (opt.o_copy_attrs) {
-		rc = ct_copy_attr(src, dst, src_fd, dst_fd);
-		if (rc < 0) {
-			CT_ERROR(rc, "cannot copy attr of '%s' to '%s'",
-				 src, dst);
-			rcf = rc;
-		}
-		CT_TRACE("attr file for '%s' saved to archive '%s'",
-			 src, dst);
-	}
-
-	/* xattrs will remain on the MDS; no need to copy them, except possibly
-	 for disaster recovery */
-	if (opt.o_copy_xattrs) {
-		rc = ct_copy_xattr(src, dst, src_fd, dst_fd, false);
-		if (rc < 0) {
-			CT_ERROR(rc, "cannot copy xattr of '%s' to '%s'",
-				 src, dst);
-			rcf = rcf ? rcf : rc;
-		}
-		CT_TRACE("xattr file for '%s' saved to archive '%s'",
-			 src, dst);
-	}
-
 	if (rename_needed == true) {
 		char	 tmp_src[PATH_MAX + 8];
 		char	 tmp_dst[PATH_MAX + 8];
@@ -1109,88 +995,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 				 tmp_dst, tmp_src);
 	}
 
-	if (opt.o_shadow_tree) {
-		/* Create a namespace of softlinks that shadows the original
-		 * Lustre namespace.  This will only be current at
-		 * time-of-archive (won't follow renames).
-		 * WARNING: release won't kill these links; a manual
-		 * cleanup of dead links would be required.
-		 */
-		char		 buf[PATH_MAX];
-		long long	 recno = -1;
-		int		 linkno = 0;
-		char		*ptr;
-		int		 depth = 0;
-		ssize_t		 sz;
-
-		sprintf(buf, DFID, PFID(&hai->hai_fid));
-		sprintf(src, "%s/shadow/", opt.o_hsm_root);
-
-		ptr = opt.o_hsm_root;
-		while (*ptr)
-			(*ptr++ == '/') ? depth-- : 0;
-
-		rc = llapi_fid2path(opt.o_mnt, buf, src + strlen(src),
-				    sizeof(src) - strlen(src), &recno, &linkno);
-		if (rc < 0) {
-			CT_ERROR(rc, "cannot get FID of '%s'", buf);
-			rcf = rcf ? rcf : rc;
-			goto fini_minor;
-		}
-
-		/* Figure out how many parent dirs to symlink back */
-		ptr = src;
-		while (*ptr)
-			(*ptr++ == '/') ? depth++ : 0;
-		sprintf(buf, "..");
-		while (--depth > 1)
-			strcat(buf, "/..");
-
-		ct_path_archive(dst, sizeof(dst), buf, &hai->hai_fid);
-
-		if (ct_mkdir_p(src)) {
-			CT_ERROR(errno, "mkdir_p '%s' failed", src);
-			rcf = rcf ? rcf : -errno;
-			goto fini_minor;
-		}
-		/* symlink already exists ? */
-		sz = readlink(src, buf, sizeof(buf));
-		/* detect truncation */
-		if (sz == sizeof(buf)) {
-			rcf = rcf ? rcf : -E2BIG;
-			CT_ERROR(rcf, "readlink '%s' truncated", src);
-			goto fini_minor;
-		}
-		if (sz >= 0) {
-			buf[sz] = '\0';
-			if (sz == 0 || strncmp(buf, dst, sz) != 0) {
-				if (unlink(src) && errno != ENOENT) {
-					CT_ERROR(errno,
-						 "cannot unlink symlink '%s'",
-						 src);
-					rcf = rcf ? rcf : -errno;
-					goto fini_minor;
-				}
-				/* unlink old symlink done */
-				CT_TRACE("remove old symlink '%s' pointing"
-					 " to '%s'", src, buf);
-			} else {
-				/* symlink already ok */
-				CT_TRACE("symlink '%s' already pointing"
-					 " to '%s'", src, dst);
-				rcf = 0;
-				goto fini_minor;
-			}
-		}
-		if (symlink(dst, src)) {
-			CT_ERROR(errno, "cannot symlink '%s' to '%s'",
-				 src, dst);
-			rcf = rcf ? rcf : -errno;
-			goto fini_minor;
-		}
-		CT_TRACE("symlink '%s' to '%s' done", src, dst);
-	}
-fini_minor:
 	if (rcf)
 		err_minor++;
 	goto out;
