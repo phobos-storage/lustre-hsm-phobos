@@ -789,17 +789,12 @@ static int ct_mkdir_p(const char *path)
 	return 0;
 }
 
-static int ct_save_stripe(int src_fd, const char *src, const char *dst, char *hexstripe)
+static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
-	char			 lov_file[PATH_MAX + 8];
 	char			 lov_buf[XATTR_SIZE_MAX];
 	struct lov_user_md	*lum;
 	int			 rc;
-	int			 fd;
 	ssize_t			 xattr_size;
-
-	snprintf(lov_file, sizeof(lov_file), "%s.lov", dst);
-	CT_TRACE("saving stripe info of '%s' in %s", src, lov_file);
 
 	xattr_size = fgetxattr(src_fd, XATTR_LUSTRE_LOV, lov_buf,
 			       sizeof(lov_buf));
@@ -819,39 +814,11 @@ static int ct_save_stripe(int src_fd, const char *src, const char *dst, char *he
 		lum->lmm_stripe_offset = -1;
 	}
 
-	fd = open(lov_file, O_TRUNC | O_CREAT | O_WRONLY, FILE_PERM);
-	if (fd < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open '%s'", lov_file);
-		goto err_cleanup;
-	}
-
 	/* Save the stripe as an hexa string to save it as 
  	 * an attr in Phobos object's metadata */ 
 	bin2hexstr((const char *)lov_buf, xattr_size, hexstripe);
 
-	rc = write(fd, lum, xattr_size);
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot write %zd bytes to '%s'",
-			 xattr_size, lov_file);
-		close(fd);
-		goto err_cleanup;
-	}
-
-	rc = close(fd);
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot close '%s'", lov_file);
-		goto err_cleanup;
-	}
-
 	return 0;
-
-err_cleanup:
-	unlink(lov_file);
-
-	return rc;
 }
 
 static int ct_restore_stripe(const char *src, const char *dst, int dst_fd,
@@ -1016,7 +983,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
 
 	/* saving stripe is not critical */
-	rc = ct_save_stripe(src_fd, src, dst, hexstripe);
+	rc = ct_save_stripe(src_fd, src, hexstripe);
 	if (rc < 0) {
 		CT_ERROR(rc, "cannot save file striping info of '%s' in '%s'",
 			 src, dst);
