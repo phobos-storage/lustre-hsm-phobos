@@ -546,6 +546,9 @@ static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
         xfer.xd_attrs = attrs;
 
         rc = phobos_put(&xfer, 1, NULL, NULL);
+	
+	pho_xfer_desc_destroy(&xfer);
+	
         if (rc)
                 pho_error(rc, "PUT failed");
 
@@ -569,6 +572,9 @@ static int phobos_op_get(const struct lu_fid *fid, int fd)
         xfer.xd_objid = objid;
 
         rc = phobos_get(&xfer, 1, NULL, NULL);
+
+	pho_xfer_desc_destroy(&xfer);
+
         if (rc)
                 pho_error(rc, "PUT failed");
 
@@ -603,6 +609,8 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
                 val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
 		strcpy(hexstripe, val);
         }
+
+	pho_xfer_desc_destroy(&xfer);
 
 	return rc; 
 }
