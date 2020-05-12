@@ -854,35 +854,6 @@ err_cleanup:
 	return rc;
 }
 
-static int ct_load_stripe(const char *src, void *lovea, size_t *lovea_size)
-{
-	char	 lov_file[PATH_MAX + 4];
-	int	 rc;
-	int	 fd;
-
-	snprintf(lov_file, sizeof(lov_file), "%s.lov", src);
-	CT_TRACE("reading stripe rules from '%s' for '%s'", lov_file, src);
-
-	fd = open(lov_file, O_RDONLY);
-	if (fd < 0) {
-		CT_ERROR(errno, "cannot open '%s'", lov_file);
-		return -ENODATA;
-	}
-
-	rc = read(fd, lovea, *lovea_size);
-	if (rc < 0) {
-		CT_ERROR(errno, "cannot read %zu bytes from '%s'",
-			 *lovea_size, lov_file);
-		close(fd);
-		return -ENODATA;
-	}
-
-	*lovea_size = rc;
-	close(fd);
-
-	return 0;
-}
-
 static int ct_restore_stripe(const char *src, const char *dst, int dst_fd,
 			     const void *lovea, size_t lovea_size)
 {
@@ -1087,10 +1058,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private	*hcp = NULL;
 	char				 src[PATH_MAX];
 	char				 dst[PATH_MAX];
-	char				 hexstripephobos[PATH_MAX];
-	char				 hexstripefs[PATH_MAX];
-	char				 lov_bufdbg[XATTR_SIZE_MAX];
-	size_t				 lov_sizedbg = sizeof(lov_bufdbg);
+	char				 hexstripe[PATH_MAX];
 	char				 lov_buf[XATTR_SIZE_MAX];
 	size_t				 lov_size = sizeof(lov_buf);
 	int				 rc;
@@ -1117,20 +1085,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 	/* restore loads and sets the LOVEA w/o interpreting it to avoid
 	 * dependency on the structure format. */
-	rc = ct_load_stripe(src, lov_bufdbg, &lov_sizedbg);
-	if (rc < 0) {
-		CT_WARN("cannot get stripe rules for '%s' (%s), use default",
-			src, strerror(-rc));
-		set_lovea = false;
-	} else {
-		open_flags |= O_LOV_DELAY_CREATE;
-		set_lovea = true;
-	}
-	bin2hexstr(lov_bufdbg, lov_sizedbg, hexstripefs);
-	printf("i-----> hexstripe in FS = %s\n", hexstripefs); 
-
-	/* Get stripe from phobos */
-	rc = phobos_op_getstripe(&hai->hai_fid, hexstripephobos);
+	rc = phobos_op_getstripe(&hai->hai_fid, hexstripe);
 	if (rc) {
 		CT_WARN("cannot get stripe rules for"DFID"  (%s), use default",
 			PFID(&hai->hai_fid), strerror(-rc));
@@ -1140,13 +1095,9 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		set_lovea = true;
 	}
 	printf("i-----> phobos_op_getstripe: rc =%d\n", rc); 
-	printf("i-----> hexstripe in phobos = %s\n", hexstripephobos); 
+	printf("i-----> hexstripe in phobos = %s\n", hexstripe); 
 
-	lov_size = hexstr2bin(hexstripephobos, lov_buf);
-	printf("----> lov_size=%d  lov_sizedbg=%d isizeof=%d\n",
-	       (int)lov_size, (int)lov_sizedbg, sizeof(struct lov_user_md)); 
-	printf("memcmp =%d\n", memcmp(lov_buf, lov_bufdbg, lov_size)); 
-	printf("strcmp =%d\n", strcmp(hexstripephobos, hexstripefs)); 
+	lov_size = hexstr2bin(hexstripe, lov_buf);
 
 	/* start the restore operation */
 	rc = ct_begin_restore(&hcp, hai, mdt_index, open_flags);
