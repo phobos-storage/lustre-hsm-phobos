@@ -589,7 +589,7 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 		return -EINVAL;
 	
 	/* /!\ additionnal letter only because of pcocc side effect */
-	return sprintf(objid, "I"DFID, PFID(fid));
+	return sprintf(objid, "K"DFID, PFID(fid));
 }
 
 static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
@@ -697,7 +697,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
 /*
  * A set of function to encode buffer into strings
  */
-static void bin2hexstr(const char *bin, size_t len, char *out)
+void bin2hexstr(const char *bin, size_t len, char *out)
 {
         size_t  i;
         char tmp[10];
@@ -705,9 +705,13 @@ static void bin2hexstr(const char *bin, size_t len, char *out)
         if (bin == NULL || len == 0)
                 return;
 
+        /* Size is encoded at the beginning */
         out[0] = 0;
+        sprintf(out, "%02x|", (unsigned int)len);
+
+        /* Next each char, one by one */
         for (i=0; i<len; i++) {
-                sprintf(tmp, "%02x", bin[i]);
+                sprintf(tmp, "%08x:", bin[i]);
                 strcat(out, tmp);
         }
 }
@@ -715,23 +719,35 @@ static void bin2hexstr(const char *bin, size_t len, char *out)
 unsigned int hexstr2bin(const char *hex, char *out)
 {
         unsigned int len ;
-        char tmp[10];
+        char tmp[10]; /* too big */
         size_t  i;
 
         if (hex == NULL || out == 0)
                 return 0;
 
-        len = strlen(hex);
-        if (len % 2 != 0)
-                return 0;
+        /* get size first */
+        tmp[0] = hex[0];
+        tmp[1] = hex[1];
+        tmp[2] = hex[2];
+        tmp[3] = 0;
+        sscanf(tmp, "%02x|", &len);
 
-        len /= 2;
+        printf("len=%d\n", len);
 
+        /* Remind that 3 first characters encodes the size */
+        out[0] = 0;
         for (i=0; i < len; i++) {
-                tmp[0] = hex[2*i];
-                tmp[1] = hex[2*i+1];
-                tmp[2] = 0;
-                sscanf(tmp, "%02x", (unsigned int *)&(out[i]));
+                tmp[0] = hex[9*i+3];
+                tmp[1] = hex[9*i+4];
+                tmp[2] = hex[9*i+5];
+                tmp[3] = hex[9*i+6];
+                tmp[4] = hex[9*i+7];
+                tmp[5] = hex[9*i+8];
+                tmp[6] = hex[9*i+9];
+                tmp[7] = hex[9*i+10];
+                tmp[8] = hex[9*i+11];
+                tmp[9] = 0;
+                sscanf(tmp, "%08x:", (unsigned int *)&(out[i]));
         }
 
         return len;
@@ -1121,6 +1137,8 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	lov_sizedbg = hexstr2bin(hexstripephobos, lov_bufdbg);
 	printf("----> lov_size=%d  lov_sizedbg=%d\n",
 	       (int)lov_size, (int)lov_sizedbg); 
+	printf("memcmp =%d\n", memcmp(lov_buf, lov_bufdbg, lov_size)); 
+	printf("strcmp =%d\n", strcmp(hexstripephobos, hexstripefs)); 
 
 	/* start the restore operation */
 	rc = ct_begin_restore(&hcp, hai, mdt_index, open_flags);
