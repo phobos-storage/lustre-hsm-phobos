@@ -587,11 +587,12 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 {
 	if (!objid || !fid)
 		return -EINVAL;
-
-	return sprintf(objid, "G"DFID, PFID(fid));
+	
+	/* /!\ additionnal letter only because of pcocc side effect */
+	return sprintf(objid, "H"DFID, PFID(fid));
 }
 
-static int phobos_op_put(const struct lu_fid *fid, int fd)
+static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
 {
         struct pho_xfer_desc    xfer = {0};
         struct pho_attrs        attrs = {0};
@@ -609,11 +610,15 @@ static int phobos_op_put(const struct lu_fid *fid, int fd)
  	 */
 	rc = fid2objid(fid, objid);
 	if (rc < 0)
-	    exit(EXIT_FAILURE);
+		return rc;
 
         rc = pho_attr_set(&attrs, "program", "copytool");
         if (rc)
-            exit(EXIT_FAILURE);
+		return rc; 
+
+        rc = pho_attr_set(&attrs, "hexstripe", hexstripe);
+        if (rc)
+		return rc; 
 
         memset(&xfer, 0, sizeof(xfer));
         xfer.xd_op = PHO_XFER_OP_PUT;
@@ -659,6 +664,24 @@ static int phobos_op_get(const struct lu_fid *fid, int fd)
 }
 
 /*
+ * A set of function to encode buffer into strings
+ */
+static void bin2hexstr(const char *bin, size_t len, char *out)
+{
+        size_t  i;
+
+        if (bin == NULL || len == 0)
+                return;
+
+        for (i=0; i<len; i++) {
+                out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+                out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+        }
+        out[len*2] = '\0';
+}
+
+
+/*
  * Copytool functions (with ct_ prefix)
  */
 
@@ -694,7 +717,7 @@ static int ct_mkdir_p(const char *path)
 	return 0;
 }
 
-static int ct_save_stripe(int src_fd, const char *src, const char *dst)
+static int ct_save_stripe(int src_fd, const char *src, const char *dst, char *hexstripe)
 {
 	char			 lov_file[PATH_MAX + 8];
 	char			 lov_buf[XATTR_SIZE_MAX];
@@ -714,6 +737,11 @@ static int ct_save_stripe(int src_fd, const char *src, const char *dst)
 		return rc;
 	}
 
+	/* Save the stripe as an hexa string to save it as 
+ 	 * an attr in Phobos object's metadata */ 
+	bin2hexstr((const char *)lov_buf, xattr_size, hexstripe);
+
+	/* read content of read xattr */
 	lum = (struct lov_user_md *)lov_buf;
 
 	if (lum->lmm_magic == LOV_USER_MAGIC_V1 ||
@@ -893,7 +921,8 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	char				 src[PATH_MAX];
 	char				 dst[PATH_MAX + 4] = "";
 	char				 root[PATH_MAX] = "";
-	int				 rc;
+	char				 hexstripe[PATH_MAX] = "";
+	int				 rc = 0;
 	int				 rcf = 0;
 	int				 hp_flags = 0;
 	int				 open_flags;
@@ -944,22 +973,25 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
 
 	/* saving stripe is not critical */
-	rc = ct_save_stripe(src_fd, src, dst);
-	if (rc < 0)
+	rc = ct_save_stripe(src_fd, src, dst, hexstripe);
+	if (rc < 0) {
 		CT_ERROR(rc, "cannot save file striping info of '%s' in '%s'",
 			 src, dst);
-	
+		goto fini_major;
+	}
+
+	printf("----> ct_archive: STRIPE IN HEXA: %s\n", hexstripe);
+		
 	/* Do phobos xfer */
-	rc = phobos_op_put(&hai->hai_fid, src_fd);
+	rc = phobos_op_put(&hai->hai_fid, src_fd, hexstripe);
 	CT_TRACE("phobos_put (archive): rc=%d", rc);
+	if (rc)
+		goto fini_major;
 	/** @todo make clear rc management */
 
 	CT_TRACE("data archiving for '%s' to '%s' done", src, dst);
-
-	if (rcf)
-		err_minor++;
-	goto out;
-
+	if (!rc)
+		goto out;
 
 fini_major:
 	err_major++;
@@ -968,12 +1000,11 @@ fini_major:
 	if (ct_is_retryable(rc))
 		hp_flags |= HP_FLAG_RETRY;
 
-	rcf = rc;
-
 out:
 	if (!(src_fd < 0))
 		close(src_fd);
 
+	rcf = rc; 
 	rc = ct_fini(&hcp, hai, hp_flags, rcf);
 
 	return rc;
