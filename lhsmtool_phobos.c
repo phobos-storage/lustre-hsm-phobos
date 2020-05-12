@@ -663,6 +663,42 @@ static int phobos_op_get(const struct lu_fid *fid, int fd)
         return rc;
 }
 
+static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
+{
+        struct pho_xfer_desc    xfer = {0};
+        int rc;
+	char objid[MAXNAMLEN];
+
+	rc = fid2objid(fid, objid);
+	if (rc < 0)
+	    exit(EXIT_FAILURE);
+
+        memset(&xfer, 0, sizeof(xfer));
+	xfer.xd_objid = objid;
+	xfer.xd_op = PHO_XFER_OP_GETMD;
+	xfer.xd_flags = 0;
+
+        rc = phobos_get(&xfer, 1, NULL, NULL);
+        if (rc) {
+                pho_error(rc, "PUT failed");
+		return rc;
+	}
+	
+        if (pho_attrs_is_empty(&xfer.xd_attrs))
+                printf("NO attr found\n");
+        else {
+                const char *val = NULL;
+
+                printf("We could find attrs\n");
+
+                val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
+                printf("val= %p %s\n", val, val);
+
+		strcpy(hexstripe, val);
+        }
+
+	return rc; 
+}
 /*
  * A set of function to encode buffer into strings
  */
@@ -941,7 +977,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	if (hai->hai_extent.length == -1) {
 		/* whole file, write it to tmp location and atomically
 		 * replace old archived file */
-		snprintf(dst, sizeof(dst), "%s_tmp", root);
+		snprintf(dst, sizeof(dst), "%s", root);
 		/* we cannot rely on the same test because ct_copy_data()
 		 * updates hai_extent.length */
 	} else {
@@ -1015,6 +1051,8 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private	*hcp = NULL;
 	char				 src[PATH_MAX];
 	char				 dst[PATH_MAX];
+	char				 hexstripephobos[PATH_MAX];
+	char				 hexstripefs[PATH_MAX];
 	char				 lov_buf[XATTR_SIZE_MAX];
 	size_t				 lov_size = sizeof(lov_buf);
 	int				 rc;
@@ -1050,6 +1088,12 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		open_flags |= O_LOV_DELAY_CREATE;
 		set_lovea = true;
 	}
+	bin2hexstr(lov_buf, lov_size, hexstripefs);
+
+	/* Get stripe from phobos */
+	rc = phobos_op_getstripe(&hai->hai_fid, hexstripephobos);
+	printf("i-----> phobos_op_getstripe: rc =%d\n", rc); 
+	printf("i-----> hexstripe in phobos = %s\n", hexstripephobos); 
 
 	rc = ct_begin_restore(&hcp, hai, mdt_index, open_flags);
 	if (rc < 0)
