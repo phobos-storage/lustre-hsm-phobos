@@ -1131,6 +1131,14 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 
 	/* Get stripe from phobos */
 	rc = phobos_op_getstripe(&hai->hai_fid, hexstripephobos);
+	if (rc) {
+		CT_WARN("cannot get stripe rules for"DFID"  (%s), use default",
+			PFID(&hai->hai_fid), strerror(-rc));
+		set_lovea = false;
+	} else {
+		open_flags |= O_LOV_DELAY_CREATE;
+		set_lovea = true;
+	}
 	printf("i-----> phobos_op_getstripe: rc =%d\n", rc); 
 	printf("i-----> hexstripe in phobos = %s\n", hexstripephobos); 
 
