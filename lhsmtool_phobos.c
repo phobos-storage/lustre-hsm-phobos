@@ -821,7 +821,7 @@ static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 	return 0;
 }
 
-static int ct_restore_stripe(const char *src, const char *dst, int dst_fd,
+static int ct_restore_stripe(const char *dst, int dst_fd,
 			     const void *lovea, size_t lovea_size)
 {
 	int	rc;
@@ -929,8 +929,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
 	char				 src[PATH_MAX];
-	char				 dst[PATH_MAX + 4] = "";
-	char				 root[PATH_MAX] = "";
 	char				 hexstripe[PATH_MAX] = "";
 	int				 rc = 0;
 	int				 rcf = 0;
@@ -947,29 +945,14 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	 * destination = lustre FID
 	 */
 	ct_path_lustre(src, sizeof(src), opt.o_mnt, &hai->hai_dfid);
-	ct_path_archive(root, sizeof(root), opt.o_hsm_root, &hai->hai_fid);
-	if (hai->hai_extent.length == -1) {
-		/* whole file, write it to tmp location and atomically
-		 * replace old archived file */
-		snprintf(dst, sizeof(dst), "%s", root);
-		/* we cannot rely on the same test because ct_copy_data()
-		 * updates hai_extent.length */
-	} else {
-		snprintf(dst, sizeof(dst), "%s", root);
-	}
 
-	CT_TRACE("archiving '%s' to '%s'", src, dst);
+	CT_TRACE("archiving '%s'", src);
 
 	if (opt.o_dry_run) {
 		rc = 0;
 		goto fini_major;
 	}
 
-	rc = ct_mkdir_p(dst);
-	if (rc < 0) {
-		CT_ERROR(rc, "mkdir_p '%s' failed", dst);
-		goto fini_major;
-	}
 
 	src_fd = llapi_hsm_action_get_fd(hcp);
 	if (src_fd < 0) {
@@ -985,8 +968,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	/* saving stripe is not critical */
 	rc = ct_save_stripe(src_fd, src, hexstripe);
 	if (rc < 0) {
-		CT_ERROR(rc, "cannot save file striping info of '%s' in '%s'",
-			 src, dst);
+		CT_ERROR(rc, "cannot save file striping info of '%s'", src);
 		goto fini_major;
 	}
 
@@ -999,14 +981,13 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini_major;
 	/** @todo make clear rc management */
 
-	CT_TRACE("data archiving for '%s' to '%s' done", src, dst);
+	CT_TRACE("data archiving for '%s' done", src);
 	if (!rc)
 		goto out;
 
 fini_major:
 	err_major++;
 
-	unlink(dst);
 	if (ct_is_retryable(rc))
 		hp_flags |= HP_FLAG_RETRY;
 
@@ -1023,7 +1004,6 @@ out:
 static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
-	char				 src[PATH_MAX];
 	char				 dst[PATH_MAX];
 	char				 hexstripe[PATH_MAX];
 	char				 lov_buf[XATTR_SIZE_MAX];
@@ -1041,8 +1021,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	 */
 
 	/* build backend file name from released file FID */
-	ct_path_archive(src, sizeof(src), opt.o_hsm_root, &hai->hai_fid);
-
 	rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid,
 					&mdt_index);
 	if (rc < 0) {
@@ -1083,7 +1061,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	/* build volatile "file name", for messages */
 	snprintf(dst, sizeof(dst), "{VOLATILE}="DFID, PFID(&dfid));
 
-	CT_TRACE("restoring data from '%s' to '%s'", src, dst);
+	CT_TRACE("restoring data from to '%s'", dst);
 
 	if (opt.o_dry_run) {
 		rc = 0;
@@ -1100,10 +1078,10 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	if (set_lovea) {
 		/* the layout cannot be allocated through .fid so we have to
 		 * restore a layout */
-		rc = ct_restore_stripe(src, dst, dst_fd, lov_buf, lov_size);
+		rc = ct_restore_stripe(dst, dst_fd, lov_buf, lov_size);
 		if (rc < 0) {
 			CT_ERROR(rc, "cannot restore file striping info"
-				 " for '%s' from '%s'", dst, src);
+				 " for '%s'", dst);
 			err_major++;
 			goto fini;
 		}
@@ -1114,7 +1092,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	CT_TRACE("phobos_get (restore): rc=%d", rc);
 	/** @todo make clear rc management */
 
-	CT_TRACE("data restore from '%s' to '%s' done", src, dst);
+	CT_TRACE("data restore to '%s' done", dst);
 
 fini:
 	rc = ct_fini(&hcp, hai, hp_flags, rc);
