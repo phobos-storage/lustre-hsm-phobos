@@ -1117,7 +1117,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 	/* restore loads and sets the LOVEA w/o interpreting it to avoid
 	 * dependency on the structure format. */
-	rc = ct_load_stripe(src, lov_buf, &lov_size);
+	rc = ct_load_stripe(src, lov_bufdbg, &lov_sizedbg);
 	if (rc < 0) {
 		CT_WARN("cannot get stripe rules for '%s' (%s), use default",
 			src, strerror(-rc));
@@ -1126,7 +1126,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		open_flags |= O_LOV_DELAY_CREATE;
 		set_lovea = true;
 	}
-	bin2hexstr(lov_buf, lov_size, hexstripefs);
+	bin2hexstr(lov_bufdbg, lov_sizedbg, hexstripefs);
 	printf("i-----> hexstripe in FS = %s\n", hexstripefs); 
 
 	/* Get stripe from phobos */
@@ -1134,7 +1134,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	printf("i-----> phobos_op_getstripe: rc =%d\n", rc); 
 	printf("i-----> hexstripe in phobos = %s\n", hexstripephobos); 
 
-	lov_sizedbg = hexstr2bin(hexstripephobos, lov_bufdbg);
+	lov_size = hexstr2bin(hexstripephobos, lov_buf);
 	printf("----> lov_size=%d  lov_sizedbg=%d isizeof=%d\n",
 	       (int)lov_size, (int)lov_sizedbg, sizeof(struct lov_user_md)); 
 	printf("memcmp =%d\n", memcmp(lov_buf, lov_bufdbg, lov_size)); 
