@@ -25,13 +25,12 @@
  *
  * Copyright (c) 2013, 2016, Intel Corporation.
  */
-/* HSM copytool program for POSIX filesystem-based HSM's.
+/* HSM copytool program for Phobos HSM's.
  *
  * An HSM copytool daemon acts on action requests from Lustre to copy files
  * to and from an HSM archive system. This one in particular makes regular
- * POSIX filesystem calls to a given path, where an HSM is presumably mounted.
+ * call to Phobos
  *
- * This particular tool can also import an existing HSM archive.
  */
 
 #ifndef _GNU_SOURCE
@@ -96,13 +95,9 @@ struct options {
 	int			 o_report_int;
 	unsigned long long	 o_bandwidth;
 	size_t			 o_chunk_size;
-	enum ct_action		 o_action;
 	char			*o_event_fifo;
 	char			*o_mnt;
 	int			 o_mnt_fd;
-	char			*o_hsm_root;
-	char			*o_src; /* for import, or rebind */
-	char			*o_dst; /* for import, or rebind */
 };
 
 /* everything else is zeroed */
@@ -116,8 +111,6 @@ struct options opt = {
  * for us. Additionally open one on the archive FS root to make sure
  * it doesn't drop out from under us (and remind the admin to shutdown
  * the copytool before unmounting). */
-
-static int arc_fd = -1;
 
 static int err_major;
 static int err_minor;
@@ -164,8 +157,7 @@ static void usage(const char *name, int rc)
 	"as a command line tool\n"
 	"The Lustre HSM daemon acts on action requests from Lustre\n"
 	"to copy files to and from an HSM archive system.\n"
-	"This POSIX-flavored daemon makes regular POSIX filesystem calls\n"
-	"to an HSM mounted at a given hsm_root.\n"
+	"This Phobos-flavored daemon makes calls toà a Phobos storage\n"
 	"   --daemon            Daemon mode, run in background\n"
 	" Options:\n"
 	"   --no-attr           Don't copy file attributes\n"
@@ -173,23 +165,9 @@ static void usage(const char *name, int rc)
 	"   --no-xattr          Don't copy file extended attributes\n"
 	"The Lustre HSM tool performs administrator-type actions\n"
 	"on a Lustre HSM archive.\n"
-	"This POSIX-flavored tool can link an existing HSM namespace\n"
+	"This Phobos-flavored tool can link an existing HSM namespace\n"
 	"into a Lustre filesystem.\n"
 	" Usage:\n"
-	"   %s [options] --import <src> <dst> <lustre_mount_point>\n"
-	"      import an archived subtree from\n"
-	"       <src> (FID or relative path to hsm_root) into the Lustre\n"
-	"             filesystem at\n"
-	"       <dst> (absolute path)\n"
-	"   %s [options] --rebind <old_FID> <new_FID> <lustre_mount_point>\n"
-	"      rebind an entry in the HSM to a new FID\n"
-	"       <old_FID> old FID the HSM entry is bound to\n"
-	"       <new_FID> new FID to bind the HSM entry to\n"
-	"   %s [options] --rebind <list_file> <lustre_mount_point>\n"
-	"      perform the rebind operation for all FID in the list file\n"
-	"       each line of <list_file> consists of <old_FID> <new_FID>\n"
-	"   %s [options] --max-sequence <fsname>\n"
-	"       return the max fid sequence of archived files\n"
 	"   --abort-on-error          Abort operation on major error\n"
 	"   -A, --archive <#>         Archive number (repeatable)\n"
 	"   -b, --bandwidth <bw>      Limit I/O bandwidth (unit can be used\n,"
@@ -198,12 +176,11 @@ static void usage(const char *name, int rc)
 	"   -c, --chunk-size <sz>     I/O size used during data copy\n"
 	"                             (unit can be used, default is MB)\n"
 	"   -f, --event-fifo <path>   Write events stream to fifo\n"
-	"   -p, --hsm-root <path>     Target HSM mount point\n"
 	"   -q, --quiet               Produce less verbose output\n"
 	"   -u, --update-interval <s> Interval between progress reports sent\n"
 	"                             to Coordinator\n"
 	"   -v, --verbose             Produce more verbose output\n",
-	cmd_name, cmd_name, cmd_name, cmd_name, cmd_name);
+	cmd_name);
 
 	exit(rc);
 }
@@ -230,7 +207,6 @@ static int ct_parseopts(int argc, char * const *argv)
 	{ .val = 'M',	.name = "max-sequence",	.has_arg = no_argument },
 	{ .val = 'M',	.name = "max_sequence",	.has_arg = no_argument },
 	{ .val = 'p',	.name = "hsm-root",	.has_arg = required_argument },
-	{ .val = 'p',	.name = "hsm_root",	.has_arg = required_argument },
 	{ .val = 'q',	.name = "quiet",	.has_arg = no_argument },
 	{ .val = 'r',	.name = "rebind",	.has_arg = no_argument },
 	{ .val = 'u',	.name = "update-interval",
@@ -253,7 +229,7 @@ static int ct_parseopts(int argc, char * const *argv)
 	if (opt.o_archive_id == NULL)
 		return -ENOMEM;
 repeat:
-	while ((c = getopt_long(argc, argv, "A:b:c:f:hiMp:qru:v",
+	while ((c = getopt_long(argc, argv, "A:b:c:f:hqu:v",
 				long_opts, NULL)) != -1) {
 		switch (c) {
 		case 'A': {
@@ -321,20 +297,8 @@ repeat:
 			break;
 		case 'h':
 			usage(argv[0], 0);
-		case 'i':
-			opt.o_action = CA_IMPORT;
-			break;
-		case 'M':
-			opt.o_action = CA_MAXSEQ;
-			break;
-		case 'p':
-			opt.o_hsm_root = optarg;
-			break;
 		case 'q':
 			opt.o_verbose--;
-			break;
-		case 'r':
-			opt.o_action = CA_REBIND;
 			break;
 		case 'u':
 			opt.o_report_int = atoi(optarg);
@@ -355,37 +319,6 @@ repeat:
 		}
 	}
 
-	switch (opt.o_action) {
-	case CA_IMPORT:
-		/* src dst mount_point */
-		if (argc != optind + 3) {
-			rc = -EINVAL;
-			CT_ERROR(rc, "--import requires 2 arguments");
-			return rc;
-		}
-		opt.o_src = argv[optind++];
-		opt.o_dst = argv[optind++];
-		break;
-	case CA_REBIND:
-		/* FID1 FID2 mount_point or FILE mount_point */
-		if (argc == optind + 2) {
-			opt.o_src = argv[optind++];
-			opt.o_dst = NULL;
-		} else if (argc == optind + 3) {
-			opt.o_src = argv[optind++];
-			opt.o_dst = argv[optind++];
-		} else {
-			rc = -EINVAL;
-			CT_ERROR(rc, "--rebind requires 1 or 2 arguments");
-			return rc;
-		}
-		break;
-	case CA_MAXSEQ:
-	default:
-		/* just mount point */
-		break;
-	}
-
 	if (argc != optind + 1) {
 		rc = -EINVAL;
 		CT_ERROR(rc, "no mount point specified");
@@ -395,29 +328,8 @@ repeat:
 	opt.o_mnt = argv[optind];
 	opt.o_mnt_fd = -1;
 
-	CT_TRACE("action=%d src=%s dst=%s mount_point=%s",
-		 opt.o_action, opt.o_src, opt.o_dst, opt.o_mnt);
-
-	if (opt.o_hsm_root == NULL) {
-		rc = -EINVAL;
-		CT_ERROR(rc, "must specify a root directory for the backend");
-		return rc;
-	}
-
-	if (opt.o_action == CA_IMPORT) {
-		if (opt.o_src && opt.o_src[0] == '/') {
-			rc = -EINVAL;
-			CT_ERROR(rc,
-				 "source path must be relative to HSM root");
-			return rc;
-		}
-
-		if (opt.o_dst && opt.o_dst[0] != '/') {
-			rc = -EINVAL;
-			CT_ERROR(rc, "destination path must be absolute");
-			return rc;
-		}
-	}
+	CT_TRACE("mount_point=%s",
+		 opt.o_mnt);
 
 	return 0;
 }
@@ -732,8 +644,6 @@ unsigned int hexstr2bin(const char *hex, char *out)
         tmp[3] = 0;
         sscanf(tmp, "%02x|", &len);
 
-        printf("len=%d\n", len);
-
         /* Remind that 3 first characters encodes the size */
         out[0] = 0;
         for (i=0; i < len; i++) {
@@ -756,38 +666,6 @@ unsigned int hexstr2bin(const char *hex, char *out)
 /*
  * Copytool functions (with ct_ prefix)
  */
-
-/* mkdir -p path */
-static int ct_mkdir_p(const char *path)
-{
-	char	*saved, *ptr;
-	int	 rc;
-
-	ptr = strdup(path);
-	if (ptr == NULL)
-		return -errno;
-
-	saved = ptr;
-	while (*ptr == '/')
-		ptr++;
-
-	while ((ptr = strchr(ptr, '/')) != NULL) {
-		*ptr = '\0';
-		rc = mkdir(saved, DIR_PERM);
-		*ptr = '/';
-		if (rc < 0 && errno != EEXIST) {
-			rc = -errno;
-			CT_ERROR(rc, "cannot mkdir '%s'", path);
-			free(saved);
-			return rc;
-		}
-		ptr++;
-	}
-
-	free(saved);
-
-	return 0;
-}
 
 static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
@@ -841,20 +719,6 @@ static int ct_path_lustre(char *buf, int sz, const char *mnt,
 {
 	return snprintf(buf, sz, "%s/%s/fid/"DFID_NOBRACE, mnt,
 			dot_lustre_name, PFID(fid));
-}
-
-static int ct_path_archive(char *buf, int sz, const char *archive_dir,
-			   const struct lu_fid *fid)
-{
-	return snprintf(buf, sz, "%s/%04x/%04x/%04x/%04x/%04x/%04x/"
-			DFID_NOBRACE, archive_dir,
-			(fid)->f_oid       & 0xFFFF,
-			(fid)->f_oid >> 16 & 0xFFFF,
-			(unsigned int)((fid)->f_seq       & 0xFFFF),
-			(unsigned int)((fid)->f_seq >> 16 & 0xFFFF),
-			(unsigned int)((fid)->f_seq >> 32 & 0xFFFF),
-			(unsigned int)((fid)->f_seq >> 48 & 0xFFFF),
-			PFID(fid));
 }
 
 static bool ct_is_retryable(int err)
@@ -972,8 +836,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini_major;
 	}
 
-	printf("----> ct_archive: STRIPE IN HEXA: %s\n", hexstripe);
-		
 	/* Do phobos xfer */
 	rc = phobos_op_put(&hai->hai_fid, src_fd, hexstripe);
 	CT_TRACE("phobos_put (archive): rc=%d", rc);
@@ -1039,9 +901,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		open_flags |= O_LOV_DELAY_CREATE;
 		set_lovea = true;
 	}
-	printf("i-----> phobos_op_getstripe: rc =%d\n", rc); 
-	printf("i-----> hexstripe in phobos = %s\n", hexstripe); 
-
 	lov_size = hexstr2bin(hexstripe, lov_buf);
 
 	/* start the restore operation */
@@ -1059,7 +918,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* build volatile "file name", for messages */
-	snprintf(dst, sizeof(dst), "{VOLATILE}="DFID, PFID(&dfid));
+	snprintf(dst, sizeof(dst), DFID, PFID(&dfid));
 
 	CT_TRACE("restoring data from to '%s'", dst);
 
@@ -1106,42 +965,18 @@ fini:
 static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
-	char				 dst[PATH_MAX], attr[PATH_MAX + 4];
 	int				 rc;
 
 	rc = ct_begin(&hcp, hai);
 	if (rc < 0)
 		goto fini;
 
-	ct_path_archive(dst, sizeof(dst), opt.o_hsm_root, &hai->hai_fid);
+	// CT_TRACE("removing file '%s'", dst);
 
-	CT_TRACE("removing file '%s'", dst);
-
+	/** @todo : add remove as it will be available in Phobos */
 	if (opt.o_dry_run) {
 		rc = 0;
 		goto fini;
-	}
-
-	rc = unlink(dst);
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot unlink '%s'", dst);
-		err_minor++;
-		goto fini;
-	}
-
-	snprintf(attr, sizeof(attr), "%s.lov", dst);
-	rc = unlink(attr);
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot unlink '%s'", attr);
-		err_minor++;
-
-		/* ignore the error when lov file does not exist. */
-		if (rc == -ENOENT)
-			rc = 0;
-		else
-			goto fini;
 	}
 
 fini:
@@ -1259,401 +1094,6 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 			 opt.o_mnt);
 
 	pthread_attr_destroy(&attr);
-	return 0;
-}
-
-static int ct_import_one(const char *src, const char *dst)
-{
-	char		newarc[PATH_MAX];
-	struct lu_fid	fid;
-	struct stat	st;
-	int		rc;
-
-	CT_TRACE("importing '%s' from '%s'", dst, src);
-
-	if (stat(src, &st) < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot stat '%s'", src);
-		return rc;
-	}
-
-	if (opt.o_dry_run)
-		return 0;
-
-	rc = llapi_hsm_import(dst,
-			      opt.o_archive_id_used ?
-			      opt.o_archive_id[0] : 0,
-			      &st, 0, 0, 0, 0, NULL, &fid);
-	if (rc < 0) {
-		CT_ERROR(rc, "cannot import '%s' from '%s'", dst, src);
-		return rc;
-	}
-
-	ct_path_archive(newarc, sizeof(newarc), opt.o_hsm_root, &fid);
-
-	rc = ct_mkdir_p(newarc);
-	if (rc < 0) {
-		CT_ERROR(rc, "mkdir_p '%s' failed", newarc);
-		err_major++;
-		return rc;
-
-	}
-
-	/* Lots of choices now: mv, ln, ln -s ? */
-	rc = link(src, newarc); /* hardlink */
-	if (rc < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot link '%s' to '%s'", newarc, src);
-		err_major++;
-		return rc;
-	}
-	CT_TRACE("imported '%s' from '%s'=='%s'", dst, newarc, src);
-
-	return 0;
-}
-
-static char *path_concat(const char *dirname, const char *basename)
-{
-	char	*result;
-	int	 rc;
-
-	rc = asprintf(&result, "%s/%s", dirname, basename);
-	if (rc < 0)
-		return NULL;
-
-	return result;
-}
-
-static int ct_import_fid(const struct lu_fid *import_fid)
-{
-	char	fid_path[PATH_MAX];
-	int	rc;
-
-	ct_path_lustre(fid_path, sizeof(fid_path), opt.o_mnt, import_fid);
-	rc = access(fid_path, F_OK);
-	if (rc == 0 || errno != ENOENT) {
-		rc = (errno == 0) ? -EEXIST : -errno;
-		CT_ERROR(rc, "cannot import '"DFID"'", PFID(import_fid));
-		return rc;
-	}
-
-	ct_path_archive(fid_path, sizeof(fid_path), opt.o_hsm_root,
-			import_fid);
-
-	CT_TRACE("Resolving "DFID" to %s", PFID(import_fid), fid_path);
-
-	return ct_import_one(fid_path, opt.o_dst);
-}
-
-static int ct_import_recurse(const char *relpath)
-{
-	DIR		*dir;
-	struct dirent	*ent;
-	char		*srcpath, *newpath;
-	struct lu_fid	 import_fid;
-	int		 rc;
-
-	if (relpath == NULL)
-		return -EINVAL;
-
-	/* Is relpath a FID? */
-	rc = llapi_fid_parse(relpath, &import_fid, NULL);
-	if (!rc)
-		return ct_import_fid(&import_fid);
-
-	srcpath = path_concat(opt.o_hsm_root, relpath);
-	if (srcpath == NULL) {
-		err_major++;
-		return -ENOMEM;
-	}
-
-	dir = opendir(srcpath);
-	if (dir == NULL) {
-		/* Not a dir, or error */
-		if (errno == ENOTDIR) {
-			/* Single regular file case, treat o_dst as absolute
-			   final location. */
-			rc = ct_import_one(srcpath, opt.o_dst);
-		} else {
-			rc = -errno;
-			CT_ERROR(rc, "cannot opendir '%s'", srcpath);
-			err_major++;
-		}
-		free(srcpath);
-		return rc;
-	}
-	free(srcpath);
-
-	while ((ent = readdir(dir)) != NULL) {
-		if (!strcmp(ent->d_name, ".") ||
-		    !strcmp(ent->d_name, ".."))
-			continue;
-
-		/* New relative path */
-		newpath = path_concat(relpath, ent->d_name);
-		if (newpath == NULL) {
-			err_major++;
-			rc = -ENOMEM;
-			goto out;
-		}
-
-		if (ent->d_type == DT_DIR) {
-			rc = ct_import_recurse(newpath);
-		} else {
-			char src[PATH_MAX];
-			char dst[PATH_MAX];
-
-			sprintf(src, "%s/%s", opt.o_hsm_root, newpath);
-			sprintf(dst, "%s/%s", opt.o_dst, newpath);
-			/* Make the target dir in the Lustre fs */
-			rc = ct_mkdir_p(dst);
-			if (rc == 0) {
-				/* Import the file */
-				rc = ct_import_one(src, dst);
-			} else {
-				CT_ERROR(rc, "ct_mkdir_p '%s' failed", dst);
-				err_major++;
-			}
-		}
-
-		if (rc != 0) {
-			CT_ERROR(rc, "cannot import '%s'", newpath);
-			if (err_major && opt.o_abort_on_error) {
-				free(newpath);
-				goto out;
-			}
-		}
-		free(newpath);
-	}
-
-	rc = 0;
-out:
-	closedir(dir);
-	return rc;
-}
-
-static int ct_rebind_one(const struct lu_fid *old_fid,
-			 const struct lu_fid *new_fid)
-{
-	char	src[PATH_MAX];
-	char	dst[PATH_MAX];
-	int	rc;
-
-	CT_TRACE("rebind "DFID" to "DFID, PFID(old_fid), PFID(new_fid));
-
-	ct_path_archive(src, sizeof(src), opt.o_hsm_root, old_fid);
-	ct_path_archive(dst, sizeof(dst), opt.o_hsm_root, new_fid);
-
-	if (!opt.o_dry_run) {
-		char src_attr[PATH_MAX + 4];
-		char dst_attr[PATH_MAX + 4];
-
-		ct_mkdir_p(dst);
-		if (rename(src, dst)) {
-			rc = -errno;
-			CT_ERROR(rc, "cannot rename '%s' to '%s'", src, dst);
-			return -errno;
-		}
-		/* rename lov file */
-		snprintf(src_attr, sizeof(src_attr), "%s.lov", src);
-		snprintf(dst_attr, sizeof(dst_attr), "%s.lov", dst);
-		if (rename(src_attr, dst_attr))
-			CT_ERROR(errno, "cannot rename '%s' to '%s'",
-				 src_attr, dst_attr);
-
-	}
-	return 0;
-}
-
-static bool fid_is_file(struct lu_fid *fid)
-{
-	return fid_is_norm(fid) || fid_is_igif(fid);
-}
-
-static bool should_ignore_line(const char *line)
-{
-	int	i;
-
-	for (i = 0; line[i] != '\0'; i++) {
-		if (isspace(line[i]))
-			continue;
-		else if (line[i] == '#')
-			return true;
-		else
-			return false;
-	}
-
-	return true;
-}
-
-static int ct_rebind_list(const char *list)
-{
-	int		 rc;
-	FILE		*filp;
-	ssize_t		 r;
-	char		*line = NULL;
-	size_t		 line_size = 0;
-	unsigned int	 nl = 0;
-	unsigned int	 ok = 0;
-
-	filp = fopen(list, "r");
-	if (filp == NULL) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open '%s'", list);
-		return rc;
-	}
-
-	/* each line consists of 2 FID */
-	while ((r = getline(&line, &line_size, filp)) != -1) {
-		struct lu_fid old_fid;
-		struct lu_fid new_fid;
-		char *next_fid;
-
-		/* Ignore empty and commented out ('#...') lines. */
-		if (should_ignore_line(line))
-			continue;
-
-		nl++;
-
-		rc = llapi_fid_parse(line, &old_fid, &next_fid);
-		if (rc)
-			goto error;
-		rc = llapi_fid_parse(next_fid, &new_fid, NULL);
-		if (rc)
-			goto error;
-		if (!fid_is_file(&old_fid) || !fid_is_file(&new_fid))
-			rc = -EINVAL;
-		if (rc) {
-error:			CT_ERROR(rc, "%s:%u: two FIDs expected in '%s'",
-				 list, nl, line);
-			err_major++;
-			continue;
-		}
-
-		if (ct_rebind_one(&old_fid, &new_fid))
-			err_major++;
-		else
-			ok++;
-	}
-
-	fclose(filp);
-
-	if (line)
-		free(line);
-
-	/* return 0 if all rebinds were successful */
-	CT_TRACE("%u lines read from '%s', %u rebind successful", nl, list, ok);
-
-	return ok == nl ? 0 : -1;
-}
-
-static int ct_rebind(void)
-{
-	int rc;
-
-	if (opt.o_dst) {
-		struct lu_fid old_fid;
-		struct lu_fid new_fid;
-
-		rc = llapi_fid_parse(opt.o_src, &old_fid, NULL);
-		if (!rc && !fid_is_file(&old_fid))
-			rc = -EINVAL;
-		if (rc) {
-			CT_ERROR(rc, "invalid source FID '%s'", opt.o_src);
-			return rc;
-		}
-
-		rc = llapi_fid_parse(opt.o_dst, &new_fid, NULL);
-		if (!rc && !fid_is_file(&new_fid))
-			rc = -EINVAL;
-		if (rc) {
-			CT_ERROR(rc, "invalid destination FID '%s'", opt.o_dst);
-			return rc;
-		}
-
-		rc = ct_rebind_one(&old_fid, &new_fid);
-
-		return rc;
-	}
-
-	/* o_src is a list file */
-	rc = ct_rebind_list(opt.o_src);
-
-	return rc;
-}
-
-static int ct_dir_level_max(const char *dirpath, __u16 *sub_seqmax)
-{
-	DIR		*dir;
-	int		 rc;
-	__u16		 sub_seq;
-	struct dirent *ent;
-
-	*sub_seqmax = 0;
-
-	dir = opendir(dirpath);
-	if (dir == NULL) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open directory '%s'", opt.o_hsm_root);
-		return rc;
-	}
-
-	do {
-		errno = 0;
-		ent = readdir(dir);
-		if (ent == NULL) {
-			/* end of directory.
-			 * rc is 0 and seqmax contains the max value. */
-			rc = -errno;
-			if (rc)
-				CT_ERROR(rc, "cannot readdir '%s'", dirpath);
-			goto out;
-		}
-
-		if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
-			continue;
-
-		if (sscanf(ent->d_name, "%hx", &sub_seq) != 1) {
-			CT_TRACE("'%s' has an unexpected dirname format, "
-				 "skip entry", ent->d_name);
-			continue;
-		}
-		if (sub_seq > *sub_seqmax)
-			*sub_seqmax = sub_seq;
-	} while (1);
-out:
-	closedir(dir);
-	return rc;
-}
-
-static int ct_max_sequence(void)
-{
-	int	rc, i;
-	char	path[PATH_MAX];
-	__u64	seq = 0;
-	__u16	subseq;
-
-	snprintf(path, sizeof(path), "%s", opt.o_hsm_root);
-	/* FID sequence is stored in top-level directory names:
-	 * hsm_root/16bits (high weight)/16 bits/16 bits/16 bits (low weight).
-	 */
-	for (i = 0; i < 4; i++) {
-		size_t path_len;
-
-		rc = ct_dir_level_max(path, &subseq);
-		if (rc != 0)
-			return rc;
-		seq |= ((__u64)subseq << ((3 - i) * 16));
-		path_len = strlen(path);
-		rc = snprintf(path + path_len, sizeof(path) - path_len,
-			      "/%04x", subseq);
-		if (rc >= (sizeof(path) - path_len))
-			return -E2BIG;
-		path[sizeof(path) - 1] = '\0';
-	}
-
-	printf("max_sequence: %#jx\n", (uintmax_t)seq);
-
 	return 0;
 }
 
@@ -1785,13 +1225,6 @@ static int ct_setup(void)
 	/* set llapi message level */
 	llapi_msg_set_level(opt.o_verbose);
 
-	arc_fd = open(opt.o_hsm_root, O_RDONLY);
-	if (arc_fd < 0) {
-		rc = -errno;
-		CT_ERROR(rc, "cannot open archive at '%s'", opt.o_hsm_root);
-		return rc;
-	}
-
 	rc = llapi_search_fsname(opt.o_mnt, fs_name);
 	if (rc < 0) {
 		CT_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
@@ -1823,15 +1256,6 @@ static int ct_cleanup(void)
 		}
 	}
 
-	if (arc_fd >= 0) {
-		rc = close(arc_fd);
-		if (rc < 0) {
-			rc = -errno;
-			CT_ERROR(rc, "cannot close archive root directory");
-			return rc;
-		}
-	}
-
 	if (opt.o_archive_id_cnt > 0) {
 		free(opt.o_archive_id);
 		opt.o_archive_id = NULL;
@@ -1856,25 +1280,11 @@ int main(int argc, char **argv)
 	if (rc < 0)
 		goto error_cleanup;
 
-	switch (opt.o_action) {
-	case CA_IMPORT:
-		rc = ct_import_recurse(opt.o_src);
-		break;
-	case CA_REBIND:
-		rc = ct_rebind();
-		break;
-	case CA_MAXSEQ:
-		rc = ct_max_sequence();
-		break;
-	default:
-		rc = ct_run();
-		break;
-	}
+	rc = ct_run();
 
-	if (opt.o_action != CA_MAXSEQ)
-		CT_TRACE("process finished, errs: %d major, %d minor,"
-			 " rc=%d (%s)", err_major, err_minor, rc,
-			 strerror(-rc));
+	CT_TRACE("process finished, errs: %d major, %d minor,"
+		 " rc=%d (%s)", err_major, err_minor, rc,
+		 strerror(-rc));
 
 error_cleanup:
 	ct_cleanup();
