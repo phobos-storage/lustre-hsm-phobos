@@ -589,7 +589,7 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 		return -EINVAL;
 	
 	/* /!\ additionnal letter only because of pcocc side effect */
-	return sprintf(objid, "H"DFID, PFID(fid));
+	return sprintf(objid, "I"DFID, PFID(fid));
 }
 
 static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
@@ -668,6 +668,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
         struct pho_xfer_desc    xfer = {0};
         int rc;
 	char objid[MAXNAMLEN];
+        const char *val = NULL;
 
 	rc = fid2objid(fid, objid);
 	if (rc < 0)
@@ -685,15 +686,9 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
 	}
 	
         if (pho_attrs_is_empty(&xfer.xd_attrs))
-                printf("NO attr found\n");
-        else {
-                const char *val = NULL;
-
-                printf("We could find attrs\n");
-
+		return -ENOENT;
+	else {
                 val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
-                printf("val= %p %s\n", val, val);
-
 		strcpy(hexstripe, val);
         }
 
@@ -705,60 +700,42 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
 static void bin2hexstr(const char *bin, size_t len, char *out)
 {
         size_t  i;
+        char tmp[10];
 
         if (bin == NULL || len == 0)
                 return;
 
+        out[0] = 0;
         for (i=0; i<len; i++) {
-                out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
-                out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+                sprintf(tmp, "%02x", bin[i]);
+                strcat(out, tmp);
         }
-        out[len*2] = '\0';
 }
 
-static int hexchr2bin(const char hex, char *out)
+unsigned int hexstr2bin(const char *hex, char *out)
 {
-        if (out == NULL)
-                return 0;
+        unsigned int len ;
+        char tmp[10];
+        size_t  i;
 
-        if (hex >= '0' && hex <= '9') {
-                *out = hex - '0';
-        } else if (hex >= 'A' && hex <= 'F') {
-                *out = hex - 'A' + 10;
-        } else if (hex >= 'a' && hex <= 'f') {
-                *out = hex - 'a' + 10;
-        } else {
-                return 0;
-        }
-
-        return 1;
-}
-
-static size_t hexstr2bin(const char *hex, char *out)
-{
-        size_t len;
-        char   b1;
-        char   b2;
-        size_t i;
-
-        if (hex == NULL || *hex == '\0' || out == NULL)
+        if (hex == NULL || out == 0)
                 return 0;
 
         len = strlen(hex);
         if (len % 2 != 0)
                 return 0;
+
         len /= 2;
 
-        memset(out, 'A', len);
-        for (i=0; i<len; i++) {
-                if (!hexchr2bin(hex[i*2], &b1) || !hexchr2bin(hex[i*2+1], &b2)) {
-                        return 0;
-                }
-                out[i] = (b1 << 4) | b2;
+        for (i=0; i < len; i++) {
+                tmp[0] = hex[2*i];
+                tmp[1] = hex[2*i+1];
+                tmp[2] = 0;
+                sscanf(tmp, "%02x", (unsigned int *)&(out[i]));
         }
+
         return len;
 }
-
 
 /*
  * Copytool functions (with ct_ prefix)
