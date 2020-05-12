@@ -809,10 +809,6 @@ static int ct_save_stripe(int src_fd, const char *src, const char *dst, char *he
 		return rc;
 	}
 
-	/* Save the stripe as an hexa string to save it as 
- 	 * an attr in Phobos object's metadata */ 
-	bin2hexstr((const char *)lov_buf, xattr_size, hexstripe);
-
 	/* read content of read xattr */
 	lum = (struct lov_user_md *)lov_buf;
 
@@ -829,6 +825,10 @@ static int ct_save_stripe(int src_fd, const char *src, const char *dst, char *he
 		CT_ERROR(rc, "cannot open '%s'", lov_file);
 		goto err_cleanup;
 	}
+
+	/* Save the stripe as an hexa string to save it as 
+ 	 * an attr in Phobos object's metadata */ 
+	bin2hexstr((const char *)lov_buf, xattr_size, hexstripe);
 
 	rc = write(fd, lum, xattr_size);
 	if (rc < 0) {
@@ -1135,8 +1135,8 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	printf("i-----> hexstripe in phobos = %s\n", hexstripephobos); 
 
 	lov_sizedbg = hexstr2bin(hexstripephobos, lov_bufdbg);
-	printf("----> lov_size=%d  lov_sizedbg=%d\n",
-	       (int)lov_size, (int)lov_sizedbg); 
+	printf("----> lov_size=%d  lov_sizedbg=%d isizeof=%d\n",
+	       (int)lov_size, (int)lov_sizedbg, sizeof(struct lov_user_md)); 
 	printf("memcmp =%d\n", memcmp(lov_buf, lov_bufdbg, lov_size)); 
 	printf("strcmp =%d\n", strcmp(hexstripephobos, hexstripefs)); 
 
