@@ -513,13 +513,25 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 	return sprintf(objid, "K%s:"DFID, fs_name, PFID(fid));
 }
 
-static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
+static int phobos_op_put(const struct lu_fid *fid, char *altobjid, 
+			 const int fd, char *hexstripe)
 {
         struct pho_xfer_desc    xfer = {0};
         struct pho_attrs        attrs = {0};
         int rc;
         struct stat st;
 	char objid[MAXNAMLEN];
+	char *obj = NULL; 
+
+	/* If provided altobjid as objectid */
+	if (altobjid)
+		obj = altobjid; 
+	else {
+		rc = fid2objid(fid, objid);
+		if (rc < 0)
+			return rc;
+		obj = objid;
+	}	
 
 	/*
  	 * @todo: 
@@ -529,9 +541,6 @@ static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
  	 *    - remove that stupid exists that are here for debug purpose
  	 *    - management of the size of string objid
  	 */
-	rc = fid2objid(fid, objid);
-	if (rc < 0)
-		return rc;
 
         rc = pho_attr_set(&attrs, "program", "copytool");
         if (rc)
@@ -551,7 +560,7 @@ static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
         xfer.xd_params.put.size = st.st_size;
 
         xfer.xd_params.put.family = PHO_RSC_DIR;
-        xfer.xd_objid = objid;
+        xfer.xd_objid = obj;
         xfer.xd_attrs = attrs;
 
         rc = phobos_put(&xfer, 1, NULL, NULL);
@@ -564,21 +573,28 @@ static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
         return rc;
 }
 
-static int phobos_op_get(const struct lu_fid *fid, int fd)
+static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
 {
         struct pho_xfer_desc    xfer = {0};
         int rc;
 	char objid[MAXNAMLEN];
+	char *obj = NULL;
 
-	rc = fid2objid(fid, objid);
-	if (rc < 0)
-	    exit(EXIT_FAILURE);
+	/* If provided altobjid as objectid */
+	if (altobjid)
+		obj = altobjid; 
+	else {
+		rc = fid2objid(fid, objid);
+		if (rc < 0)
+			return rc;
+		obj = objid;
+	}	
 
         memset(&xfer, 0, sizeof(xfer));
         xfer.xd_op = PHO_XFER_OP_GET;
         xfer.xd_fd = fd;
         xfer.xd_flags = 0;
-        xfer.xd_objid = objid;
+        xfer.xd_objid = obj;
 
         rc = phobos_get(&xfer, 1, NULL, NULL);
 
@@ -590,19 +606,27 @@ static int phobos_op_get(const struct lu_fid *fid, int fd)
         return rc;
 }
 
-static int phobos_op_getstripe(const struct lu_fid *fid, char *hexstripe)
+static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
+			       char *hexstripe)
 {
         struct pho_xfer_desc    xfer = {0};
         int rc;
 	char objid[MAXNAMLEN];
         const char *val = NULL;
+	char *obj = NULL;
 
-	rc = fid2objid(fid, objid);
-	if (rc < 0)
-	    exit(EXIT_FAILURE);
+	/* If provided altobjid as objectid */
+	if (altobjid)
+		obj = altobjid; 
+	else {
+		rc = fid2objid(fid, objid);
+		if (rc < 0)
+			return rc;
+		obj = objid;
+	}	
 
         memset(&xfer, 0, sizeof(xfer));
-	xfer.xd_objid = objid;
+	xfer.xd_objid = obj;
 	xfer.xd_op = PHO_XFER_OP_GETMD;
 	xfer.xd_flags = 0;
 
@@ -854,7 +878,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* Do phobos xfer */
-	rc = phobos_op_put(&hai->hai_fid, src_fd, hexstripe);
+	rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe);
 	CT_TRACE("phobos_put (archive): rc=%d", rc);
 	if (rc)
 		goto fini_major;
@@ -909,7 +933,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 	/* restore loads and sets the LOVEA w/o interpreting it to avoid
 	 * dependency on the structure format. */
-	rc = phobos_op_getstripe(&hai->hai_fid, hexstripe);
+	rc = phobos_op_getstripe(&hai->hai_fid, NULL, hexstripe);
 	if (rc) {
 		CT_WARN("cannot get stripe rules for"DFID"  (%s), use default",
 			PFID(&hai->hai_fid), strerror(-rc));
@@ -964,7 +988,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* Do phobos xfer */
-	rc = phobos_op_get(&hai->hai_fid, dst_fd);
+	rc = phobos_op_get(&hai->hai_fid, NULL, dst_fd);
 	CT_TRACE("phobos_get (restore): rc=%d", rc);
 	/** @todo make clear rc management */
 
