@@ -65,6 +65,8 @@
 #define LL_HSM_ORIGIN_MAX_ARCHIVE    (sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX    "trusted."
 
+#define XATTR_TRUSTED_HSM_FSUID_DEFAULT	"trusted.hsm_fuid"
+
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
 /* HSM hash subdir permissions */
@@ -117,6 +119,7 @@ static int err_minor;
 
 static char cmd_name[PATH_MAX];
 static char fs_name[MAX_OBD_NAME + 1];
+static char trusted_hsm_fsuid[MAXNAMLEN];
 
 static struct hsm_copytool_private *ctdata;
 
@@ -177,6 +180,7 @@ static void usage(const char *name, int rc)
 	"                             (unit can be used, default is MB)\n"
 	"   -f, --event-fifo <path>   Write events stream to fifo\n"
 	"   -q, --quiet               Produce less verbose output\n"
+	"   -t, --hsm_fsuid           change value of xattr for restore\n"
 	"   -u, --update-interval <s> Interval between progress reports sent\n"
 	"                             to Coordinator\n"
 	"   -v, --verbose             Produce more verbose output\n",
@@ -214,6 +218,7 @@ static int ct_parseopts(int argc, char * const *argv)
 	{ .val = 'u',	.name = "update_interval",
 						.has_arg = required_argument },
 	{ .val = 'v',	.name = "verbose",	.has_arg = no_argument },
+	{ .val = 't',	.name = "hsm_fsuid", 	.has_arg = required_argument},
 	{ .name = NULL } };
 	unsigned long long value;
 	unsigned long long unit;
@@ -229,7 +234,7 @@ static int ct_parseopts(int argc, char * const *argv)
 	if (opt.o_archive_id == NULL)
 		return -ENOMEM;
 repeat:
-	while ((c = getopt_long(argc, argv, "A:b:c:f:hqu:v",
+	while ((c = getopt_long(argc, argv, "A:b:c:f:hqt:u:v",
 				long_opts, NULL)) != -1) {
 		switch (c) {
 		case 'A': {
@@ -294,6 +299,9 @@ repeat:
 			break;
 		case 'f':
 			opt.o_event_fifo = optarg;
+			break;
+		case 't':
+			strncpy(trusted_hsm_fsuid, optarg, MAXNAMLEN);
 			break;
 		case 'h':
 			usage(argv[0], 0);
@@ -1278,6 +1286,8 @@ int main(int argc, char **argv)
 {
 	int	rc;
 
+	strncpy(trusted_hsm_fsuid, XATTR_TRUSTED_HSM_FSUID_DEFAULT, MAXNAMLEN);
+
 	snprintf(cmd_name, sizeof(cmd_name), "%s", basename(argv[0]));
 	rc = ct_parseopts(argc, argv);
 	if (rc < 0) {
@@ -1290,7 +1300,8 @@ int main(int argc, char **argv)
 		goto error_cleanup;
 
 	/* Trace the lustre fsname */
-	CT_TRACE("fsÃ_name=%s", fs_name);
+	CT_TRACE("fs_name=%s", fs_name);
+	CT_TRACE("trusted_hsm_fsuid=%s", trusted_hsm_fsuid);
 
 	rc = ct_run();
 
