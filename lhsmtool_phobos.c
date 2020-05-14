@@ -499,9 +499,10 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 {
 	if (!objid || !fid)
 		return -EINVAL;
-	
+
+	/* object id is "fsname:fid" */	
 	/* /!\ additionnal letter only because of pcocc side effect */
-	return sprintf(objid, "K"DFID, PFID(fid));
+	return sprintf(objid, "%s:"DFID, fs_name, PFID(fid));
 }
 
 static int phobos_op_put(const struct lu_fid *fid, int fd, char *hexstripe)
@@ -1287,6 +1288,9 @@ int main(int argc, char **argv)
 	rc = ct_setup();
 	if (rc < 0)
 		goto error_cleanup;
+
+	/* Trace the lustre fsname */
+	CT_TRACE("fsÃ_name=%s", fs_name);
 
 	rc = ct_run();
 
