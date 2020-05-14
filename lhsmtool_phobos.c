@@ -708,6 +708,23 @@ unsigned int hexstr2bin(const char *hex, char *out)
  * Copytool functions (with ct_ prefix)
  */
 
+static int ct_get_altobjid(int src_fd, char *altobjid)
+{
+	char			 xattr_buf[XATTR_SIZE_MAX];
+	ssize_t			 xattr_size;
+
+	xattr_size = fgetxattr(src_fd, trusted_hsm_fsuid, xattr_buf,
+			       XATTR_SIZE_MAX);
+	if (xattr_size < 0) {
+		return errno;
+	}
+	
+	memcpy(altobjid, xattr_buf, xattr_size);
+	altobjid[xattr_size] = 0; /* String trailing zero */
+
+	return 0;
+}
+
 static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
 	char			 lov_buf[XATTR_SIZE_MAX];
@@ -909,6 +926,8 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private	*hcp = NULL;
 	char				 dst[PATH_MAX];
 	char				 hexstripe[PATH_MAX];
+	char				 altobjid[PATH_MAX];
+	char				*altobj = NULL;
 	char				 lov_buf[XATTR_SIZE_MAX];
 	size_t				 lov_size = sizeof(lov_buf);
 	int				 rc;
@@ -935,7 +954,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	 * dependency on the structure format. */
 	rc = phobos_op_getstripe(&hai->hai_fid, NULL, hexstripe);
 	if (rc) {
-		CT_WARN("cannot get stripe rules for"DFID"  (%s), use default",
+		CT_WARN("cannot get stripe rules for "DFID"  (%s), use default",
 			PFID(&hai->hai_fid), strerror(-rc));
 		set_lovea = false;
 	} else {
@@ -975,6 +994,14 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini;
 	}
 
+	rc = ct_get_altobjid(dst_fd, altobjid);
+	if (!rc) {
+		CT_TRACE("Found objid as xattr for "DFID" : %s",
+			 PFID(&hai->hai_fid), altobjid);
+		altobj = altobjid;
+	} else
+		altobj = NULL; 
+
 	if (set_lovea) {
 		/* the layout cannot be allocated through .fid so we have to
 		 * restore a layout */
@@ -988,7 +1015,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* Do phobos xfer */
-	rc = phobos_op_get(&hai->hai_fid, NULL, dst_fd);
+	rc = phobos_op_get(&hai->hai_fid, altobj, dst_fd);
 	CT_TRACE("phobos_get (restore): rc=%d", rc);
 	/** @todo make clear rc management */
 
