@@ -568,7 +568,7 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
 	pho_xfer_desc_destroy(&xfer);
 	
         if (rc)
-                pho_error(rc, "PUT failed");
+                CT_ERROR(rc, "PUT failed");
 
         return rc;
 }
@@ -601,7 +601,7 @@ static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
 	pho_xfer_desc_destroy(&xfer);
 
         if (rc)
-                pho_error(rc, "PUT failed");
+                CT_ERROR(rc, "PUT failed");
 
         return rc;
 }
@@ -632,7 +632,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
 
         rc = phobos_get(&xfer, 1, NULL, NULL);
         if (rc) {
-                pho_error(rc, "PUT failed");
+                CT_ERROR(rc, "PUT failed");
 		return rc;
 	}
 	
