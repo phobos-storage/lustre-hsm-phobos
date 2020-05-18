@@ -1,4 +1,6 @@
 /*
+ *  vim:expandtab:shiftwidth=4:tabstop=4:
+ *
  * GPL HEADER START
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -109,10 +111,12 @@ struct options opt = {
     .o_chunk_size = ONE_MB,
 };
 
-/* hsm_copytool_private will hold an open FD on the lustre mount point
+/*
+ * hsm_copytool_private will hold an open FD on the lustre mount point
  * for us. Additionally open one on the archive FS root to make sure
  * it doesn't drop out from under us (and remind the admin to shutdown
- * the copytool before unmounting). */
+ * the copytool before unmounting).
+ */
 
 static int err_major;
 static int err_minor;
@@ -257,7 +261,8 @@ repeat:
                 opt.o_archive_id_cnt = 0;
                 opt.o_archive_id_used = 0;
                 all_id = true;
-                CT_WARN("archive-id = 0 is found, any backend will be served\n");
+                CT_WARN("archive-id = 0 is found,"
+                        " any backend will be served\n");
                 goto repeat;
             }
 
@@ -359,13 +364,17 @@ enum fid_seq {
         /* sequence for local pre-defined FIDs listed in local_oid */
         FID_SEQ_LOCAL_FILE      = 0x200000001ULL,
         FID_SEQ_DOT_LUSTRE      = 0x200000002ULL,
-        /* sequence is used for local named objects FIDs generated
-         * by local_object_storage library */
+        /*
+         * sequence is used for local named objects FIDs generated
+         * by local_object_storage library
+         */
         FID_SEQ_LOCAL_NAME      = 0x200000003ULL,
-        /* Because current FLD will only cache the fid sequence, instead
-     * of oid on the client side, if the FID needs to be exposed to
+        /*
+         * Because current FLD will only cache the fid sequence, instead
+         * of oid on the client side, if the FID needs to be exposed to
          * clients sides, it needs to make sure all of fids under one
-         * sequence will be located in one MDT. */
+         * sequence will be located in one MDT.
+         */
         FID_SEQ_SPECIAL         = 0x200000004ULL,
         FID_SEQ_QUOTA           = 0x200000005ULL,
         FID_SEQ_QUOTA_GLB       = 0x200000006ULL,
@@ -373,8 +382,10 @@ enum fid_seq {
         FID_SEQ_LAYOUT_RBTREE   = 0x200000008ULL,
         /* sequence is used for update logs of cross-MDT operation */
         FID_SEQ_UPDATE_LOG      = 0x200000009ULL,
-        /* Sequence is used for the directory under which update logs
-         * are created. */
+        /*
+         * Sequence is used for the directory under which update logs
+         * are created.
+         */
         FID_SEQ_UPDATE_LOG_DIR  = 0x20000000aULL,
         FID_SEQ_NORMAL          = 0x200000400ULL,
         FID_SEQ_LOV_DEFAULT     = 0xffffffffffffffffULL
@@ -508,99 +519,99 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
     if (!objid || !fid)
         return -EINVAL;
 
-    /* object id is "fsname:fid" */    
+    /* object id is "fsname:fid" */
     /* /!\ additionnal letter only because of pcocc side effect */
     return sprintf(objid, "L%s:"DFID, fs_name, PFID(fid));
 }
 
-static int phobos_op_put(const struct lu_fid *fid, char *altobjid, 
+static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
              const int fd, char *hexstripe)
 {
-        struct pho_xfer_desc    xfer = {0};
-        struct pho_attrs        attrs = {0};
-        int rc;
-        struct stat st;
-    char objid[MAXNAMLEN];
-    char *obj = NULL; 
+    struct pho_xfer_desc    xfer = {0};
+    struct pho_attrs        attrs = {0};
+    int                     rc;
+    struct stat             st;
+    char                    objid[MAXNAMLEN];
+    char                   *obj = NULL;
 
     /* If provided altobjid as objectid */
     if (altobjid)
-        obj = altobjid; 
+        obj = altobjid;
     else {
         rc = fid2objid(fid, objid);
         if (rc < 0)
             return rc;
         obj = objid;
-    }    
+    }
 
-    /*
-      * @todo: 
-      *    - indentation style
-      *    - management of the size of string objid
-      */
+    /**
+     * @todo:
+     *    - indentation style
+     *    - management of the size of string objid
+     */
 
-        rc = pho_attr_set(&attrs, "program", "copytool");
-        if (rc)
-        return rc; 
-
-        rc = pho_attr_set(&attrs, "hexstripe", hexstripe);
-        if (rc)
-        return rc; 
-
-        memset(&xfer, 0, sizeof(xfer));
-        xfer.xd_op = PHO_XFER_OP_PUT;
-        xfer.xd_fd = fd;
-        xfer.xd_flags = 0;
-
-        /* fstat on lustre fd seems to fail */
-        fstat(xfer.xd_fd, &st);
-        xfer.xd_params.put.size = st.st_size;
-
-        xfer.xd_params.put.family = PHO_RSC_DIR;
-        xfer.xd_objid = obj;
-        xfer.xd_attrs = attrs;
-
-        rc = phobos_put(&xfer, 1, NULL, NULL);
-    
-    pho_xfer_desc_destroy(&xfer);
-    
-        if (rc)
-                CT_ERROR(rc, "PUT failed");
-
+    rc = pho_attr_set(&attrs, "program", "copytool");
+    if (rc)
         return rc;
+
+    rc = pho_attr_set(&attrs, "hexstripe", hexstripe);
+    if (rc)
+        return rc;
+
+    memset(&xfer, 0, sizeof(xfer));
+    xfer.xd_op = PHO_XFER_OP_PUT;
+    xfer.xd_fd = fd;
+    xfer.xd_flags = 0;
+
+    /* fstat on lustre fd seems to fail */
+    fstat(xfer.xd_fd, &st);
+    xfer.xd_params.put.size = st.st_size;
+
+    xfer.xd_params.put.family = PHO_RSC_DIR;
+    xfer.xd_objid = obj;
+    xfer.xd_attrs = attrs;
+
+    rc = phobos_put(&xfer, 1, NULL, NULL);
+
+    pho_xfer_desc_destroy(&xfer);
+
+    if (rc)
+        CT_ERROR(rc, "PUT failed");
+
+    return rc;
 }
 
 static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
 {
-        struct pho_xfer_desc    xfer = {0};
-        int rc;
+    struct pho_xfer_desc    xfer = {0};
+    int rc;
     char objid[MAXNAMLEN];
     char *obj = NULL;
 
     /* If provided altobjid as objectid */
     if (altobjid)
-        obj = altobjid; 
+        obj = altobjid;
     else {
         rc = fid2objid(fid, objid);
         if (rc < 0)
             return rc;
         obj = objid;
-    }    
+    }
 
-        memset(&xfer, 0, sizeof(xfer));
-        xfer.xd_op = PHO_XFER_OP_GET;
-        xfer.xd_fd = fd;
-        xfer.xd_flags = 0;
-        xfer.xd_objid = obj;
+    memset(&xfer, 0, sizeof(xfer));
+    xfer.xd_op = PHO_XFER_OP_GET;
+    xfer.xd_fd = fd;
+    xfer.xd_flags = 0;
+    xfer.xd_objid = obj;
 
-        rc = phobos_get(&xfer, 1, NULL, NULL);
+    rc = phobos_get(&xfer, 1, NULL, NULL);
 
     pho_xfer_desc_destroy(&xfer);
 
-        if (rc)
-                CT_ERROR(rc, "PUT failed");
+    if (rc)
+        CT_ERROR(rc, "PUT failed");
 
-        return rc;
+    return rc;
 }
 
 static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
@@ -614,15 +625,15 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
 
     /* If provided altobjid as objectid */
     if (altobjid)
-        obj = altobjid; 
+        obj = altobjid;
     else {
         rc = fid2objid(fid, objid);
         if (rc < 0)
             return rc;
         obj = objid;
-    }    
+    }
 
-        memset(&xfer, 0, sizeof(xfer));
+    memset(&xfer, 0, sizeof(xfer));
     xfer.xd_objid = obj;
     xfer.xd_op = PHO_XFER_OP_GETMD;
     xfer.xd_flags = 0;
@@ -632,17 +643,17 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
                 CT_ERROR(rc, "PUT failed");
         return rc;
     }
-    
-        if (pho_attrs_is_empty(&xfer.xd_attrs))
+
+    if (pho_attrs_is_empty(&xfer.xd_attrs))
         return -ENOENT;
     else {
-                val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
+        val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
         strcpy(hexstripe, val);
-        }
+    }
 
     pho_xfer_desc_destroy(&xfer);
 
-    return rc; 
+    return rc;
 }
 /*
  * A set of function to encode buffer into strings
@@ -660,7 +671,7 @@ void bin2hexstr(const char *bin, size_t len, char *out)
         sprintf(out, "%02x|", (unsigned int)len);
 
         /* Next each char, one by one */
-        for (i=0; i<len; i++) {
+        for (i = 0; i < len; i++) {
                 sprintf(tmp, "%08x:", bin[i]);
                 strcat(out, tmp);
         }
@@ -668,35 +679,41 @@ void bin2hexstr(const char *bin, size_t len, char *out)
 
 unsigned int hexstr2bin(const char *hex, char *out)
 {
-        unsigned int len ;
-        char tmp[10]; /* too big */
-        size_t  i;
+    unsigned int len;
+    char tmp[10]; /* too big */
+    size_t  i;
+    int rc;
 
-        if (hex == NULL || out == 0)
-                return 0;
+    if (hex == NULL || out == 0)
+        return 0;
 
-        /* get size first */
-        tmp[0] = hex[0];
-        tmp[1] = hex[1];
-        tmp[2] = hex[2];
-        tmp[3] = 0;
-        sscanf(tmp, "%02x|", &len);
+    /* get size first */
+    tmp[0] = hex[0];
+    tmp[1] = hex[1];
+    tmp[2] = hex[2];
+    tmp[3] = 0;
+    rc = sscanf(tmp, "%02x|", &len);
+    if (!rc)
+        return 0;
 
-        /* Remind that 3 first characters encodes the size */
-        out[0] = 0;
-        for (i=0; i < len; i++) {
-                tmp[0] = hex[9*i+3];
-                tmp[1] = hex[9*i+4];
-                tmp[2] = hex[9*i+5];
-                tmp[3] = hex[9*i+6];
-                tmp[4] = hex[9*i+7];
-                tmp[5] = hex[9*i+8];
-                tmp[6] = hex[9*i+9];
-                tmp[7] = hex[9*i+10];
-                tmp[8] = hex[9*i+11];
-                tmp[9] = 0;
-                sscanf(tmp, "%08x:", (unsigned int *)&(out[i]));
-        }
+    /* Remind that 3 first characters encodes the size */
+    out[0] = 0;
+    for (i = 0; i < len; i++) {
+        tmp[0] = hex[9*i+3];
+        tmp[1] = hex[9*i+4];
+        tmp[2] = hex[9*i+5];
+        tmp[3] = hex[9*i+6];
+        tmp[4] = hex[9*i+7];
+        tmp[5] = hex[9*i+8];
+        tmp[6] = hex[9*i+9];
+        tmp[7] = hex[9*i+10];
+        tmp[8] = hex[9*i+11];
+        tmp[9] = 0;
+
+        rc = sscanf(tmp, "%08x:", (unsigned int *)&(out[i]));
+        if (!rc)
+            return 0;
+    }
 
         return len;
 }
@@ -705,8 +722,8 @@ unsigned int hexstr2bin(const char *hex, char *out)
  * Copytool functions (with ct_ prefix)
  */
 
-static int ct_get_altobjid(const struct hsm_action_item *hai, 
-               char *altobjid)
+static int ct_get_altobjid(const struct hsm_action_item *hai,
+                           char *altobjid)
 {
     char             xattr_buf[XATTR_SIZE_MAX];
     ssize_t             xattr_size;
@@ -722,7 +739,7 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
         close(fd);
         return -errno;
     }
-    
+
     memcpy(altobjid, xattr_buf, xattr_size);
     altobjid[xattr_size] = 0; /* String trailing zero */
     close(fd);
@@ -976,7 +993,12 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
         open_flags |= O_LOV_DELAY_CREATE;
         set_lovea = true;
     }
+
     lov_size = hexstr2bin(hexstripe, lov_buf);
+    if (lov_size == 0) {
+        rc = -EINVAL;
+        goto fini;
+    }
 
     /* start the restore operation */
     rc = ct_begin_restore(&hcp, hai, mdt_index, open_flags);
