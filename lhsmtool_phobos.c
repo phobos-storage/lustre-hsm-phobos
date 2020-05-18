@@ -536,9 +536,6 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
 	/*
  	 * @todo: 
  	 *    - indentation style
- 	 *    - should we use Phobos errors or Lustre ones ?
- 	 *    - convert error Phobos/lustre
- 	 *    - remove that stupid exists that are here for debug purpose
  	 *    - management of the size of string objid
  	 */
 
