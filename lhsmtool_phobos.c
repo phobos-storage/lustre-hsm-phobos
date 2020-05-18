@@ -510,7 +510,7 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 
 	/* object id is "fsname:fid" */	
 	/* /!\ additionnal letter only because of pcocc side effect */
-	return sprintf(objid, "K%s:"DFID, fs_name, PFID(fid));
+	return sprintf(objid, "L%s:"DFID, fs_name, PFID(fid));
 }
 
 static int phobos_op_put(const struct lu_fid *fid, char *altobjid, 
@@ -708,19 +708,27 @@ unsigned int hexstr2bin(const char *hex, char *out)
  * Copytool functions (with ct_ prefix)
  */
 
-static int ct_get_altobjid(int src_fd, char *altobjid)
+static int ct_get_altobjid(const struct hsm_action_item *hai, 
+			   char *altobjid)
 {
 	char			 xattr_buf[XATTR_SIZE_MAX];
 	ssize_t			 xattr_size;
+	int 			 fd;
 
-	xattr_size = fgetxattr(src_fd, trusted_hsm_fsuid, xattr_buf,
+	fd = llapi_open_by_fid(opt.o_mnt, &hai->hai_fid, O_RDONLY);
+	if (fd < 0)
+		return -errno;
+
+	xattr_size = fgetxattr(fd, trusted_hsm_fsuid, xattr_buf,
 			       XATTR_SIZE_MAX);
 	if (xattr_size < 0) {
-		return errno;
+		close(fd);
+		return -errno;
 	}
 	
 	memcpy(altobjid, xattr_buf, xattr_size);
 	altobjid[xattr_size] = 0; /* String trailing zero */
+	close(fd);
 
 	return 0;
 }
@@ -994,7 +1002,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini;
 	}
 
-	rc = ct_get_altobjid(dst_fd, altobjid);
+	rc = ct_get_altobjid(hai, altobjid);
 	if (!rc) {
 		CT_TRACE("Found objid as xattr for "DFID" : %s",
 			 PFID(&hai->hai_fid), altobjid);
