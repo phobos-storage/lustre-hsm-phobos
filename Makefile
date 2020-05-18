@@ -14,3 +14,6 @@ clean:
 
 new: clean all 
 
+checkpatch:
+	./checkpatch.pl --no-tree -f lhsmtool_phobos.c
+
