@@ -688,9 +688,7 @@ unsigned int hexstr2bin(const char *hex, char *out)
         return 0;
 
     /* get size first */
-    tmp[0] = hex[0];
-    tmp[1] = hex[1];
-    tmp[2] = hex[2];
+    memcpy(tmp, hex, 3);
     tmp[3] = 0;
     rc = sscanf(tmp, "%02x|", &len);
     if (!rc)
@@ -699,15 +697,7 @@ unsigned int hexstr2bin(const char *hex, char *out)
     /* Remind that 3 first characters encodes the size */
     out[0] = 0;
     for (i = 0; i < len; i++) {
-        tmp[0] = hex[9*i+3];
-        tmp[1] = hex[9*i+4];
-        tmp[2] = hex[9*i+5];
-        tmp[3] = hex[9*i+6];
-        tmp[4] = hex[9*i+7];
-        tmp[5] = hex[9*i+8];
-        tmp[6] = hex[9*i+9];
-        tmp[7] = hex[9*i+10];
-        tmp[8] = hex[9*i+11];
+        memcpy(tmp, &(hex[9*i+3]), 8);
         tmp[9] = 0;
 
         rc = sscanf(tmp, "%08x:", (unsigned int *)&(out[i]));
