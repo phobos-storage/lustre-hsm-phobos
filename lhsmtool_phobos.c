@@ -601,7 +601,7 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
     struct stat             st;
     char                    objid[MAXNAMLEN];
     char                   *obj = NULL;
-#define NB_HINTS_MAX 2
+#define NB_HINTS_MAX 10
     struct hinttab          hinttab[NB_HINTS_MAX];
     int                     nbhints;
     int                     i = 0;
@@ -614,15 +614,6 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
         if (rc < 0)
             return rc;
         obj = objid;
-    }
-
-    if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%u", hints, lenhints);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
-
-        for (i = 0 ; i < nbhints; i++)
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
     }
 
     /**
@@ -647,10 +638,47 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
     fstat(xfer.xd_fd, &st);
     xfer.xd_params.put.size = st.st_size;
 
+    /** @todo: default is "dir" this is to be changed */
     xfer.xd_params.put.family = PHO_RSC_DIR;
+
+    /* Use content of hints to modify fields in xfer_desc */
+    if (hints) {
+        CT_TRACE("hints provided !!! hints='%s', len=%u", hints, lenhints);
+        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+
+        for (i = 0 ; i < nbhints; i++) {
+            CT_TRACE("hints #%d  key='%s' val='%s'",
+                     i, hinttab[i].k, hinttab[i].v);
+
+            if (!strncmp(hinttab[i].k, "family", HINTMAX)) {
+                /* Deal with storage family */
+                if (!strncmp(hinttab[i].v, "disk", HINTMAX))
+                    xfer.xd_params.put.family = PHO_RSC_DISK;
+                else if (!strncmp(hinttab[i].v, "tape", HINTMAX))
+                    xfer.xd_params.put.family = PHO_RSC_TAPE;
+                else if (!strncmp(hinttab[i].v, "dir", HINTMAX))
+                    xfer.xd_params.put.family = PHO_RSC_DIR;
+                else
+                    CT_TRACE("unknown family '%s'", hinttab[i].v);
+                
+            } else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
+                /* Deal with storage layout */
+                xfer.xd_params.put.layout_name = hinttab[i].v;
+
+            } else if (!strncmp(hinttab[i].k, "layoutparam", HINTMAX)) {
+                /* Deal with storage layout parameters */
+
+            } else if (!strncmp(hinttab[i].k, "tags", HINTMAX)) {
+                /* Deal with storage tags */
+
+           } else
+                CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+        }
+    }
+
+    /* Finalize xfer_desc and to the PUT operation */
     xfer.xd_objid = obj;
     xfer.xd_attrs = attrs;
-
     rc = phobos_put(&xfer, 1, NULL, NULL);
 
     pho_xfer_desc_destroy(&xfer);
