@@ -525,7 +525,8 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
 }
 
 static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
-             const int fd, char *hexstripe)
+                         const int fd, char *hexstripe, 
+                         int lenhints, const char *hints)
 {
     struct pho_xfer_desc    xfer = {0};
     struct pho_attrs        attrs = {0};
@@ -544,9 +545,11 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
         obj = objid;
     }
 
+    if (hints)
+        CT_TRACE("hints provided !!! hints='%s', len=%u", hints, lenhints);
+
     /**
      * @todo:
-     *    - indentation style
      *    - management of the size of string objid
      */
 
@@ -870,11 +873,13 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
     struct hsm_copyaction_private    *hcp = NULL;
     char                 src[PATH_MAX];
     char                 hexstripe[PATH_MAX] = "";
-    int                 rc = 0;
-    int                 rcf = 0;
-    int                 hp_flags = 0;
-    int                 open_flags;
-    int                 src_fd = -1;
+    int                  rc = 0;
+    int                  rcf = 0;
+    int                  hp_flags = 0;
+    int                  open_flags;
+    int                  src_fd = -1;
+    int                  lenhints = 0;
+    char                *hints = NULL;
 
     rc = ct_begin(&hcp, hai);
     if (rc < 0)
@@ -912,8 +917,16 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
         goto fini_major;
     }
 
+    /* Check if hints have been provided as hsm_archive was invoked */
+    if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
+        lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
+        hints = (char *)hai->hai_data;
+
+    }
+
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe);
+    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe, 
+                       lenhints, hints);
     CT_TRACE("phobos_put (archive): rc=%d", rc);
     if (rc)
         goto fini_major;
