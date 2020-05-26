@@ -512,6 +512,73 @@ out:
 }
 
 /*
+ * A strtok-r based function for parsing the 
+ * hints provided during an archive request
+ */
+
+#define HINTMAX 80
+struct hinttab {
+    char k[HINTMAX];
+    char v[HINTMAX];
+} ;
+
+static int process_hints(const char *hints,
+                  int hinttablen,
+                  struct hinttab *hinttab)
+{
+    char *token1;
+    char *token2;
+    char *saveptr1;
+    char *saveptr2;
+    char work1[HINTMAX];
+    char work2[HINTMAX];
+    const char comma[2] = ",";
+    const char equal[2] = "=";
+    int pos1 = 0;
+    int pos2 = 0;
+
+
+    strncpy(work1, hints, HINTMAX);
+
+    /* get the first token */
+    token1 = strtok_r(work1, comma, &saveptr1);
+
+    /* walk through other tokens */
+    while (token1 != NULL) {
+        /*
+         * strtok_r corrupts the strings
+         * we must work on a copy
+         */
+        strncpy(work2, token1, HINTMAX);
+        pos2 = 0;
+
+        /* Second strtok, to get equal */
+        token2 = strtok_r(work2, equal, &saveptr2);
+
+        while (token2 != NULL) {
+            if (pos2 == 0)
+                strncpy(hinttab[pos1].k, token2, HINTMAX);
+            else if (pos2 == 1)
+                strncpy(hinttab[pos1].v, token2, HINTMAX);
+            else
+                break;
+
+            token2 = strtok_r(NULL, equal, &saveptr2);
+            pos2 += 1;
+        }
+
+        token1 = strtok_r(NULL, comma, &saveptr1);
+        pos1 += 1;
+
+        if (pos1 == hinttablen)
+            return pos1;
+    }
+
+    return pos1;
+}
+
+
+/*
  * Phobos functions
  */
 static int  fid2objid(const struct lu_fid *fid, char *objid)
@@ -534,6 +601,10 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
     struct stat             st;
     char                    objid[MAXNAMLEN];
     char                   *obj = NULL;
+#define NB_HINTS_MAX 2
+    struct hinttab          hinttab[NB_HINTS_MAX];
+    int                     nbhints;
+    int                     i = 0;
 
     /* If provided altobjid as objectid */
     if (altobjid)
@@ -545,8 +616,14 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
         obj = objid;
     }
 
-    if (hints)
+    if (hints) {
         CT_TRACE("hints provided !!! hints='%s', len=%u", hints, lenhints);
+        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+
+        for (i = 0 ; i < nbhints; i++)
+            CT_TRACE("hints #%d  key='%s' val='%s'",
+                     i, hinttab[i].k, hinttab[i].v);
+    }
 
     /**
      * @todo:
@@ -620,10 +697,10 @@ static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
 static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
                    char *hexstripe)
 {
-        struct pho_xfer_desc    xfer = {0};
-        int rc;
+    struct pho_xfer_desc    xfer = {0};
+    int rc;
     char objid[MAXNAMLEN];
-        const char *val = NULL;
+    const char *val = NULL;
     char *obj = NULL;
 
     /* If provided altobjid as objectid */
