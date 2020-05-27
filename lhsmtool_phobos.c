@@ -89,19 +89,20 @@ enum ct_action {
 };
 
 struct options {
-    int             o_daemonize;
-    int             o_dry_run;
-    int             o_abort_on_error;
-    int             o_verbose;
-    int             o_archive_id_used;
-    int             o_archive_id_cnt;
-    int            *o_archive_id;
-    int             o_report_int;
+    int                    o_daemonize;
+    int                    o_dry_run;
+    int                    o_abort_on_error;
+    int                    o_verbose;
+    int                    o_archive_id_used;
+    int                    o_archive_id_cnt;
+    int                   *o_archive_id;
+    int                    o_report_int;
     unsigned long long     o_bandwidth;
-    size_t             o_chunk_size;
-    char            *o_event_fifo;
-    char            *o_mnt;
-    int             o_mnt_fd;
+    size_t                 o_chunk_size;
+    char                  *o_event_fifo;
+    char                  *o_mnt;
+    int                    o_mnt_fd;
+    enum rsc_family        o_default_family;
 };
 
 /* everything else is zeroed */
@@ -109,6 +110,7 @@ struct options opt = {
     .o_verbose = LLAPI_MSG_INFO,
     .o_report_int = REPORT_INTERVAL_DEFAULT,
     .o_chunk_size = ONE_MB,
+    .o_default_family = PHO_RSC_INVAL,
 };
 
 /*
@@ -165,29 +167,26 @@ static void usage(const char *name, int rc)
     "The Lustre HSM daemon acts on action requests from Lustre\n"
     "to copy files to and from an HSM archive system.\n"
     "This Phobos-flavored daemon makes calls toà a Phobos storage\n"
-    "   --daemon            Daemon mode, run in background\n"
-    " Options:\n"
-    "   --no-attr           Don't copy file attributes\n"
-    "   --no-shadow         Don't create shadow namespace in archive\n"
-    "   --no-xattr          Don't copy file extended attributes\n"
     "The Lustre HSM tool performs administrator-type actions\n"
     "on a Lustre HSM archive.\n"
     "This Phobos-flavored tool can link an existing HSM namespace\n"
     "into a Lustre filesystem.\n"
     " Usage:\n"
-    "   --abort-on-error          Abort operation on major error\n"
-    "   -A, --archive <#>         Archive number (repeatable)\n"
-    "   -b, --bandwidth <bw>      Limit I/O bandwidth (unit can be used\n,"
-    "                             default is MB)\n"
-    "   --dry-run                 Don't run, just show what would be done\n"
-    "   -c, --chunk-size <sz>     I/O size used during data copy\n"
-    "                             (unit can be used, default is MB)\n"
-    "   -f, --event-fifo <path>   Write events stream to fifo\n"
-    "   -q, --quiet               Produce less verbose output\n"
-    "   -t, --hsm_fsuid           change value of xattr for restore\n"
-    "   -u, --update-interval <s> Interval between progress reports sent\n"
-    "                             to Coordinator\n"
-    "   -v, --verbose             Produce more verbose output\n",
+    "   --daemon                     Daemon mode, run in background\n"
+    "   --abort-on-error             Abort operation on major error\n"
+    "   -A, --archive <#>            Archive number (repeatable)\n"
+    "   -b, --bandwidth <bw>         Limit I/O bandwidth (unit can be used\n,"
+    "                                default is MB)\n"
+    "   --dry-run                    Don't run, just show what would be done\n"
+    "   -c, --chunk-size <sz>        I/O size used during data copy\n"
+    "                                (unit can be used, default is MB)\n"
+    "   -f, --event-fifo <path>      Write events stream to fifo\n"
+    "   -F, --default-family <name>  Set the default family"
+    "   -q, --quiet                  Produce less verbose output\n"
+    "   -t, --hsm_fsuid              change value of xattr for restore\n"
+    "   -u, --update-interval <s>    Interval between progress reports sent\n"
+    "                                to Coordinator\n"
+    "   -v, --verbose                Produce more verbose output\n",
     cmd_name);
 
     exit(rc);
@@ -208,6 +207,8 @@ static int ct_parseopts(int argc, char * const *argv)
       .flag = &opt.o_daemonize },
     { .val = 'f',    .name = "event-fifo",    .has_arg = required_argument },
     { .val = 'f',    .name = "event_fifo",    .has_arg = required_argument },
+    { .val = 'F',    .name = "default-family",    .has_arg = required_argument },
+    { .val = 'F',    .name = "default_family",    .has_arg = required_argument },
     { .val = 1,    .name = "dry-run",    .has_arg = no_argument,
       .flag = &opt.o_dry_run },
     { .val = 'h',    .name = "help",        .has_arg = no_argument },
@@ -238,7 +239,7 @@ static int ct_parseopts(int argc, char * const *argv)
     if (opt.o_archive_id == NULL)
         return -ENOMEM;
 repeat:
-    while ((c = getopt_long(argc, argv, "A:b:c:f:hqt:u:v",
+    while ((c = getopt_long(argc, argv, "A:b:c:f:F:hqt:u:v",
                 long_opts, NULL)) != -1) {
         switch (c) {
         case 'A': {
@@ -305,6 +306,8 @@ repeat:
         case 'f':
             opt.o_event_fifo = optarg;
             break;
+        case 'F':
+            opt.o_default_family = str2rsc_family(optarg);
         case 't':
             strncpy(trusted_hsm_fsuid, optarg, MAXNAMLEN);
             break;
@@ -638,8 +641,8 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
     fstat(xfer.xd_fd, &st);
     xfer.xd_params.put.size = st.st_size;
 
-    /** @todo: default is "dir" this is to be changed */
-    xfer.xd_params.put.family = PHO_RSC_DIR;
+    /* Using default family (can be amened later by a hint) */
+    xfer.xd_params.put.family = opt.o_default_family;
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints) {
@@ -652,15 +655,11 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
 
             if (!strncmp(hinttab[i].k, "family", HINTMAX)) {
                 /* Deal with storage family */
-                if (!strncmp(hinttab[i].v, "disk", HINTMAX))
-                    xfer.xd_params.put.family = PHO_RSC_DISK;
-                else if (!strncmp(hinttab[i].v, "tape", HINTMAX))
-                    xfer.xd_params.put.family = PHO_RSC_TAPE;
-                else if (!strncmp(hinttab[i].v, "dir", HINTMAX))
-                    xfer.xd_params.put.family = PHO_RSC_DIR;
-                else
-                    CT_TRACE("unknown family '%s'", hinttab[i].v);
-                
+                xfer.xd_params.put.family = str2rsc_family(hinttab[i].v);
+
+                if (xfer.xd_params.put.family == PHO_RSC_INVAL)
+                    CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+
             } else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
                 /* Deal with storage layout */
                 xfer.xd_params.put.layout_name = hinttab[i].v;
