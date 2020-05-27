@@ -96,9 +96,6 @@ struct options {
     int                    o_archive_id_used;
     int                    o_archive_id_cnt;
     int                   *o_archive_id;
-    int                    o_report_int;
-    unsigned long long     o_bandwidth;
-    size_t                 o_chunk_size;
     char                  *o_event_fifo;
     char                  *o_mnt;
     int                    o_mnt_fd;
@@ -108,8 +105,6 @@ struct options {
 /* everything else is zeroed */
 struct options opt = {
     .o_verbose = LLAPI_MSG_INFO,
-    .o_report_int = REPORT_INTERVAL_DEFAULT,
-    .o_chunk_size = ONE_MB,
     .o_default_family = PHO_RSC_INVAL,
 };
 
@@ -166,26 +161,20 @@ static void usage(const char *name, int rc)
     "as a command line tool\n"
     "The Lustre HSM daemon acts on action requests from Lustre\n"
     "to copy files to and from an HSM archive system.\n"
-    "This Phobos-flavored daemon makes calls toà a Phobos storage\n"
+    "This Phobos-flavored daemon makes calls to Phobos storage\n"
     "The Lustre HSM tool performs administrator-type actions\n"
     "on a Lustre HSM archive.\n"
     "This Phobos-flavored tool can link an existing HSM namespace\n"
     "into a Lustre filesystem.\n"
     " Usage:\n"
-    "   --daemon                     Daemon mode, run in background\n"
-    "   --abort-on-error             Abort operation on major error\n"
+    "       --daemon                 Daemon mode, run in background\n"
+    "       --abort-on-error         Abort operation on major error\n"
     "   -A, --archive <#>            Archive number (repeatable)\n"
-    "   -b, --bandwidth <bw>         Limit I/O bandwidth (unit can be used\n,"
-    "                                default is MB)\n"
-    "   --dry-run                    Don't run, just show what would be done\n"
-    "   -c, --chunk-size <sz>        I/O size used during data copy\n"
-    "                                (unit can be used, default is MB)\n"
+    "       --dry-run                Don't run, just show what would be done\n"
     "   -f, --event-fifo <path>      Write events stream to fifo\n"
-    "   -F, --default-family <name>  Set the default family"
+    "   -F, --default-family <name>  Set the default family\n"
     "   -q, --quiet                  Produce less verbose output\n"
     "   -t, --hsm_fsuid              change value of xattr for restore\n"
-    "   -u, --update-interval <s>    Interval between progress reports sent\n"
-    "                                to Coordinator\n"
     "   -v, --verbose                Produce more verbose output\n",
     cmd_name);
 
@@ -201,8 +190,6 @@ static int ct_parseopts(int argc, char * const *argv)
       .flag = &opt.o_abort_on_error,    .has_arg = no_argument },
     { .val = 'A',    .name = "archive",    .has_arg = required_argument },
     { .val = 'b',    .name = "bandwidth",    .has_arg = required_argument },
-    { .val = 'c',    .name = "chunk-size",    .has_arg = required_argument },
-    { .val = 'c',    .name = "chunk_size",    .has_arg = required_argument },
     { .val = 1,    .name = "daemon",    .has_arg = no_argument,
       .flag = &opt.o_daemonize },
     { .val = 'f',    .name = "event-fifo",    .has_arg = required_argument },
@@ -220,13 +207,9 @@ static int ct_parseopts(int argc, char * const *argv)
     { .val = 'r',    .name = "rebind",    .has_arg = no_argument },
     { .val = 'u',    .name = "update-interval",
                         .has_arg = required_argument },
-    { .val = 'u',    .name = "update_interval",
-                        .has_arg = required_argument },
     { .val = 'v',    .name = "verbose",    .has_arg = no_argument },
     { .val = 't',    .name = "hsm_fsuid",     .has_arg = required_argument},
     { .name = NULL } };
-    unsigned long long value;
-    unsigned long long unit;
     bool all_id = false;
     int c, rc;
     int i;
@@ -239,7 +222,7 @@ static int ct_parseopts(int argc, char * const *argv)
     if (opt.o_archive_id == NULL)
         return -ENOMEM;
 repeat:
-    while ((c = getopt_long(argc, argv, "A:b:c:f:F:hqt:u:v",
+    while ((c = getopt_long(argc, argv, "A:b:c:f:F:hqt:v",
                 long_opts, NULL)) != -1) {
         switch (c) {
         case 'A': {
@@ -289,20 +272,6 @@ repeat:
             opt.o_archive_id[opt.o_archive_id_used++] = val;
             break;
         }
-        case 'b': /* -b and -c have both a number with unit as arg */
-        case 'c':
-            unit = ONE_MB;
-            if (llapi_parse_size(optarg, &value, &unit, 0) < 0) {
-                rc = -EINVAL;
-                CT_ERROR(rc, "bad value for -%c '%s'", c,
-                     optarg);
-                return rc;
-            }
-            if (c == 'c')
-                opt.o_chunk_size = value;
-            else
-                opt.o_bandwidth = value;
-            break;
         case 'f':
             opt.o_event_fifo = optarg;
             break;
@@ -315,15 +284,6 @@ repeat:
             usage(argv[0], 0);
         case 'q':
             opt.o_verbose--;
-            break;
-        case 'u':
-            opt.o_report_int = atoi(optarg);
-            if (opt.o_report_int < 0) {
-                rc = -EINVAL;
-                CT_ERROR(rc, "bad value for -%c '%s'", c,
-                     optarg);
-                return rc;
-            }
             break;
         case 'v':
             opt.o_verbose++;
