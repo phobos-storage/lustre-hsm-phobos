@@ -199,12 +199,7 @@ static int ct_parseopts(int argc, char * const *argv)
     { .val = 1,    .name = "dry-run",    .has_arg = no_argument,
       .flag = &opt.o_dry_run },
     { .val = 'h',    .name = "help",        .has_arg = no_argument },
-    { .val = 'i',    .name = "import",    .has_arg = no_argument },
-    { .val = 'M',    .name = "max-sequence",    .has_arg = no_argument },
-    { .val = 'M',    .name = "max_sequence",    .has_arg = no_argument },
-    { .val = 'p',    .name = "hsm-root",    .has_arg = required_argument },
     { .val = 'q',    .name = "quiet",    .has_arg = no_argument },
-    { .val = 'r',    .name = "rebind",    .has_arg = no_argument },
     { .val = 'u',    .name = "update-interval",
                         .has_arg = required_argument },
     { .val = 'v',    .name = "verbose",    .has_arg = no_argument },
@@ -218,7 +213,7 @@ static int ct_parseopts(int argc, char * const *argv)
 
     opt.o_archive_id_cnt = LL_HSM_ORIGIN_MAX_ARCHIVE;
     opt.o_archive_id = malloc(opt.o_archive_id_cnt *
-                  sizeof(*opt.o_archive_id));
+                              sizeof(*opt.o_archive_id));
     if (opt.o_archive_id == NULL)
         return -ENOMEM;
 repeat:
@@ -232,7 +227,7 @@ repeat:
             if (*end != '\0') {
                 rc = -EINVAL;
                 CT_ERROR(rc, "invalid archive-id: '%s'",
-                     optarg);
+                         optarg);
                 return rc;
             }
             /* if archiveID is zero, any archiveID is accepted */
@@ -262,7 +257,7 @@ repeat:
                 opt.o_archive_id_cnt *= 2;
                 tmp = realloc(opt.o_archive_id,
                           sizeof(*opt.o_archive_id) *
-                          opt.o_archive_id_cnt);
+                                 opt.o_archive_id_cnt);
                 if (tmp == NULL)
                     return -ENOMEM;
 
@@ -544,7 +539,7 @@ static int process_hints(const char *hints,
 /*
  * Phobos functions
  */
-static int  fid2objid(const struct lu_fid *fid, char *objid)
+static int fid2objid(const struct lu_fid *fid, char *objid)
 {
     if (!objid || !fid)
         return -EINVAL;
@@ -554,9 +549,12 @@ static int  fid2objid(const struct lu_fid *fid, char *objid)
     return sprintf(objid, "P%s:"DFID, fs_name, PFID(fid));
 }
 
-static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
-                         const int fd, char *hexstripe, 
-                         int lenhints, const char *hints)
+static int phobos_op_put(const struct lu_fid *fid,
+                         char *altobjid,
+                         const int fd,
+                         char *hexstripe, 
+                         int lenhints,
+                         const char *hints)
 {
     struct pho_xfer_desc    xfer = {0};
     struct pho_attrs        attrs = {0};
@@ -648,13 +646,14 @@ static int phobos_op_put(const struct lu_fid *fid, char *altobjid,
     return rc;
 }
 
-static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
+static int phobos_op_get(const struct lu_fid *fid,
+                         char *altobjid,
+                         int fd)
 {
     struct pho_xfer_desc    xfer = {0};
     int rc;
     char objid[MAXNAMLEN];
     char *obj = NULL;
-
     /* If provided altobjid as objectid */
     if (altobjid)
         obj = altobjid;
@@ -676,13 +675,14 @@ static int phobos_op_get(const struct lu_fid *fid, char *altobjid, int fd)
     pho_xfer_desc_destroy(&xfer);
 
     if (rc)
-        CT_ERROR(rc, "PUT failed");
+        CT_ERROR(rc, "GET failed");
 
     return rc;
 }
 
-static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
-                   char *hexstripe)
+static int phobos_op_getstripe(const struct lu_fid *fid,
+                               char *altobjid,
+                               char *hexstripe)
 {
     struct pho_xfer_desc    xfer = {0};
     int rc;
@@ -705,9 +705,9 @@ static int phobos_op_getstripe(const struct lu_fid *fid, char *altobjid,
     xfer.xd_op = PHO_XFER_OP_GETMD;
     xfer.xd_flags = 0;
 
-        rc = phobos_get(&xfer, 1, NULL, NULL);
-        if (rc) {
-                CT_ERROR(rc, "PUT failed");
+    rc = phobos_getmd(&xfer, 1, NULL, NULL);
+    if (rc) {
+        CT_ERROR(rc, "GETMD failed");
         return rc;
     }
 
@@ -782,8 +782,8 @@ unsigned int hexstr2bin(const char *hex, char *out)
 static int ct_get_altobjid(const struct hsm_action_item *hai,
                            char *altobjid)
 {
-    char             xattr_buf[XATTR_SIZE_MAX];
-    ssize_t             xattr_size;
+    char             xattr_buf[XATTR_SIZE_MAX+1];
+    ssize_t          xattr_size;
     int              fd;
 
     fd = llapi_open_by_fid(opt.o_mnt, &hai->hai_fid, O_RDONLY);
@@ -806,10 +806,10 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 
 static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
-    char             lov_buf[XATTR_SIZE_MAX];
+    char                   lov_buf[XATTR_SIZE_MAX+1];
     struct lov_user_md    *lum;
-    int             rc;
-    ssize_t             xattr_size;
+    int                    rc;
+    ssize_t                xattr_size;
 
     xattr_size = fgetxattr(src_fd, XATTR_LUSTRE_LOV, lov_buf,
                    sizeof(lov_buf));
@@ -872,7 +872,7 @@ static int ct_begin_restore(struct hsm_copyaction_private **phcp,
                 int mdt_index, int open_flags)
 {
     char     src[PATH_MAX];
-    int     rc;
+    int      rc;
 
     rc = llapi_hsm_action_begin(phcp, ctdata, hai, mdt_index, open_flags,
                     false);
@@ -1025,7 +1025,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
     char                hexstripe[PATH_MAX];
     char                altobjid[PATH_MAX];
     char               *altobj = NULL;
-    char                lov_buf[XATTR_SIZE_MAX];
+    char                lov_buf[XATTR_SIZE_MAX+1];
     size_t              lov_size = sizeof(lov_buf);
     int                 rc;
     int                 hp_flags = 0;

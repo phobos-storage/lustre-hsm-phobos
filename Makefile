@@ -12,7 +12,7 @@ lhsmtool_posix: lhsmtool_posix.c Makefile
 clean:
 	rm -f *.o lhsmtool_phobos lhsmtool_posix *.tar.gz
 
-new: clean all 
+new: clean all
 
 checkpatch:
 	./checkpatch.pl --no-tree -f lhsmtool_phobos.c
