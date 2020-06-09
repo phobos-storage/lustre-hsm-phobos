@@ -546,7 +546,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 
     /* object id is "fsname:fid" */
     /* /!\ additionnal letter only because of pcocc side effect */
-    return sprintf(objid, "P%s:"DFID, fs_name, PFID(fid));
+    return sprintf(objid, "Q%s:"DFID, fs_name, PFID(fid));
 }
 
 static int phobos_op_put(const struct lu_fid *fid,
