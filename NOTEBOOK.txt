@@ -1,10 +1,4 @@
 sudo /usr/sbin/lhsmtool_posix -v  --hsm_root /tmp/arch/ /mnt/lustre
 
-TODO
-         *    - indentation style
-         *    - should we use Phobos errors or Lustre ones ?
-         *    - convert error Phobos/lustre
-         *    - remove that stupid exists that are here for debug purpose
-         *    - management of the size of string objid
-
+ sudo lfs hsm_archive --data family=dir,tag=a  fichier
 
