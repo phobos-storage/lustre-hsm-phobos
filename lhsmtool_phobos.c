@@ -69,6 +69,8 @@
 
 #define XATTR_TRUSTED_HSM_FSUID_DEFAULT    "trusted.hsm_fuid"
 
+#define MAXTAGS 10 
+
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
 /* HSM hash subdir permissions */
@@ -625,9 +627,24 @@ static int phobos_op_put(const struct lu_fid *fid,
             } else if (!strncmp(hinttab[i].k, "layoutparam", HINTMAX)) {
                 /* Deal with storage layout parameters */
 
-            } else if (!strncmp(hinttab[i].k, "tags", HINTMAX)) {
+            } else if (!strncmp(hinttab[i].k, "tag", HINTMAX)) {
                 /* Deal with storage tags */
+                if (xfer.xd_params.put.tags.n_tags == 0) {
+                    xfer.xd_params.put.tags.tags = malloc(sizeof(char **));
 
+                    if (!xfer.xd_params.put.tags.tags) 
+                        CT_ERROR(errno, "Out of memory !! Malloc failed");
+                }
+
+                /* I use this #define to deal with loooooog structures names */
+#define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
+                EASIER = malloc(HINTMAX); 
+                if (!EASIER)
+                   CT_ERROR(errno, "Out of memory !! Malloc failed");
+
+                strncpy(EASIER, hinttab[i].v, HINTMAX);
+                xfer.xd_params.put.tags.n_tags +=1 ;
+#undef EASIER
            } else
                 CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
         }
