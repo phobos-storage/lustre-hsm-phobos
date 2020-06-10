@@ -655,6 +655,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     xfer.xd_attrs = attrs;
     rc = phobos_put(&xfer, 1, NULL, NULL);
 
+    /* Does this free() the tags too ? */
     pho_xfer_desc_destroy(&xfer);
 
     if (rc)
