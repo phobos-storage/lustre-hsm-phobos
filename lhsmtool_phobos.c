@@ -106,7 +106,7 @@ struct options {
 
 /* everything else is zeroed */
 struct options opt = {
-    .o_verbose = LLAPI_MSG_INFO,
+    .o_verbose        = LLAPI_MSG_INFO,
     .o_default_family = PHO_RSC_INVAL,
 };
 
@@ -158,7 +158,7 @@ static inline double ct_now(void)
 static void usage(const char *name, int rc)
 {
     fprintf(stdout,
-    " Usage: %s [options]... <mode> <lustre_mount_point>\n"
+    "Usage: %s [options]... <mode> <lustre_mount_point>\n"
     "The Lustre HSM Posix copy tool can be used as a daemon or "
     "as a command line tool\n"
     "The Lustre HSM daemon acts on action requests from Lustre\n"
@@ -307,6 +307,12 @@ repeat:
     return 0;
 }
 
+/*
+ * iThe following items are replicated from Lustre sources to avoid
+ * dependencies with Lustre sources. 
+ *
+ * This makes it possible to compile this copytool outside Lustre source tree
+ */
 enum fid_seq {
         FID_SEQ_OST_MDT0        = 0,
         FID_SEQ_LLOG            = 1, /* unnamed llogs */
@@ -669,10 +675,11 @@ static int phobos_op_get(const struct lu_fid *fid,
                          int fd)
 {
     struct pho_xfer_desc    xfer = {0};
-    int rc;
-    char objid[MAXNAMLEN];
-    char *obj = NULL;
-    /* If provided altobjid as objectid */
+    int                     rc;
+    char                    objid[MAXNAMLEN];
+    char                   *obj = NULL;
+
+    /* If provided altobjid is used as objectid */
     if (altobjid)
         obj = altobjid;
     else {
@@ -703,12 +710,12 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
                                char *hexstripe)
 {
     struct pho_xfer_desc    xfer = {0};
-    int rc;
-    char objid[MAXNAMLEN];
-    const char *val = NULL;
-    char *obj = NULL;
+    int                     rc;
+    char                    objid[MAXNAMLEN];
+    const char             *val = NULL;
+    char                   *obj = NULL;
 
-    /* If provided altobjid as objectid */
+    /* If provided altobjid is used as objectid */
     if (altobjid)
         obj = altobjid;
     else {
@@ -745,29 +752,29 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
  */
 void bin2hexstr(const char *bin, size_t len, char *out)
 {
-        size_t  i;
-        char tmp[10];
+    size_t  i;
+    char    tmp[10];
 
-        if (bin == NULL || len == 0)
+    if (bin == NULL || len == 0)
                 return;
 
-        /* Size is encoded at the beginning */
-        out[0] = 0;
-        sprintf(out, "%02x|", (unsigned int)len);
+    /* Size is encoded at the beginning */
+    out[0] = 0;
+    sprintf(out, "%02x|", (unsigned int)len);
 
-        /* Next each char, one by one */
-        for (i = 0; i < len; i++) {
-                sprintf(tmp, "%08x:", bin[i]);
-                strcat(out, tmp);
-        }
+    /* Next each char, one by one */
+    for (i = 0; i < len; i++) {
+            sprintf(tmp, "%08x:", bin[i]);
+            strcat(out, tmp);
+    }
 }
 
 unsigned int hexstr2bin(const char *hex, char *out)
 {
     unsigned int len;
-    char tmp[10]; /* too big */
-    size_t  i;
-    int rc;
+    char         tmp[10]; /* too big */
+    size_t       i;
+    int          rc;
 
     if (hex == NULL || out == 0)
         return 0;
@@ -790,7 +797,7 @@ unsigned int hexstr2bin(const char *hex, char *out)
             return 0;
     }
 
-        return len;
+    return len;
 }
 
 /*
@@ -916,8 +923,8 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
            const struct hsm_action_item *hai, int hp_flags, int ct_rc)
 {
     struct hsm_copyaction_private    *hcp;
-    char                 lstr[PATH_MAX];
-    int                 rc;
+    char                              lstr[PATH_MAX];
+    int                               rc;
 
     CT_TRACE("Action completed, notifying coordinator "
          "cookie=%#jx, FID="DFID", hp_flags=%d err=%d",
@@ -952,16 +959,16 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 
 static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 {
-    struct hsm_copyaction_private    *hcp = NULL;
-    char                 src[PATH_MAX];
-    char                 hexstripe[PATH_MAX] = "";
-    int                  rc = 0;
-    int                  rcf = 0;
-    int                  hp_flags = 0;
-    int                  open_flags;
-    int                  src_fd = -1;
-    int                  lenhints = 0;
-    char                *hints = NULL;
+    struct hsm_copyaction_private   *hcp = NULL;
+    char                             src[PATH_MAX];
+    char                             hexstripe[PATH_MAX] = "";
+    int                              rc = 0;
+    int                              rcf = 0;
+    int                              hp_flags = 0;
+    int                              open_flags;
+    int                              src_fd = -1;
+    int                              lenhints = 0;
+    char                            *hints = NULL;
 
     rc = ct_begin(&hcp, hai);
     if (rc < 0)
@@ -1038,19 +1045,19 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private    *hcp = NULL;
     struct lu_fid                     dfid;
+    char                              dst[PATH_MAX];
+    char                              hexstripe[PATH_MAX];
+    char                              altobjid[PATH_MAX];
+    char                             *altobj = NULL;
+    char                              lov_buf[XATTR_SIZE_MAX+1];
+    size_t                            lov_size = sizeof(lov_buf);
+    int                               rc;
+    int                               hp_flags = 0;
+    int                               dst_fd = -1;
+    int                               mdt_index = -1;
+    int                               open_flags = 0;
+    bool                              set_lovea;
 
-    char                dst[PATH_MAX];
-    char                hexstripe[PATH_MAX];
-    char                altobjid[PATH_MAX];
-    char               *altobj = NULL;
-    char                lov_buf[XATTR_SIZE_MAX+1];
-    size_t              lov_size = sizeof(lov_buf);
-    int                 rc;
-    int                 hp_flags = 0;
-    int                 dst_fd = -1;
-    int                 mdt_index = -1;
-    int                 open_flags = 0;
-    bool                set_lovea;
     /*
      * we fill lustre so:
      * source = lustre FID in the backend
@@ -1065,6 +1072,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
              PFID(&hai->hai_fid));
         return rc;
     }
+
     /*
      * restore loads and sets the LOVEA w/o interpreting it to avoid
      * dependency on the structure format.
@@ -1157,7 +1165,7 @@ fini:
 static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private    *hcp = NULL;
-    int                 rc;
+    int                               rc;
 
     rc = ct_begin(&hcp, hai);
     if (rc < 0)
@@ -1185,8 +1193,8 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
         /* Print the original path */
         char        fid[128];
         char        path[PATH_MAX];
-        long long    recno = -1;
-        int        linkno = 0;
+        long long   recno = -1;
+        int         linkno = 0;
 
         sprintf(fid, DFID, PFID(&hai->hai_fid));
         CT_TRACE("'%s' action %s reclen %d, cookie=%#jx",
@@ -1234,14 +1242,14 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 }
 
 struct ct_th_data {
-    long             hal_flags;
-    struct hsm_action_item    *hai;
+    long                    hal_flags;
+    struct hsm_action_item *hai;
 };
 
 static void *ct_thread(void *data)
 {
     struct ct_th_data *cttd = data;
-    int rc;
+    int                rc;
 
     rc = ct_process_item(cttd->hai, cttd->hal_flags);
 
@@ -1253,10 +1261,10 @@ static void *ct_thread(void *data)
 static int ct_process_item_async(const struct hsm_action_item *hai,
                  long hal_flags)
 {
-    pthread_attr_t         attr;
-    pthread_t         thread;
-    struct ct_th_data    *data;
-    int             rc;
+    pthread_attr_t      attr;
+    pthread_t           thread;
+    struct ct_th_data  *data;
+    int                 rc;
 
     data = malloc(sizeof(*data));
     if (data == NULL)
@@ -1312,7 +1320,7 @@ static void handler(int signal)
 static int ct_run(void)
 {
     struct sigaction cleanup_sigaction;
-    int rc;
+    int              rc;
 
     if (opt.o_daemonize) {
         rc = daemon(1, 1);
