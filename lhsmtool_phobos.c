@@ -67,7 +67,9 @@
 #define LL_HSM_ORIGIN_MAX_ARCHIVE	(sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX	"trusted."
 
-#define XATTR_TRUSTED_HSM_FSUID_DEFAULT	"trusted.hsm_fuid"
+#define XATTR_TRUSTED_HSM_FUID_DEFAULT	"trusted.hsm_fuid"
+
+#define HINT_HSM_FUID "hsm_fuid"
 
 #define MAXTAGS 10 
 
@@ -83,6 +85,8 @@
 #ifndef NSEC_PER_SEC
 # define NSEC_PER_SEC 1000000000UL
 #endif
+
+#define NB_HINTS_MAX 10
 
 enum ct_action {
 	CA_IMPORT = 1,
@@ -554,7 +558,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 
 	/* object id is "fsname:fid" */
 	/* /!\ additionnal letter only because of pcocc side effect */
-	return sprintf(objid, "Q%s:"DFID, fs_name, PFID(fid));
+	return sprintf(objid, "%s:"DFID, fs_name, PFID(fid));
 }
 
 static int phobos_op_del(const struct lu_fid *fid,
@@ -564,16 +568,41 @@ static int phobos_op_del(const struct lu_fid *fid,
 	struct pho_xfer_desc	xfer = {0};
 	int					    rc;
 	char					objid[MAXNAMLEN];
+	struct hinttab			hinttab[NB_HINTS_MAX];
+    int                     i = 0;
+    int                     nbhints;
+	char				   *obj = NULL;
+    bool                    objset = false;
 
 
-	rc = fid2objid(fid, objid);
-	if (rc < 0)
-		return rc;
+	if (hints) {
+		CT_TRACE("phobos_op_del: hints provided !!! hints='%s', len=%u",
+                 hints, lenhints);
+		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+
+		for (i = 0 ; i < nbhints; i++) {
+			CT_TRACE("hints #%d  key='%s' val='%s'",
+					 i, hinttab[i].k, hinttab[i].v);
+
+			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+				/* Deal with storage family */
+	            obj = hinttab[i].v;
+                objset = true;
+            }
+        } 
+    }
+
+    if (!objset) {
+	    rc = fid2objid(fid, objid);
+	    if (rc < 0)
+		    return rc;
+        obj = objid;
+    }
 
 	/* DO THE UNDELETE */
 	memset(&xfer, 0, sizeof(xfer));
 	xfer.xd_op = PHO_XFER_OP_DEL;
-	xfer.xd_objid = objid;
+	xfer.xd_objid = obj;
 
 	rc = phobos_object_delete(&xfer, 1);
 
@@ -600,20 +629,19 @@ static int phobos_op_put(const struct lu_fid *fid,
 	struct stat				st;
 	char					objid[MAXNAMLEN];
 	char				   *obj = NULL;
-#define NB_HINTS_MAX 10
 	struct hinttab			 hinttab[NB_HINTS_MAX];
 	int						 nbhints;
 	int						 i = 0;
 
-	/* If provided altobjid as objectid */
-	if (altobjid)
-		obj = altobjid;
-	else {
-		rc = fid2objid(fid, objid);
-		if (rc < 0)
-			return rc;
-		obj = objid;
-	}
+	/* If provided altobjid as objectid, if not set by hints */
+   if (altobjid)
+        obj = altobjid;
+    else {
+        rc = fid2objid(fid, objid);
+        if (rc < 0)
+		    return rc;
+	    obj = objid;
+    }
 
 	/**
 	 * @todo:
@@ -656,6 +684,10 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 				if (xfer.xd_params.put.family == PHO_RSC_INVAL)
 					CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+
+            } else if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+                /* Force a given objectid */
+                obj = hinttab[i].v;
 
 			} else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
 				/* Deal with storage layout */
@@ -708,9 +740,12 @@ static int phobos_op_get(const struct lu_fid *fid,
 						 int fd)
 {
 	struct pho_xfer_desc	xfer = {0};
-	int					 rc;
+	int					    rc;
+    int                     i = 0;
 	char					objid[MAXNAMLEN];
 	char				   *obj = NULL;
+	struct hinttab			 hinttab[NB_HINTS_MAX];
+	int						 nbhints;
 
 	/* If provided altobjid is used as objectid */
 	if (altobjid)
@@ -721,6 +756,24 @@ static int phobos_op_get(const struct lu_fid *fid,
 			return rc;
 		obj = objid;
 	}
+
+	/* Use content of hints to modify fields in xfer_desc */
+	if (hints) {
+		CT_TRACE("phobos_op_get: hints provided !!! hints='%s', len=%u",
+                 hints, lenhints);
+		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+
+		for (i = 0 ; i < nbhints; i++) {
+			CT_TRACE("hints #%d  key='%s' val='%s'",
+					 i, hinttab[i].k, hinttab[i].v);
+
+			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+                    obj = hinttab[i].v;
+
+		   } else
+				CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+        }
+    }
 
 	memset(&xfer, 0, sizeof(xfer));
 	xfer.xd_op = PHO_XFER_OP_GET;
@@ -995,12 +1048,12 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private   *hcp = NULL;
 	char							 src[PATH_MAX];
 	char							 hexstripe[PATH_MAX] = "";
-	int							  rc = 0;
-	int							  rcf = 0;
-	int							  hp_flags = 0;
-	int							  open_flags;
-	int							  src_fd = -1;
-	int							  lenhints = 0;
+	int						  	     rc = 0;
+	int							     rcf = 0;
+	int							     hp_flags = 0;
+	int							     open_flags;
+	int							     src_fd = -1;
+	int							     lenhints = 0;
 	char							*hints = NULL;
 
 	rc = ct_begin(&hcp, hai);
@@ -1524,7 +1577,7 @@ int main(int argc, char **argv)
 {
 	int	rc;
 
-	strncpy(trusted_hsm_fsuid, XATTR_TRUSTED_HSM_FSUID_DEFAULT, MAXNAMLEN);
+	strncpy(trusted_hsm_fsuid, XATTR_TRUSTED_HSM_FUID_DEFAULT, MAXNAMLEN);
 
 	snprintf(cmd_name, sizeof(cmd_name), "%s", basename(argv[0]));
 	rc = ct_parseopts(argc, argv);
