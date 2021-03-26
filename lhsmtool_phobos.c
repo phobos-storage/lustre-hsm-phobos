@@ -557,7 +557,9 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 	return sprintf(objid, "Q%s:"DFID, fs_name, PFID(fid));
 }
 
-static int phobos_op_del(const struct lu_fid *fid)
+static int phobos_op_del(const struct lu_fid *fid,
+						 int lenhints,
+						 const char *hints)
 {
 	struct pho_xfer_desc	xfer = {0};
 	int					    rc;
@@ -640,7 +642,8 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 	/* Use content of hints to modify fields in xfer_desc */
 	if (hints) {
-		CT_TRACE("hints provided !!! hints='%s', len=%u", hints, lenhints);
+		CT_TRACE("phobos_op_put: hints provided !!! hints='%s', len=%u",
+                 hints, lenhints);
 		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
 		for (i = 0 ; i < nbhints; i++) {
@@ -700,6 +703,8 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 static int phobos_op_get(const struct lu_fid *fid,
 						 char *altobjid,
+						 int lenhints,
+						 const char *hints,
 						 int fd)
 {
 	struct pho_xfer_desc	xfer = {0};
@@ -1038,7 +1043,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
 		lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
 		hints = (char *)hai->hai_data;
-
 	}
 
 	/* Do phobos xfer */
@@ -1073,18 +1077,20 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
 	struct lu_fid					 dfid;
-	char							  dst[PATH_MAX];
-	char							  hexstripe[PATH_MAX];
-	char							  altobjid[PATH_MAX];
-	char							 *altobj = NULL;
-	char							  lov_buf[XATTR_SIZE_MAX+1];
-	size_t							lov_size = sizeof(lov_buf);
-	int							   rc;
-	int							   hp_flags = 0;
-	int							   dst_fd = -1;
-	int							   mdt_index = -1;
-	int							   open_flags = 0;
-	bool							  set_lovea;
+	char							 dst[PATH_MAX];
+	char							 hexstripe[PATH_MAX];
+	char							 altobjid[PATH_MAX];
+	char							*altobj = NULL;
+	char							 lov_buf[XATTR_SIZE_MAX+1];
+	size_t							 lov_size = sizeof(lov_buf);
+	int							     lenhints = 0;
+	char						 	*hints = NULL;
+	int							     rc;
+	int							     hp_flags = 0;
+	int							     dst_fd = -1;
+	int							     mdt_index = -1;
+	int							     open_flags = 0;
+	bool							 set_lovea;
 
 	/*
 	 * we fill lustre so:
@@ -1152,6 +1158,12 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini;
 	}
 
+	/* Check if hints have been provided as hsm_archive was invoked */
+	if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
+		lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
+		hints = (char *)hai->hai_data;
+	}
+
 	rc = ct_get_altobjid(hai, altobjid);
 	if (!rc) {
 		CT_TRACE("Found objid as xattr for "DFID" : %s",
@@ -1175,7 +1187,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* Do phobos xfer */
-	rc = phobos_op_get(&hai->hai_fid, altobj, dst_fd);
+	rc = phobos_op_get(&hai->hai_fid, altobj, lenhints, hints, dst_fd);
 	CT_TRACE("phobos_get (restore): rc=%d", rc);
 	/** @todo make clear rc management */
 
@@ -1193,7 +1205,9 @@ fini:
 static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
-	int							   rc;
+	int							     rc;
+	int							     lenhints = 0;
+	char						 	*hints = NULL;
 
 
 	rc = ct_begin(&hcp, hai);
@@ -1202,13 +1216,19 @@ static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 
 	CT_TRACE("removing an entry");
 
+	/* Check if hints have been provided as hsm_archive was invoked */
+	if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
+		lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
+		hints = (char *)hai->hai_data;
+	}
+
 	/** @todo : add remove as it will be available in Phobos */
 	if (opt.o_dry_run) {
 		rc = 0;
 		goto fini;
 	}
 
-	rc = phobos_op_del(&hai->hai_fid);
+	rc = phobos_op_del(&hai->hai_fid, lenhints, hints);
 
 fini:
 	rc = ct_fini(&hcp, hai, 0, rc);
