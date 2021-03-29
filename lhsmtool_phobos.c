@@ -566,18 +566,18 @@ static int phobos_op_del(const struct lu_fid *fid,
 						 const char *hints)
 {
 	struct pho_xfer_desc	xfer = {0};
-	int					    rc;
+	int						rc;
 	char					objid[MAXNAMLEN];
 	struct hinttab			hinttab[NB_HINTS_MAX];
-    int                     i = 0;
-    int                     nbhints;
+	int					 i = 0;
+	int					 nbhints;
 	char				   *obj = NULL;
-    bool                    objset = false;
+	bool					objset = false;
 
 
 	if (hints) {
 		CT_TRACE("phobos_op_del: hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+				 hints, lenhints);
 		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
 		for (i = 0 ; i < nbhints; i++) {
@@ -586,18 +586,18 @@ static int phobos_op_del(const struct lu_fid *fid,
 
 			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
 				/* Deal with storage family */
-	            obj = hinttab[i].v;
-                objset = true;
-            }
-        } 
-    }
+				obj = hinttab[i].v;
+				objset = true;
+			}
+		} 
+	}
 
-    if (!objset) {
-	    rc = fid2objid(fid, objid);
-	    if (rc < 0)
-		    return rc;
-        obj = objid;
-    }
+	if (!objset) {
+		rc = fid2objid(fid, objid);
+		if (rc < 0)
+			return rc;
+		obj = objid;
+	}
 
 	/* DO THE UNDELETE */
 	memset(&xfer, 0, sizeof(xfer));
@@ -635,13 +635,13 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 	/* If provided altobjid as objectid, if not set by hints */
    if (altobjid)
-        obj = altobjid;
-    else {
-        rc = fid2objid(fid, objid);
-        if (rc < 0)
-		    return rc;
-	    obj = objid;
-    }
+		obj = altobjid;
+	else {
+		rc = fid2objid(fid, objid);
+		if (rc < 0)
+			return rc;
+		obj = objid;
+	}
 
 	/**
 	 * @todo:
@@ -671,7 +671,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 	/* Use content of hints to modify fields in xfer_desc */
 	if (hints) {
 		CT_TRACE("phobos_op_put: hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+				 hints, lenhints);
 		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
 		for (i = 0 ; i < nbhints; i++) {
@@ -685,9 +685,9 @@ static int phobos_op_put(const struct lu_fid *fid,
 				if (xfer.xd_params.put.family == PHO_RSC_INVAL)
 					CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
 
-            } else if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                /* Force a given objectid */
-                obj = hinttab[i].v;
+			} else if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+				/* Force a given objectid */
+				obj = hinttab[i].v;
 
 			} else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
 				/* Deal with storage layout */
@@ -740,8 +740,8 @@ static int phobos_op_get(const struct lu_fid *fid,
 						 int fd)
 {
 	struct pho_xfer_desc	xfer = {0};
-	int					    rc;
-    int                     i = 0;
+	int						rc;
+	int					 i = 0;
 	char					objid[MAXNAMLEN];
 	char				   *obj = NULL;
 	struct hinttab			 hinttab[NB_HINTS_MAX];
@@ -760,7 +760,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 	/* Use content of hints to modify fields in xfer_desc */
 	if (hints) {
 		CT_TRACE("phobos_op_get: hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+				 hints, lenhints);
 		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
 		for (i = 0 ; i < nbhints; i++) {
@@ -768,12 +768,12 @@ static int phobos_op_get(const struct lu_fid *fid,
 					 i, hinttab[i].k, hinttab[i].v);
 
 			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                    obj = hinttab[i].v;
+					obj = hinttab[i].v;
 
 		   } else
 				CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
-        }
-    }
+		}
+	}
 
 	memset(&xfer, 0, sizeof(xfer));
 	xfer.xd_op = PHO_XFER_OP_GET;
@@ -793,13 +793,19 @@ static int phobos_op_get(const struct lu_fid *fid,
 
 static int phobos_op_getstripe(const struct lu_fid *fid,
 							   char *altobjid,
+						       int lenhints,
+						       const char *hints,
 							   char *hexstripe)
 {
 	struct pho_xfer_desc	xfer = {0};
-	int					 rc;
+	int						rc;
 	char					objid[MAXNAMLEN];
-	const char			 *val = NULL;
+	const char			   *val = NULL;
 	char				   *obj = NULL;
+    struct hinttab          hinttab[NB_HINTS_MAX];
+    int                     nbhints;
+    int                     i = 0;
+
 
 	/* If provided altobjid is used as objectid */
 	if (altobjid)
@@ -810,6 +816,23 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
 			return rc;
 		obj = objid;
 	}
+
+    /* Use content of hints to modify fields in xfer_desc */
+    if (hints) {
+        CT_TRACE("phobos_op_getstripe: hints provided !!! hints='%s', len=%u",
+                 hints, lenhints);
+        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+
+        for (i = 0 ; i < nbhints; i++) {
+            CT_TRACE("hints #%d  key='%s' val='%s'",
+                     i, hinttab[i].k, hinttab[i].v);
+    
+            if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+                /* Force a given objectid */
+                obj = hinttab[i].v;
+            }
+        }
+    }
 
 	memset(&xfer, 0, sizeof(xfer));
 	xfer.xd_objid = obj;
@@ -1048,12 +1071,12 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private   *hcp = NULL;
 	char							 src[PATH_MAX];
 	char							 hexstripe[PATH_MAX] = "";
-	int						  	     rc = 0;
-	int							     rcf = 0;
-	int							     hp_flags = 0;
-	int							     open_flags;
-	int							     src_fd = -1;
-	int							     lenhints = 0;
+	int						  		 rc = 0;
+	int								 rcf = 0;
+	int								 hp_flags = 0;
+	int								 open_flags;
+	int								 src_fd = -1;
+	int								 lenhints = 0;
 	char							*hints = NULL;
 
 	rc = ct_begin(&hcp, hai);
@@ -1136,13 +1159,13 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	char							*altobj = NULL;
 	char							 lov_buf[XATTR_SIZE_MAX+1];
 	size_t							 lov_size = sizeof(lov_buf);
-	int							     lenhints = 0;
+	int								 lenhints = 0;
 	char						 	*hints = NULL;
-	int							     rc;
-	int							     hp_flags = 0;
-	int							     dst_fd = -1;
-	int							     mdt_index = -1;
-	int							     open_flags = 0;
+	int								 rc;
+	int								 hp_flags = 0;
+	int								 dst_fd = -1;
+	int								 mdt_index = -1;
+	int								 open_flags = 0;
 	bool							 set_lovea;
 
 	/*
@@ -1160,11 +1183,17 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		return rc;
 	}
 
+	/* Check if hints have been provided as hsm_archive was invoked */
+	if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
+		lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
+		hints = (char *)hai->hai_data;
+	}
+
 	/*
 	 * restore loads and sets the LOVEA w/o interpreting it to avoid
 	 * dependency on the structure format.
 	 */
-	rc = phobos_op_getstripe(&hai->hai_fid, NULL, hexstripe);
+	rc = phobos_op_getstripe(&hai->hai_fid, NULL, lenhints, hints, hexstripe);
 	if (rc) {
 		CT_WARN("cannot get stripe rules for "DFID"  (%s), use default",
 			PFID(&hai->hai_fid), strerror(-rc));
@@ -1211,12 +1240,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		goto fini;
 	}
 
-	/* Check if hints have been provided as hsm_archive was invoked */
-	if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
-		lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
-		hints = (char *)hai->hai_data;
-	}
-
 	rc = ct_get_altobjid(hai, altobjid);
 	if (!rc) {
 		CT_TRACE("Found objid as xattr for "DFID" : %s",
@@ -1258,8 +1281,8 @@ fini:
 static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 {
 	struct hsm_copyaction_private	*hcp = NULL;
-	int							     rc;
-	int							     lenhints = 0;
+	int								 rc;
+	int								 lenhints = 0;
 	char						 	*hints = NULL;
 
 
