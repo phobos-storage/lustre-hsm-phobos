@@ -492,8 +492,8 @@ struct hinttab {
 } ;
 
 static int process_hints(const char *hints,
-				  int hinttablen,
-				  struct hinttab *hinttab)
+						 int hinttablen,
+						 struct hinttab *hinttab)
 {
 	char *token1;
 	char *token2;
@@ -568,8 +568,8 @@ static int phobos_op_del(const struct lu_fid *fid,
 	int						rc;
 	char					objid[MAXNAMLEN];
 	struct hinttab			hinttab[NB_HINTS_MAX];
-	int					 i = 0;
-	int					 nbhints;
+	int						i = 0;
+	int						nbhints;
 	char				   *obj = NULL;
 	bool					objset = false;
 
@@ -628,14 +628,14 @@ static int phobos_op_put(const struct lu_fid *fid,
 	struct stat				st;
 	char					objid[MAXNAMLEN];
 	char				   *obj = NULL;
-	struct hinttab			 hinttab[NB_HINTS_MAX];
-	int						 nbhints;
-	int						 i = 0;
+	struct hinttab			hinttab[NB_HINTS_MAX];
+	int						nbhints;
+	int						i = 0;
 
 	/* If provided altobjid as objectid, if not set by hints */
-   if (altobjid)
+	if (altobjid) {
 		obj = altobjid;
-	else {
+	} else {
 		rc = fid2objid(fid, objid);
 		if (rc < 0)
 			return rc;
@@ -713,8 +713,9 @@ static int phobos_op_put(const struct lu_fid *fid,
 				strncpy(EASIER, hinttab[i].v, HINTMAX);
 				xfer.xd_params.put.tags.n_tags +=1 ;
 #undef EASIER
-		   } else
-				CT_TRACE("unknow hint '%s'",  hinttab[i].k);
+			} else {
+				CT_TRACE("unknown hint '%s'",  hinttab[i].k);
+			}
 		}
 	}
 
@@ -747,9 +748,9 @@ static int phobos_op_get(const struct lu_fid *fid,
 	int						 nbhints;
 
 	/* If provided altobjid is used as objectid */
-	if (altobjid)
+	if (altobjid) {
 		obj = altobjid;
-	else {
+	} else {
 		rc = fid2objid(fid, objid);
 		if (rc < 0)
 			return rc;
@@ -766,11 +767,10 @@ static int phobos_op_get(const struct lu_fid *fid,
 			CT_TRACE("hints #%d  key='%s' val='%s'",
 					 i, hinttab[i].k, hinttab[i].v);
 
-			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX))
 					obj = hinttab[i].v;
-
-		   } else
-				CT_TRACE("unknow hint '%s'",  hinttab[i].k);
+			else
+				CT_TRACE("unknown hint '%s'",  hinttab[i].k);
 		}
 	}
 
@@ -792,8 +792,8 @@ static int phobos_op_get(const struct lu_fid *fid,
 
 static int phobos_op_getstripe(const struct lu_fid *fid,
 							   char *altobjid,
-						       int lenhints,
-						       const char *hints,
+							   int lenhints,
+							   const char *hints,
 							   char *hexstripe)
 {
 	struct pho_xfer_desc	xfer = {0};
@@ -801,9 +801,9 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
 	char					objid[MAXNAMLEN];
 	const char			   *val = NULL;
 	char				   *obj = NULL;
-    struct hinttab          hinttab[NB_HINTS_MAX];
-    int                     nbhints;
-    int                     i = 0;
+	struct hinttab			hinttab[NB_HINTS_MAX];
+	int						nbhints;
+	int						i = 0;
 
 
 	/* If provided altobjid is used as objectid */
@@ -816,22 +816,22 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
 		obj = objid;
 	}
 
-    /* Use content of hints to modify fields in xfer_desc */
-    if (hints) {
-        CT_TRACE("phobos_op_getstripe: hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+	/* Use content of hints to modify fields in xfer_desc */
+	if (hints) {
+		CT_TRACE("phobos_op_getstripe: hints provided !!! hints='%s', len=%u",
+				 hints, lenhints);
+		nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
-        for (i = 0 ; i < nbhints; i++) {
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
+		for (i = 0 ; i < nbhints; i++) {
+			CT_TRACE("hints #%d  key='%s' val='%s'",
+					 i, hinttab[i].k, hinttab[i].v);
 
-            if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                /* Force a given objectid */
-                obj = hinttab[i].v;
-            }
-        }
-    }
+			if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
+				/* Force a given objectid */
+				obj = hinttab[i].v;
+			}
+		}
+	}
 
 	memset(&xfer, 0, sizeof(xfer));
 	xfer.xd_objid = obj;
@@ -881,8 +881,8 @@ unsigned int hexstr2bin(const char *hex, char *out)
 {
 	unsigned int len;
 	char		 tmp[10]; /* too big */
-	size_t	   i;
-	int		  rc;
+	size_t		 i;
+	int			 rc;
 
 	if (hex == NULL || out == 0)
 		return 0;
@@ -915,16 +915,16 @@ unsigned int hexstr2bin(const char *hex, char *out)
 static int ct_get_altobjid(const struct hsm_action_item *hai,
 						   char *altobjid)
 {
-	char			 xattr_buf[XATTR_SIZE_MAX+1];
-	ssize_t		  xattr_size;
-	int			  fd;
+	char	 xattr_buf[XATTR_SIZE_MAX+1];
+	ssize_t	 xattr_size;
+	int		 fd;
 
 	fd = llapi_open_by_fid(opt.o_mnt, &hai->hai_fid, O_RDONLY);
 	if (fd < 0)
 		return -errno;
 
 	xattr_size = fgetxattr(fd, trusted_hsm_fsuid, xattr_buf,
-				   XATTR_SIZE_MAX);
+						   XATTR_SIZE_MAX);
 	if (xattr_size < 0) {
 		close(fd);
 		return -errno;
@@ -939,13 +939,13 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 
 static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
-	char				   lov_buf[XATTR_SIZE_MAX+1];
+	char				 lov_buf[XATTR_SIZE_MAX+1];
 	struct lov_user_md	*lum;
-	int					rc;
-	ssize_t				xattr_size;
+	int					 rc;
+	ssize_t				 xattr_size;
 
 	xattr_size = fgetxattr(src_fd, XATTR_LUSTRE_LOV, lov_buf,
-				   sizeof(lov_buf));
+						   sizeof(lov_buf));
 	if (xattr_size < 0) {
 		rc = -errno;
 		CT_ERROR(rc, "cannot get stripe info on '%s'", src);
@@ -979,7 +979,7 @@ static int ct_restore_stripe(const char *dst, int dst_fd,
 	int	rc;
 
 	rc = fsetxattr(dst_fd, XATTR_LUSTRE_LOV, lovea, lovea_size,
-			   XATTR_CREATE);
+				   XATTR_CREATE);
 	if (rc < 0) {
 		rc = -errno;
 		CT_ERROR(rc, "cannot set lov EA on '%s'", dst);
@@ -1004,8 +1004,8 @@ static int ct_begin_restore(struct hsm_copyaction_private **phcp,
 				const struct hsm_action_item *hai,
 				int mdt_index, int open_flags)
 {
-	char	 src[PATH_MAX];
-	int	  rc;
+	char	src[PATH_MAX];
+	int		rc;
 
 	rc = llapi_hsm_action_begin(phcp, ctdata, hai, mdt_index, open_flags,
 					false);
@@ -1031,13 +1031,13 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 		   const struct hsm_action_item *hai, int hp_flags, int ct_rc)
 {
 	struct hsm_copyaction_private	*hcp;
-	char							  lstr[PATH_MAX];
-	int							   rc;
+	char							 lstr[PATH_MAX];
+	int								 rc;
 
 	CT_TRACE("Action completed, notifying coordinator "
-		 "cookie=%#jx, FID="DFID", hp_flags=%d err=%d",
-		 (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid),
-		 hp_flags, -ct_rc);
+			 "cookie=%#jx, FID="DFID", hp_flags=%d err=%d",
+			 (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid),
+			 hp_flags, -ct_rc);
 
 	ct_path_lustre(lstr, sizeof(lstr), opt.o_mnt, &hai->hai_fid);
 
@@ -1045,7 +1045,7 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 		rc = llapi_hsm_action_begin(&hcp, ctdata, hai, -1, 0, true);
 		if (rc < 0) {
 			CT_ERROR(rc, "llapi_hsm_action_begin() on '%s' failed",
-				 lstr);
+					 lstr);
 			return rc;
 		}
 		phcp = &hcp;
@@ -1054,13 +1054,13 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 	rc = llapi_hsm_action_end(phcp, &hai->hai_extent, hp_flags, abs(ct_rc));
 	if (rc == -ECANCELED)
 		CT_ERROR(rc, "completed action on '%s' has been canceled: "
-			 "cookie=%#jx, FID="DFID, lstr,
-			 (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid));
+				 "cookie=%#jx, FID="DFID, lstr,
+				 (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid));
 	else if (rc < 0)
 		CT_ERROR(rc, "llapi_hsm_action_end() on '%s' failed", lstr);
 	else
 		CT_TRACE("llapi_hsm_action_end() on '%s' ok (rc=%d)",
-			 lstr, rc);
+				 lstr, rc);
 
 	return rc;
 }
@@ -1070,7 +1070,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private   *hcp = NULL;
 	char							 src[PATH_MAX];
 	char							 hexstripe[PATH_MAX] = "";
-	int						  		 rc = 0;
+	int								 rc = 0;
 	int								 rcf = 0;
 	int								 hp_flags = 0;
 	int								 open_flags;
@@ -1242,7 +1242,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	rc = ct_get_altobjid(hai, altobjid);
 	if (!rc) {
 		CT_TRACE("Found objid as xattr for "DFID" : %s",
-			 PFID(&hai->hai_fid), altobjid);
+				 PFID(&hai->hai_fid), altobjid);
 		altobj = altobjid;
 	} else
 		altobj = NULL;
@@ -1359,7 +1359,7 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 	default:
 		rc = -EINVAL;
 		CT_ERROR(rc, "unknown action %d, on '%s'", hai->hai_action,
-			 opt.o_mnt);
+				 opt.o_mnt);
 		err_minor++;
 		ct_fini(NULL, hai, 0, rc);
 	}
