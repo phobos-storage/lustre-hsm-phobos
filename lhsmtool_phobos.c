@@ -61,7 +61,6 @@
 #include <lustre/lustreapi.h>
 
 /* Phobos headers */
-#include "pho_common.h"
 #include "phobos_store.h"
 
 #define LL_HSM_ORIGIN_MAX_ARCHIVE	(sizeof(__u32) * 8)
@@ -71,7 +70,7 @@
 
 #define HINT_HSM_FUID "hsm_fuid"
 
-#define MAXTAGS 10 
+#define MAXTAGS 10
 
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
@@ -313,7 +312,7 @@ repeat:
 
 /*
  * iThe following items are replicated from Lustre sources to avoid
- * dependencies with Lustre sources. 
+ * dependencies with Lustre sources.
  *
  * This makes it possible to compile this copytool outside Lustre source tree
  */
@@ -482,7 +481,7 @@ out:
 }
 
 /*
- * A strtok-r based function for parsing the 
+ * A strtok-r based function for parsing the
  * hints provided during an archive request
  */
 
@@ -589,7 +588,7 @@ static int phobos_op_del(const struct lu_fid *fid,
 				obj = hinttab[i].v;
 				objset = true;
 			}
-		} 
+		}
 	}
 
 	if (!objset) {
@@ -604,10 +603,10 @@ static int phobos_op_del(const struct lu_fid *fid,
 	xfer.xd_op = PHO_XFER_OP_DEL;
 	xfer.xd_objid = obj;
 
-	rc = phobos_object_delete(&xfer, 1);
+	rc = phobos_delete(&xfer, 1);
 
 	/* Cleanup and exit */
-	pho_xfer_desc_destroy(&xfer);
+	pho_xfer_desc_clean(&xfer);
 
 	if (rc)
 		CT_ERROR(rc, "DEL failed");
@@ -619,7 +618,7 @@ static int phobos_op_del(const struct lu_fid *fid,
 static int phobos_op_put(const struct lu_fid *fid,
 						 char *altobjid,
 						 const int fd,
-						 char *hexstripe, 
+						 char *hexstripe,
 						 int lenhints,
 						 const char *hints)
 {
@@ -683,7 +682,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 				xfer.xd_params.put.family = str2rsc_family(hinttab[i].v);
 
 				if (xfer.xd_params.put.family == PHO_RSC_INVAL)
-					CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+					CT_TRACE("unknown hint '%s'",  hinttab[i].k);
 
 			} else if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
 				/* Force a given objectid */
@@ -701,13 +700,13 @@ static int phobos_op_put(const struct lu_fid *fid,
 				if (xfer.xd_params.put.tags.n_tags == 0) {
 					xfer.xd_params.put.tags.tags = malloc(sizeof(char **));
 
-					if (!xfer.xd_params.put.tags.tags) 
+					if (!xfer.xd_params.put.tags.tags)
 						CT_ERROR(errno, "Out of memory !! Malloc failed");
 				}
 
 				/* I use this #define to deal with loooooog structures names */
 #define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
-				EASIER = malloc(HINTMAX); 
+				EASIER = malloc(HINTMAX);
 				if (!EASIER)
 				   CT_ERROR(errno, "Out of memory !! Malloc failed");
 
@@ -715,7 +714,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 				xfer.xd_params.put.tags.n_tags +=1 ;
 #undef EASIER
 		   } else
-				CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+				CT_TRACE("unknow hint '%s'",  hinttab[i].k);
 		}
 	}
 
@@ -725,7 +724,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 	rc = phobos_put(&xfer, 1, NULL, NULL);
 
 	/* Does this free() the tags too ? */
-	pho_xfer_desc_destroy(&xfer);
+	pho_xfer_desc_clean(&xfer);
 
 	if (rc)
 		CT_ERROR(rc, "PUT failed");
@@ -771,7 +770,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 					obj = hinttab[i].v;
 
 		   } else
-				CT_TRACE("unknow hint '%s'",  hinttab[i].k); 
+				CT_TRACE("unknow hint '%s'",  hinttab[i].k);
 		}
 	}
 
@@ -783,7 +782,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 
 	rc = phobos_get(&xfer, 1, NULL, NULL);
 
-	pho_xfer_desc_destroy(&xfer);
+	pho_xfer_desc_clean(&xfer);
 
 	if (rc)
 		CT_ERROR(rc, "GET failed");
@@ -826,7 +825,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
         for (i = 0 ; i < nbhints; i++) {
             CT_TRACE("hints #%d  key='%s' val='%s'",
                      i, hinttab[i].k, hinttab[i].v);
-    
+
             if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
                 /* Force a given objectid */
                 obj = hinttab[i].v;
@@ -852,7 +851,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
 		strcpy(hexstripe, val);
 	}
 
-	pho_xfer_desc_destroy(&xfer);
+	pho_xfer_desc_clean(&xfer);
 
 	return rc;
 }
@@ -1122,7 +1121,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 	}
 
 	/* Do phobos xfer */
-	rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe, 
+	rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe,
 					   lenhints, hints);
 	CT_TRACE("phobos_put (archive): rc=%d", rc);
 	if (rc)
