@@ -277,6 +277,7 @@ repeat:
 			break;
 		case 'F':
 			opt.o_default_family = str2rsc_family(optarg);
+			break;
 		case 't':
 			strncpy(trusted_hsm_fsuid, optarg, MAXNAMLEN);
 			break;
@@ -660,6 +661,12 @@ static int phobos_op_put(const struct lu_fid *fid,
 	xfer.xd_fd = fd;
 	xfer.xd_flags = 0;
 
+	/* set oid in xattr for later use */
+	rc = fsetxattr(xfer.xd_fd, trusted_hsm_fsuid, obj, strlen(obj),
+				   XATTR_CREATE);
+	if (rc)
+		CT_TRACE("phobos_op_put: failed to write xattr: %s\n", strerror(errno));
+
 	/* fstat on lustre fd seems to fail */
 	fstat(xfer.xd_fd, &st);
 	xfer.xd_params.put.size = st.st_size;
@@ -704,7 +711,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 						CT_ERROR(errno, "Out of memory !! Malloc failed");
 				}
 
-				/* I use this #define to deal with loooooog structures names */
+				/* I use this #define to deal with loooooong structures names */
 #define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
 				EASIER = malloc(HINTMAX);
 				if (!EASIER)
