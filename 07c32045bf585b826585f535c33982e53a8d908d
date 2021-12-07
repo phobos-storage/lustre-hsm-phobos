@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc680bd6_e5ab0af8",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2021-12-07T15:38:18Z",
+      "side": 1,
+      "message": "style: with a 4-width tabulation, this area is bad indented",
+      "range": {
+        "startLine": 741,
+        "startChar": 1,
+        "endLine": 747,
+        "endChar": 19
+      },
+      "revId": "07c32045bf585b826585f535c33982e53a8d908d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
