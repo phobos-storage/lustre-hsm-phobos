@@ -1,5 +1,5 @@
 /*
- *  vim:expandtab:shiftwidth=4:tabstop=4:
+ *  vim:noexpandtab:shiftwidth=4:tabstop=4:
  *
  * GPL HEADER START
  *
@@ -23,7 +23,7 @@
  */
 /*
  * (C) Copyright 2012 Commissariat a l'energie atomique et aux energies
- *	 alternatives
+ * alternatives
  *
  * Copyright (c) 2013, 2016, Intel Corporation.
  */
@@ -64,7 +64,7 @@
 #include "phobos_store.h"
 
 #define LL_HSM_ORIGIN_MAX_ARCHIVE	(sizeof(__u32) * 8)
-#define XATTR_TRUSTED_PREFIX	"trusted."
+#define XATTR_TRUSTED_PREFIX		"trusted."
 
 #define XATTR_TRUSTED_HSM_FUID_DEFAULT	"trusted.hsm_fuid"
 
@@ -94,23 +94,23 @@ enum ct_action {
 };
 
 struct options {
-	int					o_daemonize;
-	int					o_dry_run;
-	int					o_abort_on_error;
-	int					o_verbose;
-	int					o_archive_id_used;
-	int					o_archive_id_cnt;
-	int				   *o_archive_id;
-	char				  *o_event_fifo;
-	char				  *o_mnt;
-	int					o_mnt_fd;
-	enum rsc_family		o_default_family;
+	int				 o_daemonize;
+	int				 o_dry_run;
+	int				 o_abort_on_error;
+	int				 o_verbose;
+	int				 o_archive_id_used;
+	int				 o_archive_id_cnt;
+	int				*o_archive_id;
+	char			*o_event_fifo;
+	char			*o_mnt;
+	int				 o_mnt_fd;
+	enum rsc_family	 o_default_family;
 };
 
 /* everything else is zeroed */
 struct options opt = {
-	.o_verbose		= LLAPI_MSG_INFO,
-	.o_default_family = PHO_RSC_INVAL,
+	.o_verbose			= LLAPI_MSG_INFO,
+	.o_default_family	= PHO_RSC_INVAL,
 };
 
 /*
@@ -140,23 +140,23 @@ static inline double ct_now(void)
 
 #define CT_ERROR(_rc, _format, ...)					\
 	llapi_error(LLAPI_MSG_ERROR, _rc,				\
-			"%f %s[%ld]: "_format,				\
-			ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
+				"%f %s[%ld]: "_format,				\
+				ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
 
-#define CT_DEBUG(_format, ...)						\
-	llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,		\
-			"%f %s[%ld]: "_format,				\
-			ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
+#define CT_DEBUG(_format, ...)								\
+	llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0,	\
+				"%f %s[%ld]: "_format,						\
+				ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
 
 #define CT_WARN(_format, ...) \
-	llapi_error(LLAPI_MSG_WARN | LLAPI_MSG_NO_ERRNO, 0,		\
-			"%f %s[%ld]: "_format,				\
-			ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
+	llapi_error(LLAPI_MSG_WARN | LLAPI_MSG_NO_ERRNO, 0,	\
+				"%f %s[%ld]: "_format,					\
+				ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
 
-#define CT_TRACE(_format, ...)						\
-	llapi_error(LLAPI_MSG_INFO | LLAPI_MSG_NO_ERRNO, 0,		\
-			"%f %s[%ld]: "_format,				\
-			ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
+#define CT_TRACE(_format, ...)							\
+	llapi_error(LLAPI_MSG_INFO | LLAPI_MSG_NO_ERRNO, 0,	\
+				"%f %s[%ld]: "_format,					\
+				ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
 
 static void usage(const char *name, int rc)
 {
@@ -170,17 +170,17 @@ static void usage(const char *name, int rc)
 	"The Lustre HSM tool performs administrator-type actions\n"
 	"on a Lustre HSM archive.\n"
 	"This Phobos-flavored tool can link an existing HSM namespace\n"
-	"into a Lustre filesystem.\n"
-	" Usage:\n"
-	"	   --daemon				 Daemon mode, run in background\n"
-	"	   --abort-on-error		 Abort operation on major error\n"
-	"   -A, --archive <#>			Archive number (repeatable)\n"
-	"	   --dry-run				Don't run, just show what would be done\n"
-	"   -f, --event-fifo <path>	  Write events stream to fifo\n"
-	"   -F, --default-family <name>  Set the default family\n"
-	"   -q, --quiet				  Produce less verbose output\n"
-	"   -t, --hsm_fsuid			  change value of xattr for restore\n"
-	"   -v, --verbose				Produce more verbose output\n",
+	"into a Lustre filesystem.\n\n"
+	"Usage:\n"
+	"        --daemon					Daemon mode, run in background\n"
+	"        --abort-on-error			Abort operation on major error\n"
+	"    -A, --archive <#>				Archive number (repeatable)\n"
+	"        --dry-run					Don't run, just show what would be done\n"
+	"    -f, --event-fifo <path>		Write events stream to fifo\n"
+	"    -F, --default-family <name>	Set the default family\n"
+	"    -q, --quiet					Produce less verbose output\n"
+	"    -t, --hsm_fsuid				Change value of xattr for restore\n"
+	"    -v, --verbose					Produce more verbose output\n",
 	cmd_name);
 
 	exit(rc);
@@ -209,9 +209,11 @@ static int ct_parseopts(int argc, char * const *argv)
 						.has_arg = required_argument },
 	{ .val = 'v',	.name = "verbose",	.has_arg = no_argument },
 	{ .val = 't',	.name = "hsm_fsuid",	 .has_arg = required_argument},
-	{ .name = NULL } };
+	{ .name = NULL }
+	};
 	bool all_id = false;
-	int c, rc;
+	int rc;
+	int c;
 	int i;
 
 	optind = 0;
@@ -221,9 +223,10 @@ static int ct_parseopts(int argc, char * const *argv)
 							  sizeof(*opt.o_archive_id));
 	if (opt.o_archive_id == NULL)
 		return -ENOMEM;
+
 repeat:
 	while ((c = getopt_long(argc, argv, "A:b:c:f:F:hqt:v",
-				long_opts, NULL)) != -1) {
+							long_opts, NULL)) != -1) {
 		switch (c) {
 		case 'A': {
 			char *end = NULL;
@@ -261,8 +264,8 @@ repeat:
 
 				opt.o_archive_id_cnt *= 2;
 				tmp = realloc(opt.o_archive_id,
-						  sizeof(*opt.o_archive_id) *
-								 opt.o_archive_id_cnt);
+							  sizeof(*opt.o_archive_id) *
+							  opt.o_archive_id_cnt);
 				if (tmp == NULL)
 					return -ENOMEM;
 
@@ -312,7 +315,7 @@ repeat:
 }
 
 /*
- * iThe following items are replicated from Lustre sources to avoid
+ * The following items are replicated from Lustre sources to avoid
  * dependencies with Lustre sources.
  *
  * This makes it possible to compile this copytool outside Lustre source tree
@@ -322,48 +325,48 @@ enum fid_seq {
 		FID_SEQ_LLOG			= 1, /* unnamed llogs */
 		FID_SEQ_ECHO			= 2,
 		FID_SEQ_UNUSED_START	= 3,
-		FID_SEQ_UNUSED_END	  = 9,
-		FID_SEQ_LLOG_NAME	   = 10, /* named llogs */
+		FID_SEQ_UNUSED_END		= 9,
+		FID_SEQ_LLOG_NAME		= 10, /* named llogs */
 		FID_SEQ_RSVD			= 11,
 		FID_SEQ_IGIF			= 12,
 		FID_SEQ_IGIF_MAX		= 0x0ffffffffULL,
 		FID_SEQ_IDIF			= 0x100000000ULL,
 		FID_SEQ_IDIF_MAX		= 0x1ffffffffULL,
 		/* Normal FID sequence starts from this value, i.e. 1<<33 */
-		FID_SEQ_START		   = 0x200000000ULL,
+		FID_SEQ_START			= 0x200000000ULL,
 		/* sequence for local pre-defined FIDs listed in local_oid */
-		FID_SEQ_LOCAL_FILE	  = 0x200000001ULL,
-		FID_SEQ_DOT_LUSTRE	  = 0x200000002ULL,
+		FID_SEQ_LOCAL_FILE		= 0x200000001ULL,
+		FID_SEQ_DOT_LUSTRE		= 0x200000002ULL,
 		/*
 		 * sequence is used for local named objects FIDs generated
 		 * by local_object_storage library
 		 */
-		FID_SEQ_LOCAL_NAME	  = 0x200000003ULL,
+		FID_SEQ_LOCAL_NAME		= 0x200000003ULL,
 		/*
 		 * Because current FLD will only cache the fid sequence, instead
 		 * of oid on the client side, if the FID needs to be exposed to
 		 * clients sides, it needs to make sure all of fids under one
 		 * sequence will be located in one MDT.
 		 */
-		FID_SEQ_SPECIAL		 = 0x200000004ULL,
-		FID_SEQ_QUOTA		   = 0x200000005ULL,
-		FID_SEQ_QUOTA_GLB	   = 0x200000006ULL,
+		FID_SEQ_SPECIAL			= 0x200000004ULL,
+		FID_SEQ_QUOTA			= 0x200000005ULL,
+		FID_SEQ_QUOTA_GLB		= 0x200000006ULL,
 		FID_SEQ_ROOT			= 0x200000007ULL,  /* Located on MDT0 */
-		FID_SEQ_LAYOUT_RBTREE   = 0x200000008ULL,
+		FID_SEQ_LAYOUT_RBTREE	= 0x200000008ULL,
 		/* sequence is used for update logs of cross-MDT operation */
-		FID_SEQ_UPDATE_LOG	  = 0x200000009ULL,
+		FID_SEQ_UPDATE_LOG		= 0x200000009ULL,
 		/*
 		 * Sequence is used for the directory under which update logs
 		 * are created.
 		 */
-		FID_SEQ_UPDATE_LOG_DIR  = 0x20000000aULL,
-		FID_SEQ_NORMAL		  = 0x200000400ULL,
-		FID_SEQ_LOV_DEFAULT	 = 0xffffffffffffffffULL
+		FID_SEQ_UPDATE_LOG_DIR	= 0x20000000aULL,
+		FID_SEQ_NORMAL			= 0x200000400ULL,
+		FID_SEQ_LOV_DEFAULT		= 0xffffffffffffffffULL
 };
 
 enum root_oid {
-		FID_OID_ROOT			= 1UL,
-		FID_OID_ECHO_ROOT	   = 2UL,
+		FID_OID_ROOT		= 1UL,
+		FID_OID_ECHO_ROOT	= 2UL,
 };
 
 static inline __u64 fid_seq(const struct lu_fid *fid)
@@ -487,10 +490,11 @@ out:
  */
 
 #define HINTMAX 80
+
 struct hinttab {
 	char k[HINTMAX];
 	char v[HINTMAX];
-} ;
+};
 
 static int process_hints(const char *hints,
 						 int hinttablen,
@@ -547,7 +551,6 @@ static int process_hints(const char *hints,
 	return pos1;
 }
 
-
 /*
  * Phobos functions
  */
@@ -596,6 +599,7 @@ static int phobos_op_del(const struct lu_fid *fid,
 		rc = fid2objid(fid, objid);
 		if (rc < 0)
 			return rc;
+
 		obj = objid;
 	}
 
@@ -613,7 +617,6 @@ static int phobos_op_del(const struct lu_fid *fid,
 		CT_ERROR(rc, "DEL failed");
 
 	return rc;
-
 }
 
 static int phobos_op_put(const struct lu_fid *fid,
@@ -863,6 +866,7 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
 
 	return rc;
 }
+
 /*
  * A set of function to encode buffer into strings
  */
@@ -872,7 +876,7 @@ void bin2hexstr(const char *bin, size_t len, char *out)
 	char	tmp[10];
 
 	if (bin == NULL || len == 0)
-				return;
+		return;
 
 	/* Size is encoded at the beginning */
 	out[0] = 0;
@@ -880,17 +884,17 @@ void bin2hexstr(const char *bin, size_t len, char *out)
 
 	/* Next each char, one by one */
 	for (i = 0; i < len; i++) {
-			sprintf(tmp, "%08x:", bin[i]);
-			strcat(out, tmp);
+		sprintf(tmp, "%08x:", bin[i]);
+		strcat(out, tmp);
 	}
 }
 
 unsigned int hexstr2bin(const char *hex, char *out)
 {
-	unsigned int len;
-	char		 tmp[10]; /* too big */
-	size_t		 i;
-	int			 rc;
+	unsigned int	len;
+	char			tmp[10]; /* too big */
+	size_t			i;
+	int				rc;
 
 	if (hex == NULL || out == 0)
 		return 0;
@@ -904,6 +908,7 @@ unsigned int hexstr2bin(const char *hex, char *out)
 
 	/* Remind that 3 first characters encodes the size */
 	out[0] = 0;
+
 	for (i = 0; i < len; i++) {
 		memcpy(tmp, &(hex[9*i+3]), 8);
 		tmp[9] = 0;
@@ -923,7 +928,7 @@ unsigned int hexstr2bin(const char *hex, char *out)
 static int ct_get_altobjid(const struct hsm_action_item *hai,
 						   char *altobjid)
 {
-	char	 xattr_buf[XATTR_SIZE_MAX+1];
+	char	 xattr_buf[XATTR_SIZE_MAX + 1];
 	ssize_t	 xattr_size;
 	int		 fd;
 
@@ -947,10 +952,10 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 
 static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 {
-	char				 lov_buf[XATTR_SIZE_MAX+1];
+	char				 lov_buf[XATTR_SIZE_MAX + 1];
+	ssize_t				 xattr_size;
 	struct lov_user_md	*lum;
 	int					 rc;
-	ssize_t				 xattr_size;
 
 	xattr_size = fgetxattr(src_fd, XATTR_LUSTRE_LOV, lov_buf,
 						   sizeof(lov_buf));
@@ -982,9 +987,9 @@ static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
 }
 
 static int ct_restore_stripe(const char *dst, int dst_fd,
-				 const void *lovea, size_t lovea_size)
+							 const void *lovea, size_t lovea_size)
 {
-	int	rc;
+	int rc;
 
 	rc = fsetxattr(dst_fd, XATTR_LUSTRE_LOV, lovea, lovea_size,
 				   XATTR_CREATE);
@@ -997,10 +1002,10 @@ static int ct_restore_stripe(const char *dst, int dst_fd,
 }
 
 static int ct_path_lustre(char *buf, int sz, const char *mnt,
-			  const struct lu_fid *fid)
+						  const struct lu_fid *fid)
 {
 	return snprintf(buf, sz, "%s/%s/fid/"DFID_NOBRACE, mnt,
-			dot_lustre_name, PFID(fid));
+					dot_lustre_name, PFID(fid));
 }
 
 static bool ct_is_retryable(int err)
@@ -1009,14 +1014,14 @@ static bool ct_is_retryable(int err)
 }
 
 static int ct_begin_restore(struct hsm_copyaction_private **phcp,
-				const struct hsm_action_item *hai,
-				int mdt_index, int open_flags)
+							const struct hsm_action_item *hai,
+							int mdt_index, int open_flags)
 {
 	char	src[PATH_MAX];
 	int		rc;
 
 	rc = llapi_hsm_action_begin(phcp, ctdata, hai, mdt_index, open_flags,
-					false);
+								false);
 	if (rc < 0) {
 		ct_path_lustre(src, sizeof(src), opt.o_mnt, &hai->hai_fid);
 		CT_ERROR(rc, "llapi_hsm_action_begin() on '%s' failed", src);
@@ -1026,7 +1031,7 @@ static int ct_begin_restore(struct hsm_copyaction_private **phcp,
 }
 
 static int ct_begin(struct hsm_copyaction_private **phcp,
-			const struct hsm_action_item *hai)
+					const struct hsm_action_item *hai)
 {
 	/*
 	 * Restore takes specific parameters. Call the same function w/ default
@@ -1036,7 +1041,7 @@ static int ct_begin(struct hsm_copyaction_private **phcp,
 }
 
 static int ct_fini(struct hsm_copyaction_private **phcp,
-		   const struct hsm_action_item *hai, int hp_flags, int ct_rc)
+				   const struct hsm_action_item *hai, int hp_flags, int ct_rc)
 {
 	struct hsm_copyaction_private	*hcp;
 	char							 lstr[PATH_MAX];
@@ -1167,7 +1172,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	char							 lov_buf[XATTR_SIZE_MAX+1];
 	size_t							 lov_size = sizeof(lov_buf);
 	int								 lenhints = 0;
-	char						 	*hints = NULL;
+	char							*hints = NULL;
 	int								 rc;
 	int								 hp_flags = 0;
 	int								 dst_fd = -1;
@@ -1183,10 +1188,10 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 
 	/* build backend file name from released file FID */
 	rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid,
-					&mdt_index);
+									&mdt_index);
 	if (rc < 0) {
 		CT_ERROR(rc, "cannot get mdt index "DFID"",
-			 PFID(&hai->hai_fid));
+				 PFID(&hai->hai_fid));
 		return rc;
 	}
 
@@ -1203,7 +1208,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	rc = phobos_op_getstripe(&hai->hai_fid, NULL, lenhints, hints, hexstripe);
 	if (rc) {
 		CT_WARN("cannot get stripe rules for "DFID"  (%s), use default",
-			PFID(&hai->hai_fid), strerror(-rc));
+				PFID(&hai->hai_fid), strerror(-rc));
 		set_lovea = false;
 	} else {
 		open_flags |= O_LOV_DELAY_CREATE;
@@ -1224,9 +1229,9 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 	/* get the FID of the volatile file */
 	rc = llapi_hsm_action_get_dfid(hcp, &dfid);
 	if (rc < 0) {
-		CT_ERROR(rc, "restoring "DFID
-			 ", cannot get FID of created volatile file",
-			 PFID(&hai->hai_fid));
+		CT_ERROR(rc, "restoring "DFID", "
+				 "cannot get FID of created volatile file",
+				 PFID(&hai->hai_fid));
 		goto fini;
 	}
 
@@ -1263,7 +1268,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 		rc = ct_restore_stripe(dst, dst_fd, lov_buf, lov_size);
 		if (rc < 0) {
 			CT_ERROR(rc, "cannot restore file striping info"
-				 " for '%s'", dst);
+					 " for '%s'", dst);
 			err_major++;
 			goto fini;
 		}
@@ -1279,7 +1284,7 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 fini:
 	rc = ct_fini(&hcp, hai, hp_flags, rc);
 
-	if (!(dst_fd < 0))
+	if (dst_fd >= 0)
 		close(dst_fd);
 
 	return rc;
@@ -1290,7 +1295,7 @@ static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 	struct hsm_copyaction_private	*hcp = NULL;
 	int								 rc;
 	int								 lenhints = 0;
-	char						 	*hints = NULL;
+	char							*hints = NULL;
 
 
 	rc = ct_begin(&hcp, hai);
@@ -1321,21 +1326,21 @@ fini:
 
 static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 {
-	int	rc = 0;
+	int rc = 0;
 
 	if (opt.o_verbose >= LLAPI_MSG_INFO || opt.o_dry_run) {
 		/* Print the original path */
-		char		fid[128];
 		char		path[PATH_MAX];
-		long long   recno = -1;
-		int		 linkno = 0;
+		long long	recno = -1;
+		int			linkno = 0;
+		char		fid[128];
 
 		sprintf(fid, DFID, PFID(&hai->hai_fid));
 		CT_TRACE("'%s' action %s reclen %d, cookie=%#jx",
-			 fid, hsm_copytool_action2name(hai->hai_action),
-			 hai->hai_len, (uintmax_t)hai->hai_cookie);
+				 fid, hsm_copytool_action2name(hai->hai_action),
+				 hai->hai_len, (uintmax_t)hai->hai_cookie);
 		rc = llapi_fid2path(opt.o_mnt, fid, path,
-					sizeof(path), &recno, &linkno);
+							sizeof(path), &recno, &linkno);
 		if (rc < 0)
 			CT_ERROR(rc, "cannot get path of FID %s", fid);
 		else
@@ -1355,7 +1360,7 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 		break;
 	case HSMA_CANCEL:
 		CT_TRACE("cancel not implemented for file system '%s'",
-			 opt.o_mnt);
+				 opt.o_mnt);
 		/*
 		 * Don't report progress to coordinator for this cookie:
 		 * the copy function will get ECANCELED when reporting
@@ -1377,13 +1382,13 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 
 struct ct_th_data {
 	long					hal_flags;
-	struct hsm_action_item *hai;
+	struct hsm_action_item	*hai;
 };
 
 static void *ct_thread(void *data)
 {
-	struct ct_th_data *cttd = data;
-	int				rc;
+	struct ct_th_data	*cttd = data;
+	int					 rc;
 
 	rc = ct_process_item(cttd->hai, cttd->hal_flags);
 
@@ -1393,12 +1398,12 @@ static void *ct_thread(void *data)
 }
 
 static int ct_process_item_async(const struct hsm_action_item *hai,
-				 long hal_flags)
+								 long hal_flags)
 {
-	pthread_attr_t	  attr;
-	pthread_t		   thread;
-	struct ct_th_data  *data;
-	int				 rc;
+	pthread_attr_t		 attr;
+	pthread_t			 thread;
+	struct ct_th_data	*data;
+	int					 rc;
 
 	data = malloc(sizeof(*data));
 	if (data == NULL)
@@ -1416,7 +1421,7 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 	rc = pthread_attr_init(&attr);
 	if (rc != 0) {
 		CT_ERROR(rc, "pthread_attr_init failed for '%s' service",
-			 opt.o_mnt);
+				 opt.o_mnt);
 		free(data->hai);
 		free(data);
 		return -rc;
@@ -1427,7 +1432,7 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 	rc = pthread_create(&thread, &attr, ct_thread, data);
 	if (rc != 0)
 		CT_ERROR(rc, "cannot create thread for '%s' service",
-			 opt.o_mnt);
+				 opt.o_mnt);
 
 	pthread_attr_destroy(&attr);
 	return 0;
@@ -1454,7 +1459,7 @@ static void handler(int signal)
 static int ct_run(void)
 {
 	struct sigaction cleanup_sigaction;
-	int			  rc;
+	int rc;
 
 	if (opt.o_daemonize) {
 		rc = daemon(1, 1);
@@ -1477,8 +1482,8 @@ static int ct_run(void)
 	}
 
 	rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
-					 opt.o_archive_id_used,
-					 opt.o_archive_id, 0);
+									 opt.o_archive_id_used,
+									 opt.o_archive_id, 0);
 	if (rc < 0) {
 		CT_ERROR(rc, "cannot start copytool interface");
 		return rc;
@@ -1504,7 +1509,7 @@ static int ct_run(void)
 			break;
 		} else if (rc < 0) {
 			CT_WARN("cannot receive action list: %s",
-				strerror(-rc));
+					strerror(-rc));
 			err_major++;
 			if (opt.o_abort_on_error)
 				break;
@@ -1513,12 +1518,12 @@ static int ct_run(void)
 		}
 
 		CT_TRACE("copytool fs=%s archive#=%d item_count=%d",
-			 hal->hal_fsname, hal->hal_archive_id, hal->hal_count);
+				 hal->hal_fsname, hal->hal_archive_id, hal->hal_count);
 
 		if (strcmp(hal->hal_fsname, fs_name) != 0) {
 			rc = -EINVAL;
 			CT_ERROR(rc, "'%s' invalid fs name, expecting: %s",
-				 hal->hal_fsname, fs_name);
+					 hal->hal_fsname, fs_name);
 			err_major++;
 			if (opt.o_abort_on_error)
 				break;
@@ -1539,7 +1544,7 @@ static int ct_run(void)
 			rc = ct_process_item_async(hai, hal->hal_flags);
 			if (rc < 0)
 				CT_ERROR(rc, "'%s' item %d process",
-					 opt.o_mnt, i);
+						 opt.o_mnt, i);
 			if (opt.o_abort_on_error && err_major)
 				break;
 			hai = hai_next(hai);
@@ -1566,7 +1571,7 @@ static int ct_setup(void)
 	rc = llapi_search_fsname(opt.o_mnt, fs_name);
 	if (rc < 0) {
 		CT_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
-			 opt.o_mnt);
+				 opt.o_mnt);
 		return rc;
 	}
 
@@ -1574,7 +1579,7 @@ static int ct_setup(void)
 	if (opt.o_mnt_fd < 0) {
 		rc = -errno;
 		CT_ERROR(rc, "cannot open mount point at '%s'",
-			 opt.o_mnt);
+				 opt.o_mnt);
 		return rc;
 	}
 
@@ -1605,7 +1610,7 @@ static int ct_cleanup(void)
 
 int main(int argc, char **argv)
 {
-	int	rc;
+	int rc;
 
 	strncpy(trusted_hsm_fsuid, XATTR_TRUSTED_HSM_FUID_DEFAULT, MAXNAMLEN);
 
@@ -1627,11 +1632,11 @@ int main(int argc, char **argv)
 	rc = ct_run();
 
 	CT_TRACE("process finished, errs: %d major, %d minor,"
-		 " rc=%d (%s)", err_major, err_minor, rc,
-		 strerror(-rc));
+			 " rc=%d (%s)", err_major, err_minor, rc,
+			 strerror(-rc));
 
 error_cleanup:
-		 ct_cleanup();
+	ct_cleanup();
 
-	 return -rc;
+	return -rc;
 }
