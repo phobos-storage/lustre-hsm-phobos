@@ -729,6 +729,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 	/* Finalize xfer_desc and to the PUT operation */
 	xfer.xd_objid = obj;
 	xfer.xd_attrs = attrs;
+    xfer.xd_params.put.overwrite = true;
 	rc = phobos_put(&xfer, 1, NULL, NULL);
 
 	/* Does this free() the tags too ? */
