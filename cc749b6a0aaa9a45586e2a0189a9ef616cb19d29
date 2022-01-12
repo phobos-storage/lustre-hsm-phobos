@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fea9a83_408dff68",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1641,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-01-12T08:49:44Z",
+      "side": 1,
+      "message": "style: bad alignment",
+      "range": {
+        "startLine": 1641,
+        "startChar": 1,
+        "endLine": 1641,
+        "endChar": 2
+      },
+      "revId": "cc749b6a0aaa9a45586e2a0189a9ef616cb19d29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
