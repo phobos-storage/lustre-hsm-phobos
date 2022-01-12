@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9b6be17_0ad09595",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-01-12T08:33:37Z",
+      "side": 1,
+      "message": "As suggested, we need to be sure the user will not choose their object_id, to avoid them overwriting objects they do not own.",
+      "revId": "94d339a9c12721f1a3ccb58dcaa4ecdf1045a958",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
