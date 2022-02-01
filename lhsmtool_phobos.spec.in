@@ -1,0 +1,38 @@
+Name:    lhsmtool_phobos
+Version: @VERSION@
+Release: 1%{?dist}
+Summary: Lustre HSM Copytool for Phobos
+
+Group:   Applications/System
+License: LGPLv3
+URL:     https://github.com/phobos-storage/lustre-hsm-phobos
+Source0: %{name}-%{version}.tar.gz
+
+Requires: phobos >= 1.93
+
+BuildRequires: gcc
+BuildRequires: lustre-client
+BuildRequires: phobos-devel >= 1.93
+
+%description
+A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
+runs Phobos' LRS daemon (version > 1.93).
+
+%prep
+%setup -q
+
+%build
+%make_build
+
+%install
+%make_install
+
+%files
+%{_bindir}/lhsmtool_phobos
+
+%changelog
+
+* Tue Feb 03 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.0-1
+- Implementation of Archive/Restore/Delete HSM actions
+- Support for hints through the "--data" option of "lfs hsm_archive"
+- RPM and SRPM generation with "make rpm"
