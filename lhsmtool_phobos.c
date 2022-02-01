@@ -23,7 +23,7 @@
  */
 /*
  * (C) Copyright 2012 Commissariat a l'energie atomique et aux energies
- *	 alternatives
+ * alternatives
  *
  * Copyright (c) 2013, 2016, Intel Corporation.
  */
@@ -1416,7 +1416,7 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 	rc = pthread_attr_init(&attr);
 	if (rc != 0) {
 		CT_ERROR(rc, "pthread_attr_init failed for '%s' service",
-			 opt.o_mnt);
+				 opt.o_mnt);
 		free(data->hai);
 		free(data);
 		return -rc;
@@ -1427,7 +1427,7 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 	rc = pthread_create(&thread, &attr, ct_thread, data);
 	if (rc != 0)
 		CT_ERROR(rc, "cannot create thread for '%s' service",
-			 opt.o_mnt);
+				 opt.o_mnt);
 
 	pthread_attr_destroy(&attr);
 	return 0;
