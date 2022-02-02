@@ -52,7 +52,11 @@ RPMDIR=`pwd`/rpms
 rpm: dist lhsmtool_phobos.spec
 	rpmbuild --define="_topdir $(RPMDIR)" -ta lhsmtool_phobos-$(VERSION).tar.gz
 
+check:
+	@bash acceptance.sh
+
 checkpatch:
 	./checkpatch.pl --no-tree -f lhsmtool_phobos.c
+	./checkpatch.pl --no-tree -f acceptance.sh
 
-.PHONY: all clean checkpatch dist rpm install
+.PHONY: all clean checkpatch dist rpm install check
