@@ -1176,7 +1176,6 @@ out:
 static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
-    size_t lov_size = sizeof(lov_buf);
     char lov_buf[XATTR_SIZE_MAX+1];
     char hexstripe[PATH_MAX];
     char altobjid[PATH_MAX];
@@ -1188,9 +1187,12 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
     int mdt_index = -1;
     int lenhints = 0;
     int hp_flags = 0;
+    size_t lov_size;
     int dst_fd = -1;
     bool set_lovea;
     int rc;
+
+    lov_size = sizeof(lov_buf);
 
     /*
      * we fill lustre so:
