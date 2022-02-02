@@ -20,6 +20,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0ef7cc02_ed267930",
+        "filename": "Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-02-02T08:08:43Z",
+      "side": 1,
+      "message": "style: one too many tab",
+      "range": {
+        "startLine": 10,
+        "startChar": 1,
+        "endLine": 10,
+        "endChar": 2
+      },
+      "revId": "1c8893683fc939e9fde536afca06b1ef92317994",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "368a34c9_b17e08d2",
+        "filename": "Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-02-02T08:08:43Z",
+      "side": 1,
+      "message": "minor: missing install command",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 37
+      },
+      "revId": "1c8893683fc939e9fde536afca06b1ef92317994",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7abfbd24_56274e69",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-02-02T08:08:43Z",
+      "side": 1,
+      "message": "style: unnecessary tab",
+      "range": {
+        "startLine": 1419,
+        "startChar": 3,
+        "endLine": 1419,
+        "endChar": 4
+      },
+      "revId": "1c8893683fc939e9fde536afca06b1ef92317994",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98f0e715_ff69a02d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1430,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-02-02T08:08:43Z",
+      "side": 1,
+      "message": "style: idem",
+      "range": {
+        "startLine": 1430,
+        "startChar": 3,
+        "endLine": 1430,
+        "endChar": 4
+      },
+      "revId": "1c8893683fc939e9fde536afca06b1ef92317994",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "97ff59a0_b0ebdec0",
         "filename": "lhsmtool_phobos.spec.in",
         "patchSetId": 1
