@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23063924_50227fb9",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-02T18:16:27Z",
+      "side": 1,
+      "message": "not related to this patch. It should be included to the previous patch. You can use \"git reset HEAD^\" then \"git add -p\" to split this patch.",
+      "range": {
+        "startLine": 1419,
+        "startChar": 3,
+        "endLine": 1419,
+        "endChar": 4
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76a47de3_644dfcde",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-02T18:16:27Z",
+      "side": 1,
+      "message": "phobos-devel \u003e\u003d 1.93 ?",
+      "range": {
+        "startLine": 13,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 27
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "489491ed_abc56763",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-02T18:16:27Z",
+      "side": 1,
+      "message": "It it should have:\n\n Requires: phobos \u003e\u003d 1.93",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 17,
+        "endChar": 41
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44c143e7_d6d7d10b",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-02T18:16:27Z",
+      "side": 1,
+      "message": "missing an entry for this initial version",
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
