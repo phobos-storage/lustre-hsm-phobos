@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0459fbb0_2b87693d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-03T08:40:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23063924_50227fb9",
+      "range": {
+        "startLine": 1419,
+        "startChar": 3,
+        "endLine": 1419,
+        "endChar": 4
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76a47de3_644dfcde",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-02-02T18:16:27Z",
       "side": 1,
       "message": "phobos-devel \u003e\u003d 1.93 ?",
+      "range": {
+        "startLine": 13,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 27
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "673adda5_9fe4568c",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-03T08:40:46Z",
+      "side": 1,
+      "message": "The issue is that it won\u0027t work with 1.93 due to the multithreading issues. The current working version is 1.93 release 2. Would this work: \"phobos-devel \u003e\u003d 1.93.0-2\"? Or maybe a simpler \"\u003e 1.93\"?",
+      "parentUuid": "76a47de3_644dfcde",
       "range": {
         "startLine": 13,
         "startChar": 15,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1319589d_3c9609f3",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-03T08:40:46Z",
+      "side": 1,
+      "message": "Done, I just didn\u0027t add the version checking due to the question related to phobos-devel.",
+      "parentUuid": "489491ed_abc56763",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 17,
+        "endChar": 41
+      },
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44c143e7_d6d7d10b",
@@ -83,6 +155,24 @@
       "writtenOn": "2022-02-02T18:16:27Z",
       "side": 1,
       "message": "missing an entry for this initial version",
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "702ad1ff_f17c6356",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-03T08:40:46Z",
+      "side": 1,
+      "message": "I assumed that changelog meant \"what changed since the last version\". Let me know if what I wrote is enough.",
+      "parentUuid": "44c143e7_d6d7d10b",
       "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
