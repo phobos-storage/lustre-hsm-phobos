@@ -217,6 +217,24 @@
       "parentUuid": "702ad1ff_f17c6356",
       "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "567a9c38_4c69c694",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-16T14:21:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7b2d083_870330ff",
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
