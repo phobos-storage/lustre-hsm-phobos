@@ -199,6 +199,24 @@
       "parentUuid": "44c143e7_d6d7d10b",
       "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7b2d083_870330ff",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-02-16T14:13:21Z",
+      "side": 1,
+      "message": "OK. Strictly speaking, the changelog is a kind of release history, and relates at least package changes. But it is also convenient for admins who will install this RPM to see there the main changes in terms of features.\n\nThe first two items are relevant.\nI think the 3rd one is not, as it doesn\u0027t concern someone who is installing the RPM (it is only for the developer who wants to generate it).",
+      "parentUuid": "702ad1ff_f17c6356",
+      "revId": "681e081ff9643ac93f8e2a891846ff9236240c27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
