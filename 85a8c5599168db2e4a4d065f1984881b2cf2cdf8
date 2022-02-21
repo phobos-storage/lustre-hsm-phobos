@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da2113d3_0ec8021d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-02-21T15:17:27Z",
+      "side": 1,
+      "message": "Seems good to me!",
+      "revId": "85a8c5599168db2e4a4d065f1984881b2cf2cdf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f5695b5_7ae89828",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1200,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-02-21T15:17:27Z",
+      "side": 1,
+      "message": "nit: double space",
+      "range": {
+        "startLine": 1200,
+        "startChar": 51,
+        "endLine": 1200,
+        "endChar": 53
+      },
+      "revId": "85a8c5599168db2e4a4d065f1984881b2cf2cdf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
