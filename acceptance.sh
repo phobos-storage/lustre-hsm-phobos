@@ -248,6 +248,10 @@ function test_archive_release_restore()
     local copy="$test_dir/copy"
 
     create_file "$file"
+
+    local defaultstripe=$(lfs getstripe -cSp "$file")
+
+    lfs migrate -c 2 -S 4096K "$file"
     cp "$file" "$copy"
 
     add_event_watch
@@ -263,7 +267,45 @@ function test_archive_release_restore()
     wait_for_event RESTORE_FINISH "$file"
 
     check_valid_restore "$copy" "$file"
+
+    local newstripe=$(lfs getstripe -cSp "$file")
+
+    if [[ $defaultstripe != $newstripe ]]
+    then
+        error "Stripping not set to default after restore: " \
+              "$defaultstripe != $newstripe"
+    fi
 }
 add_test archive_release_restore
+
+function test_archive_release_restore_with_lov()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+    lfs migrate -c 2 -S 4096K "$file"
+
+    local oldstripe=$(lfs getstripe -cSp "$file")
+
+    add_event_watch
+    start_copytool --restore-lov
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    lfs hsm_release "$file"
+    wait_for_state "$file" "released"
+
+    lfs hsm_restore "$file"
+    wait_for_event RESTORE_FINISH "$file"
+
+    local newstripe=$(lfs getstripe -cSp "$file")
+
+    if [[ $oldstripe != $newstripe ]]
+    then
+        error "Stripping changed after restore: $oldstripe != $newstripe"
+    fi
+}
+add_test archive_release_restore_with_lov
 
 run_tests

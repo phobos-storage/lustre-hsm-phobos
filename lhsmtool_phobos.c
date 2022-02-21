@@ -105,12 +105,14 @@ struct options {
     char            *o_mnt;
     int              o_mnt_fd;
     enum rsc_family  o_default_family;
+    bool             o_restore_lov;
 };
 
 /* everything else is zeroed */
 struct options opt = {
     .o_verbose         = LLAPI_MSG_INFO,
     .o_default_family  = PHO_RSC_INVAL,
+    .o_restore_lov     = false,
 };
 
 /*
@@ -181,7 +183,9 @@ static void usage(const char *name, int rc)
             "    -F, --default-family <name>  Set the default family\n"
             "    -q, --quiet                  Produce less verbose output\n"
             "    -t, --hsm_fsuid              Change value of xattr for restore\n"
-            "    -v, --verbose                Produce more verbose output\n",
+            "    -v, --verbose                Produce more verbose output\n"
+            "    -l, --restore-lov            Use the striping that the file "
+            "had when archived (off by default)\n",
         cmd_name);
 
     exit(rc);
@@ -215,6 +219,8 @@ static int ct_parseopts(int argc, char * const *argv)
             .has_arg = no_argument,
             .flag = &opt.o_dry_run },
         { .val = 'h',    .name = "help",
+            .has_arg = no_argument },
+        { .val = 'l',    .name = "restore-lov",
             .has_arg = no_argument },
         { .val = 'q',    .name = "quiet",
             .has_arg = no_argument },
@@ -301,6 +307,9 @@ repeat:
             break;
         case 'h':
             usage(argv[0], 0);
+        case 'l':
+            opt.o_restore_lov = true;
+            break;
         case 'q':
              opt.o_verbose--;
              break;
@@ -1173,11 +1182,41 @@ out:
     return rc;
 }
 
-static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
+/* \p lov_buf buffer of size at least PATH_MAX */
+static int get_stripe_bin(const struct hsm_action_item *hai,
+                          char *hints, int lenhints, int *open_flags,
+                          char *lov_buf)
+{
+    char hexstripe[PATH_MAX];
+    int lov_size;
+    int rc;
+
+    /*
+     * restore loads and sets the LOVEA w/o interpreting it to avoid
+     * dependency on the structure format.
+     */
+    rc = phobos_op_getstripe(&hai->hai_fid, NULL, lenhints, hints, hexstripe);
+    if (rc) {
+        CT_WARN("cannot get stripe rules for "DFID"  (%s), use default",
+                PFID(&hai->hai_fid), strerror(-rc));
+        return rc;
+    }
+
+    lov_size = hexstr2bin(hexstripe, lov_buf);
+    if (lov_size == 0)
+        return -EINVAL;
+
+    *open_flags |= O_LOV_DELAY_CREATE;
+
+    return lov_size;
+}
+
+static int ct_restore(const struct hsm_action_item *hai,
+                      const long hal_flags,
+                      bool restore_lov)
 {
     struct hsm_copyaction_private *hcp = NULL;
     char lov_buf[XATTR_SIZE_MAX+1];
-    char hexstripe[PATH_MAX];
     char altobjid[PATH_MAX];
     char *altobj = NULL;
     char *hints = NULL;
@@ -1189,7 +1228,6 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
     int hp_flags = 0;
     size_t lov_size;
     int dst_fd = -1;
-    bool set_lovea;
     int rc;
 
     lov_size = sizeof(lov_buf);
@@ -1215,24 +1253,15 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
         hints = (char *)hai->hai_data;
     }
 
-    /*
-     * restore loads and sets the LOVEA w/o interpreting it to avoid
-     * dependency on the structure format.
-     */
-    rc = phobos_op_getstripe(&hai->hai_fid, NULL, lenhints, hints, hexstripe);
-    if (rc) {
-        CT_WARN("cannot get stripe rules for "DFID"  (%s), use default",
-                PFID(&hai->hai_fid), strerror(-rc));
-        set_lovea = false;
-    } else {
-        open_flags |= O_LOV_DELAY_CREATE;
-        set_lovea = true;
-    }
-
-    lov_size = hexstr2bin(hexstripe, lov_buf);
-    if (lov_size == 0) {
-        rc = -EINVAL;
-        goto fini;
+    if (restore_lov) {
+        lov_size = get_stripe_bin(hai, hints, lenhints, &open_flags, lov_buf);
+        if (lov_size < 0) {
+            CT_WARN("Could not read LOV for "DFID", will proceed with default "
+                    "striping.", PFID(&hai->hai_fid));
+            restore_lov = false;
+            /* use the default layout if not found in user metadata */
+            rc = 0;
+        }
     }
 
     /* start the restore operation */
@@ -1271,10 +1300,11 @@ static int ct_restore(const struct hsm_action_item *hai, const long hal_flags)
         CT_TRACE("Found objid as xattr for "DFID" : %s",
                  PFID(&hai->hai_fid), altobjid);
         altobj = altobjid;
-    } else
+    } else {
         altobj = NULL;
+    }
 
-    if (set_lovea) {
+    if (restore_lov) {
         /*
          *  the layout cannot be allocated through .fid so we have to
          * restore a layout
@@ -1366,7 +1396,7 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
         rc = ct_archive(hai, hal_flags);
         break;
     case HSMA_RESTORE:
-        rc = ct_restore(hai, hal_flags);
+        rc = ct_restore(hai, hal_flags, opt.o_restore_lov);
         break;
     case HSMA_REMOVE:
         rc = ct_remove(hai, hal_flags);
