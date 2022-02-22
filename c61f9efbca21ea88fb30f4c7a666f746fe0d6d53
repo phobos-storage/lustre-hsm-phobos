@@ -22,6 +22,30 @@
       },
       "revId": "c61f9efbca21ea88fb30f4c7a666f746fe0d6d53",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5ecdf61_4c31bcb7",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1185,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-02-22T08:26:24Z",
+      "side": 1,
+      "message": "No it\u0027s at least but I\u0027ve noticed that it should be XATTR_SIZE_MAX+1, not PATH_MAX... I will fix it.",
+      "parentUuid": "30d4dd1b_7ca3ff3d",
+      "range": {
+        "startLine": 1185,
+        "startChar": 32,
+        "endLine": 1185,
+        "endChar": 37
+      },
+      "revId": "c61f9efbca21ea88fb30f4c7a666f746fe0d6d53",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
