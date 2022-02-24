@@ -9,9 +9,13 @@ URL:     https://github.com/phobos-storage/lustre-hsm-phobos
 Source0: %{name}-%{version}.tar.gz
 
 Requires: phobos >= 1.93
+Requires: lustre-client
 
 BuildRequires: gcc
 BuildRequires: lustre-client
+BuildRequires: glib2-devel >= 2.28
+BuildRequires: jansson-devel >= 2.5
+BuildRequires: phobos >= 1.93
 BuildRequires: phobos-devel >= 1.93
 
 %description
@@ -32,6 +36,6 @@ runs Phobos' LRS daemon (version > 1.93).
 
 %changelog
 
-* Tue Feb 03 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.0-1
+* Thu Feb 03 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.0-1
 - Implementation of Archive/Restore/Delete HSM actions
 - Support for hints through the "--data" option of "lfs hsm_archive"
