@@ -11,6 +11,8 @@ PHOBOSD_LOG=$(mktemp -t phobosd.log.XXXXX -p "$LOG_DIR")
 PHOBOSD_LOCK=/tmp/phobosd.lock
 PHOBOSD_SOCKET=/tmp/lrs
 LUSTRE_ROOT=/mnt/lustre
+FSNAME=lustre
+SKIP=77
 
 # Safe check QUICK variable
 if [[ $QUICK != true && $QUICK != false ]]
@@ -22,6 +24,12 @@ function error()
 {
     echo $*
     exit 1
+}
+
+function skip()
+{
+    echo $*
+    exit $SKIP
 }
 
 function phobos_setup()
@@ -62,6 +70,11 @@ function lustre_setup()
     llmount.sh
     lctl set_param mdt.*.hsm_control=enabled
     lctl set_param mdt.*.hsm.max_requests=50
+
+    lctl pool_new "${FSNAME}.test_pool" ||
+        error "Failed to create pool 'test_pool'"
+    lctl pool_add "${FSNAME}.test_pool" OST[0] ||
+        error "Failed to add 'OST0' to 'test_pool'"
 }
 
 function global_setup()
@@ -107,10 +120,14 @@ function run_test()
      trap "rm -rf $test_dir" EXIT
      $test_func &> "$log_file"
     )
+    local rc=$?
 
-    if [[ $? == 0 ]]
+    if [[ $rc == 0 ]]
     then
         echo "$test_name: PASS"
+    elif [[ $rc == $SKIP ]]
+    then
+        echo "$test_name: SKIP"
     else
         echo "$test_name: FAILED"
         echo "Log file: $log_file"
@@ -195,7 +212,7 @@ function wait_for_event()
         if ((count > 50))
         then
             cat "$EVENTS"
-            error "Event $event not found after 5s"
+            error "Event $event not found after 5s for $fid"
         fi
     done
 }
@@ -207,6 +224,31 @@ function check_valid_restore()
 
     diff "$orig" "$restored" >/dev/null ||
         error "File $restored changed after restore"
+}
+
+function user_md_contains()
+{
+    local oid="$1"
+    local component="$2"
+    local value="$3"
+
+    phobos -q getmd "$oid" | grep "$component" | grep "$value"
+    return $?
+}
+
+function get_oid_from_fid()
+{
+    echo "$FSNAME:$1"
+}
+
+function get_oid_from_path()
+{
+    echo "$FSNAME:$(lfs path2fid "$1")"
+}
+
+function get_file_user_md()
+{
+    phobos -q getmd "$(get_oid_from_path "$1")"
 }
 
 function get_trap()
@@ -251,7 +293,8 @@ function test_archive_release_restore()
 
     local defaultstripe=$(lfs getstripe -cSp "$file")
 
-    lfs migrate -c 2 -S 4096K "$file"
+    lfs migrate -c 2 -S 4096K "$file" ||
+        error "Could not migrate '$file'"
     cp "$file" "$copy"
 
     add_event_watch
@@ -282,8 +325,14 @@ function test_archive_release_restore_with_lov()
 {
     local file="$test_dir/file"
 
+    if ! ct_phobos --help | grep restore-lov
+    then
+        skip "Option '--restore-lov' required for this test"
+    fi
+
     create_file "$file"
-    lfs migrate -c 2 -S 4096K "$file"
+    lfs migrate -c 2 -S 4096K "$file" ||
+        error "Could not migrate '$file'"
 
     local oldstripe=$(lfs getstripe -cSp "$file")
 
@@ -307,5 +356,150 @@ function test_archive_release_restore_with_lov()
     fi
 }
 add_test archive_release_restore_with_lov
+
+function invalid_layout_error()
+{
+    local file="$1"
+
+    error -e "Invalid user_md for $file:\n" \
+             "got: $(get_file_user_md "$file")\n" \
+             "expected: $(lfs getstripe -cSLp "$file")"
+}
+
+function check_layout()
+{
+    local file="$1"
+    local oid="$(get_oid_from_path "$file")"
+
+    user_md_contains "$oid" "layout" \
+        "stripe_count=$(lfs getstripe -c "$file")" ||
+        invalid_layout_error "$file"
+
+    user_md_contains "$oid" "layout" \
+        "stripe_size=$(lfs getstripe -S "$file")" ||
+        invalid_layout_error "$file"
+
+    user_md_contains "$oid" "layout" \
+        "pattern=$(lfs getstripe -L "$file")" ||
+        invalid_layout_error "$file"
+
+    if [[ $(lfs getstripe -p "$file") != "" ]]
+    then
+        user_md_contains "$oid" "layout" \
+            "pool_name=$(lfs getstripe -p "$file")" ||
+            invalid_layout_error "$file"
+    fi
+}
+
+function test_layout_in_user_md()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    check_layout "$file"
+
+    lfs migrate -p test_pool "$file" ||
+        error "Could not migrate '$file' to 'test_pool'"
+    lfs hsm_set --dirty "$file"
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    check_layout "$file"
+}
+add_test layout_in_user_md
+
+function invalid_component_error()
+{
+    local file="$1"
+    local id="$2"
+
+    error -e "Invalid user_md for $file in component $id:\n" \
+             "got: $(get_file_user_md "$file")\n" \
+             "expected: $(lfs getstripe --component-id="$id" -cSLp "$file")"
+}
+
+function check_layout_component()
+{
+    local file="$1"
+    local oid="$(get_oid_from_path "$file")"
+    local id="$2"
+
+    user_md_contains "$oid" "layout_comp$id" \
+        "stripe_count=$(lfs getstripe --component-id="$id" -c "$file")" ||
+        invalid_component_error "$file" "$id"
+
+    user_md_contains "$oid" "layout_comp$id" \
+        "stripe_size=$(lfs getstripe --component-id="$id" -S "$file")" ||
+        invalid_component_error "$file" "$id"
+
+    user_md_contains "$oid" "layout_comp$id" \
+        "pattern=$(lfs getstripe --component-id="$id" -L "$file")" ||
+        invalid_component_error "$file" "$id"
+
+    if [[ $(lfs getstripe -p "$file") != "" ]]
+    then
+        user_md_contains "$oid" "layout_comp$id" \
+            "pool_name=$(lfs getstripe --component-id="$id" -p "$file")" ||
+            invalid_component_error "$file" "$id"
+    fi
+
+    local comp_start=$(lfs getstripe --component-id="$id" \
+                       --component-start "$file")
+    local comp_end=$(lfs getstripe --component-id="$id" --component-end "$file")
+
+    user_md_contains "$oid" "layout_comp$id" \
+        "extent_start=$comp_start" ||
+        invalid_component_error "$file" "$id"
+
+    user_md_contains "$oid" "layout_comp$id" \
+        "extent_end=$comp_end" ||
+        invalid_component_error "$file" "$id"
+}
+
+function check_layout_pfl()
+{
+    local file="$1"
+    local oid="$(get_oid_from_path "$file")"
+
+    get_file_user_md "$file"
+    lfs getstripe -y "$file"
+
+    for i in $(seq $(lfs getstripe --component-count "$file"))
+    do
+        user_md_contains "$oid" "layout_comp$i" "stripe_count" ||
+            error "'layout_comp$i' not found in user_md of '$oid'"
+
+        check_layout_component "$file" $i
+    done
+}
+
+function test_layout_pfl_in_user_md()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    lfs migrate \
+        -E   1M -c  1 -S 256k -p test_pool \
+        -E 512M -c  2 -S 512k -p "" \
+        -E  -1  -c -1 -S 1024k \
+        "$file" || error "Could not migrate '$file'"
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    check_layout_pfl "$file"
+}
+add_test layout_pfl_in_user_md
 
 run_tests
