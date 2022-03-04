@@ -63,6 +63,8 @@
 /* Phobos headers */
 #include "phobos_store.h"
 
+#include "layout.h"
+
 #define LL_HSM_ORIGIN_MAX_ARCHIVE (sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX      "trusted."
 
@@ -184,12 +186,20 @@ static void usage(const char *name, int rc)
             "    -q, --quiet                  Produce less verbose output\n"
             "    -t, --hsm_fsuid              Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
+#ifdef LLAPI_LAYOUT_SET_BY_FD
             "    -l, --restore-lov            Use the striping that the file "
-            "had when archived (off by default)\n",
-        cmd_name);
+            "had when archived (off by default)\n"
+#endif
+        , cmd_name);
 
     exit(rc);
 }
+
+#ifdef LLAPI_LAYOUT_SET_BY_FD
+#define GETOPTS_STRING "A:b:c:f:F:hqt:vl"
+#else
+#define GETOPTS_STRING "A:b:c:f:F:hqt:v"
+#endif
 
 static int ct_parseopts(int argc, char * const *argv)
 {
@@ -220,8 +230,10 @@ static int ct_parseopts(int argc, char * const *argv)
             .flag = &opt.o_dry_run },
         { .val = 'h',    .name = "help",
             .has_arg = no_argument },
+#ifdef LLAPI_LAYOUT_SET_BY_FD
         { .val = 'l',    .name = "restore-lov",
             .has_arg = no_argument },
+#endif
         { .val = 'q',    .name = "quiet",
             .has_arg = no_argument },
         { .val = 'u',    .name = "update-interval",
@@ -246,7 +258,7 @@ static int ct_parseopts(int argc, char * const *argv)
         return -ENOMEM;
 
 repeat:
-    while ((c = getopt_long(argc, argv, "A:b:c:f:F:hqt:v",
+    while ((c = getopt_long(argc, argv, GETOPTS_STRING,
                             long_opts, NULL)) != -1) {
         switch (c) {
         case 'A': {
@@ -307,9 +319,12 @@ repeat:
             break;
         case 'h':
             usage(argv[0], 0);
+            break;
+#ifdef LLAPI_LAYOUT_SET_BY_FD
         case 'l':
             opt.o_restore_lov = true;
             break;
+#endif
         case 'q':
              opt.o_verbose--;
              break;
@@ -642,10 +657,46 @@ static int phobos_op_del(const struct lu_fid *fid,
     return rc;
 }
 
+static int component_to_attr(struct llapi_layout *layout, void *user_data)
+{
+    struct pho_attrs *attrs = (struct pho_attrs *)user_data;
+    char *component_str = NULL;
+    char *id_str = NULL;
+    uint32_t id;
+    int rc;
+
+    rc = llapi_layout_comp_id_get(layout, &id);
+    if (rc)
+        return -errno;
+
+    if (llapi_layout_is_composite(layout)) {
+        rc = asprintf(&id_str, "layout_comp%u", id);
+        if (rc == -1)
+            return -ENOMEM;
+    }
+
+    rc = layout_component2str(layout, &component_str);
+    if (rc)
+        goto out_free;
+
+    if (llapi_layout_is_composite(layout))
+        rc = pho_attr_set(attrs, id_str, component_str);
+    else
+        rc = pho_attr_set(attrs, "layout", component_str);
+
+    CT_TRACE("adding layout information key='%s', value='%s'",
+             id_str ? : "layout", component_str);
+
+    free(component_str);
+out_free:
+    free(id_str);
+    return rc;
+}
+
 static int phobos_op_put(const struct lu_fid *fid,
                          char *altobjid,
                          const int fd,
-                         char *hexstripe,
+                         struct llapi_layout *layout,
                          int lenhints,
                          const char *hints)
 {
@@ -678,9 +729,12 @@ static int phobos_op_put(const struct lu_fid *fid,
     if (rc)
         return rc;
 
-    rc = pho_attr_set(&attrs, "hexstripe", hexstripe);
-    if (rc)
-        return rc;
+    if (layout) {
+        rc = llapi_layout_comp_iterate(layout, component_to_attr,
+                                       (void *)&attrs);
+        if (rc != LLAPI_LAYOUT_ITER_CONT)
+            return rc;
+    }
 
     memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_PUT;
@@ -758,7 +812,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     xfer.xd_params.put.overwrite = true;
     rc = phobos_put(&xfer, 1, NULL, NULL);
 
-    /* Does this free() the tags too ? */
+    /* free the tags as well */
     pho_xfer_desc_clean(&xfer);
 
     if (rc)
@@ -824,15 +878,14 @@ static int phobos_op_get(const struct lu_fid *fid,
     return rc;
 }
 
-static int phobos_op_getstripe(const struct lu_fid *fid,
+static int phobos_op_getlayout(const struct lu_fid *fid,
                                char *altobjid,
                                int lenhints,
                                const char *hints,
-                               char *hexstripe)
+                               struct llapi_layout **layout)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
-    const char *val = NULL;
     char objid[MAXNAMLEN];
     char *obj = NULL;
     int nbhints;
@@ -877,12 +930,9 @@ static int phobos_op_getstripe(const struct lu_fid *fid,
         return rc;
     }
 
-    if (pho_attrs_is_empty(&xfer.xd_attrs))
-        return -ENOENT;
-    else {
-        val = pho_attr_get(&xfer.xd_attrs, "hexstripe");
-        strcpy(hexstripe, val);
-    }
+    rc = layout_from_object_md(&xfer.xd_attrs, layout);
+    if (rc)
+        return -rc;
 
     pho_xfer_desc_clean(&xfer);
 
@@ -971,56 +1021,13 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 
     return 0;
 }
-
-static int ct_save_stripe(int src_fd, const char *src, char *hexstripe)
+/* FIXME the layout API doesn't provide a function to restore \p layout
+ * from \p dst_fd directly. So this function does nothing at the moment.
+ */
+static int ct_restore_layout(const char *dst, int dst_fd,
+                             struct llapi_layout *layout)
 {
-    char lov_buf[XATTR_SIZE_MAX + 1];
-    struct lov_user_md *lum;
-    ssize_t xattr_size;
-    int rc;
-
-    xattr_size = fgetxattr(src_fd, XATTR_LUSTRE_LOV, lov_buf,
-                           sizeof(lov_buf));
-    if (xattr_size < 0) {
-        rc = -errno;
-        CT_ERROR(rc, "cannot get stripe info on '%s'", src);
-        return rc;
-    }
-
-    /* read content of read xattr */
-    lum = (struct lov_user_md *)lov_buf;
-
-    if (lum->lmm_magic == LOV_USER_MAGIC_V1 ||
-        lum->lmm_magic == LOV_USER_MAGIC_V3) {
-        /*
-         * Set stripe_offset to -1 so that it is not interpreted as a
-         * hint on restore.
-         */
-        lum->lmm_stripe_offset = -1;
-    }
-
-    /*
-     * Save the stripe as an hexa string to save it as
-     * an attr in Phobos object's metadata
-     */
-    bin2hexstr((const char *)lov_buf, xattr_size, hexstripe);
-
     return 0;
-}
-
-static int ct_restore_stripe(const char *dst, int dst_fd,
-                             const void *lovea, size_t lovea_size)
-{
-    int rc;
-
-    rc = fsetxattr(dst_fd, XATTR_LUSTRE_LOV, lovea, lovea_size,
-                   XATTR_CREATE);
-    if (rc < 0) {
-        rc = -errno;
-        CT_ERROR(rc, "cannot set lov EA on '%s'", dst);
-    }
-
-    return rc;
 }
 
 static int ct_path_lustre(char *buf, int sz, const char *mnt,
@@ -1102,8 +1109,8 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
-    char  hexstripe[PATH_MAX] = "";
-    char  src[PATH_MAX];
+    struct llapi_layout *layout;
+    char src[PATH_MAX];
     char *hints = NULL;
     int lenhints = 0;
     int hp_flags = 0;
@@ -1129,7 +1136,6 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
         goto fini_major;
     }
 
-
     src_fd = llapi_hsm_action_get_fd(hcp);
     if (src_fd < 0) {
         rc = src_fd;
@@ -1141,12 +1147,9 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
     /* If extent is specified, don't truncate an old archived copy */
     open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
 
-    /* saving stripe is not critical */
-    rc = ct_save_stripe(src_fd, src, hexstripe);
-    if (rc < 0) {
-        CT_ERROR(rc, "cannot save file striping info of '%s'", src);
-        goto fini_major;
-    }
+    layout = llapi_layout_get_by_fd(src_fd, 0);
+    if (!layout)
+        CT_ERROR(-errno, "cannot read layout of '%s'", src);
 
     /* Check if hints have been provided as hsm_archive was invoked */
     if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
@@ -1155,7 +1158,7 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
     }
 
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, hexstripe,
+    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout,
                        lenhints, hints);
     CT_TRACE("phobos_put (archive): rc=%d", rc);
     if (rc)
@@ -1182,33 +1185,17 @@ out:
     return rc;
 }
 
-/* \p lov_buf buffer of size at least XATTR_SIZE_MAX+1 */
-static int get_stripe_bin(const struct hsm_action_item *hai,
-                          char *hints, int lenhints, int *open_flags,
-                          char *lov_buf)
+static int get_file_layout(const struct hsm_action_item *hai,
+                           char *hints, int lenhints, int *open_flags,
+                           struct llapi_layout **layout)
 {
-    char hexstripe[PATH_MAX];
-    int lov_size;
     int rc;
 
-    /*
-     * restore loads and sets the LOVEA w/o interpreting it to avoid
-     * dependency on the structure format.
-     */
-    rc = phobos_op_getstripe(&hai->hai_fid, NULL, lenhints, hints, hexstripe);
-    if (rc) {
-        CT_WARN("cannot get stripe rules for "DFID" (%s), use default",
-                PFID(&hai->hai_fid), strerror(-rc));
-        return rc;
-    }
-
-    lov_size = hexstr2bin(hexstripe, lov_buf);
-    if (lov_size == 0)
-        return -EINVAL;
+    rc = phobos_op_getlayout(&hai->hai_fid, NULL, lenhints, hints, layout);
 
     *open_flags |= O_LOV_DELAY_CREATE;
 
-    return lov_size;
+    return rc;
 }
 
 static int ct_restore(const struct hsm_action_item *hai,
@@ -1216,7 +1203,7 @@ static int ct_restore(const struct hsm_action_item *hai,
                       bool restore_lov)
 {
     struct hsm_copyaction_private *hcp = NULL;
-    char lov_buf[XATTR_SIZE_MAX+1];
+    struct llapi_layout *layout = NULL;
     char altobjid[PATH_MAX];
     char *altobj = NULL;
     char *hints = NULL;
@@ -1226,11 +1213,8 @@ static int ct_restore(const struct hsm_action_item *hai,
     int mdt_index = -1;
     int lenhints = 0;
     int hp_flags = 0;
-    size_t lov_size;
     int dst_fd = -1;
     int rc;
-
-    lov_size = sizeof(lov_buf);
 
     /*
      * we fill lustre so:
@@ -1254,10 +1238,10 @@ static int ct_restore(const struct hsm_action_item *hai,
     }
 
     if (restore_lov) {
-        lov_size = get_stripe_bin(hai, hints, lenhints, &open_flags, lov_buf);
-        if (lov_size < 0) {
-            CT_WARN("Could not read LOV for "DFID", will proceed with default "
-                    "striping.", PFID(&hai->hai_fid));
+        rc = get_file_layout(hai, hints, lenhints, &open_flags, &layout);
+        if (rc < 0) {
+            CT_WARN("Could not get file layout for "DFID", will proceed with "
+                    "default striping.", PFID(&hai->hai_fid));
             /* use the default layout if not found in user metadata */
             restore_lov = false;
         }
@@ -1304,17 +1288,10 @@ static int ct_restore(const struct hsm_action_item *hai,
     }
 
     if (restore_lov) {
-        /*
-         *  the layout cannot be allocated through .fid so we have to
-         * restore a layout
-         */
-        rc = ct_restore_stripe(dst, dst_fd, lov_buf, lov_size);
-        if (rc < 0) {
-            CT_ERROR(rc, "cannot restore file striping info"
-                     " for '%s'", dst);
-            err_major++;
-            goto fini;
-        }
+        rc = ct_restore_layout(dst, dst_fd, layout);
+        if (rc < 0)
+            CT_WARN("cannot restore file layout for '%s', will use default "
+                    "(rc=%d)", dst, rc);
     }
 
     /* Do phobos xfer */
@@ -1325,6 +1302,7 @@ static int ct_restore(const struct hsm_action_item *hai,
     CT_TRACE("data restore to '%s' done", dst);
 
 fini:
+    llapi_layout_free(layout);
     rc = ct_fini(&hcp, hai, hp_flags, rc);
 
     if (dst_fd >= 0)
