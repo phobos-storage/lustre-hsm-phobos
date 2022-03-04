@@ -14,14 +14,17 @@ all: \
 glib_LDFLAGS=$(shell pkg-config --libs glib-2.0)
 glib_CFLAGS=$(shell pkg-config --cflags glib-2.0)
 
-CFLAGS=-g -Wall -Werror
-LDFLAGS=-pthread -llustreapi
+SOURCES=lhsmtool_phobos.c src/layout.c
+HEADERS=src/layout.h
+
+CFLAGS=-g -Wall -Werror -Isrc
+LDFLAGS=-pthread -l:liblustreapi.a
 
 build:
 	mkdir -p build
 
-build/lhsmtool_phobos: lhsmtool_phobos.c Makefile build
-	$(CC) $(CFLAGS) $(glib_CFLAGS) -o $@ lhsmtool_phobos.c \
+build/lhsmtool_phobos: $(HEADERS) $(SOURCES) Makefile build
+	$(CC) $(CFLAGS) $(glib_CFLAGS) -o $@ $(SOURCES) \
 		$(LDFLAGS) $(glib_LDFLAGS) -lphobos_store
 
 build/lhsmtool_posix: lhsmtool_posix.c Makefile build
@@ -56,7 +59,7 @@ check:
 	@bash acceptance.sh
 
 checkpatch:
-	./checkpatch.pl --no-tree -f lhsmtool_phobos.c
+	./checkpatch.pl --no-tree -f $(SOURCES)
 	./checkpatch.pl --no-tree -f acceptance.sh
 
 .PHONY: all clean checkpatch dist rpm install check
