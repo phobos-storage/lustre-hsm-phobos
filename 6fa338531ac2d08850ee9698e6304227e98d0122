@@ -49,6 +49,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f20fc22_abc80857",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-03-08T11:26:32Z",
+      "side": 1,
+      "message": "typo: striping",
+      "range": {
+        "startLine": 190,
+        "startChar": 54,
+        "endLine": 190,
+        "endChar": 61
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8832fb5b_f3eb1967",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-03-08T11:26:32Z",
+      "side": 1,
+      "message": "typo: as well",
+      "range": {
+        "startLine": 815,
+        "startChar": 21,
+        "endLine": 815,
+        "endChar": 27
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3f7c4f18_345e3a70",
         "filename": "lhsmtool_phobos.c",
         "patchSetId": 1
@@ -65,6 +111,29 @@
         "startChar": 61,
         "endLine": 1024,
         "endChar": 62
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b9391c4_3f80b760",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-03-08T11:26:32Z",
+      "side": 1,
+      "message": "typo: comma",
+      "range": {
+        "startLine": 161,
+        "startChar": 10,
+        "endLine": 161,
+        "endChar": 14
       },
       "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
