@@ -141,6 +141,121 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c4842033_74e6faf4",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "question: isn\u0027t this dangerous ? It should be up to the caller to keep a valid reference to that string on their side and free it I think",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7750df85_dc229cb1",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "suggest: return -ENOMEM directly in the above if, and 0 here.\nAlso, why return -ENOMEM here when -1 is returned on line 675 of lhsmtool_phobos.c ?",
+      "range": {
+        "startLine": 54,
+        "startChar": 4,
+        "endLine": 54,
+        "endChar": 34
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb14c2d6_876c9935",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "idem",
+      "range": {
+        "startLine": 64,
+        "startChar": 8,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6ce8528_29047dc2",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "idem",
+      "range": {
+        "startLine": 68,
+        "startChar": 4,
+        "endLine": 68,
+        "endChar": 34
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a9f1c45_7a4342c7",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "question: is there any way for the user to know what are the attrs added to the user_md ? Are all the attrs related to layouts kept, or a specific list ?",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 71,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "07b2679d_021de97b",
         "filename": "src/layout.c",
         "patchSetId": 1
@@ -157,6 +272,52 @@
         "startChar": 8,
         "endLine": 79,
         "endChar": 21
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d37c72da_307e8e3d",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "question: so the function is all or nothing ? Is there a specific reason behind that choice ?",
+      "range": {
+        "startLine": 78,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50eb0592_bf341b84",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-08T15:48:15Z",
+      "side": 1,
+      "message": "minor?: I suppose these should return rc as well ?",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 22
       },
       "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
