@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f422d488_246378f4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a35e38ca_8ea7b891",
+      "range": {
+        "startLine": 13,
+        "startChar": 61,
+        "endLine": 13,
+        "endChar": 64
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e67c2bc7_59c77cf1",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-03-08T11:52:30Z",
       "side": 1,
       "message": "typo",
+      "range": {
+        "startLine": 473,
+        "startChar": 39,
+        "endLine": 473,
+        "endChar": 47
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b0042a9_4d268b92",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e67c2bc7_59c77cf1",
       "range": {
         "startLine": 473,
         "startChar": 39,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79bfef9a_0029a650",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2fcc840_497ebf6e",
+      "range": {
+        "startLine": 501,
+        "startChar": 1,
+        "endLine": 526,
+        "endChar": 24
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f20fc22_abc80857",
@@ -83,6 +155,30 @@
       "writtenOn": "2022-03-08T11:26:32Z",
       "side": 1,
       "message": "typo: striping",
+      "range": {
+        "startLine": 190,
+        "startChar": 54,
+        "endLine": 190,
+        "endChar": 61
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5d32d6_c7ae4dec",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f20fc22_abc80857",
       "range": {
         "startLine": 190,
         "startChar": 54,
@@ -116,6 +212,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5f3fa0c_1bbc8323",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8832fb5b_f3eb1967",
+      "range": {
+        "startLine": 815,
+        "startChar": 21,
+        "endLine": 815,
+        "endChar": 27
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f7c4f18_345e3a70",
@@ -129,6 +249,30 @@
       "writtenOn": "2022-03-07T15:41:39Z",
       "side": 1,
       "message": "typo: restore",
+      "range": {
+        "startLine": 1024,
+        "startChar": 61,
+        "endLine": 1024,
+        "endChar": 62
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6aa23ae_7faca711",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1024,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f7c4f18_345e3a70",
       "range": {
         "startLine": 1024,
         "startChar": 61,
@@ -164,6 +308,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80e1313b_81a7c5eb",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "No because we are duplicating the string, so we free the old one. A bit like how functions such as realloc work. Without this free here, I would have to pass the new and the old string in the arguments...\n\nManaging memory and errors is very tedious in C. I like to keep things simple when they can be. Especially when this is internal behavior.",
+      "parentUuid": "c4842033_74e6faf4",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7750df85_dc229cb1",
         "filename": "src/layout.c",
         "patchSetId": 1
@@ -175,6 +343,30 @@
       "writtenOn": "2022-03-08T15:48:15Z",
       "side": 1,
       "message": "suggest: return -ENOMEM directly in the above if, and 0 here.\nAlso, why return -ENOMEM here when -1 is returned on line 675 of lhsmtool_phobos.c ?",
+      "range": {
+        "startLine": 54,
+        "startChar": 4,
+        "endLine": 54,
+        "endChar": 34
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e17f2674_62af5896",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Because I should probably return -ENOMEN in lhsmtool_phobos.c",
+      "parentUuid": "7750df85_dc229cb1",
       "range": {
         "startLine": 54,
         "startChar": 4,
@@ -231,6 +423,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64273cad_06e3f826",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6ce8528_29047dc2",
+      "range": {
+        "startLine": 68,
+        "startChar": 4,
+        "endLine": 68,
+        "endChar": 34
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a9f1c45_7a4342c7",
@@ -244,6 +460,30 @@
       "writtenOn": "2022-03-08T15:48:15Z",
       "side": 1,
       "message": "question: is there any way for the user to know what are the attrs added to the user_md ? Are all the attrs related to layouts kept, or a specific list ?",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 71,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef1b4a44_b128ab89",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "For the first question, no. The documentation is... well inexistant.\n\nFor the second, everything usefull to rebuild the old striping should be conserved though this patch does not handle mirroring. Some informations are discarded such as the OST index because this should not be inforced on restore.",
+      "parentUuid": "7a9f1c45_7a4342c7",
       "range": {
         "startLine": 71,
         "startChar": 4,
@@ -302,6 +542,54 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "690d0555_195bf4ef",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Mainly coding habits... But does it make sense to keep only part of the striping?\n\nGiven that memory allocations won\u0027t fail on Linux, I don\u0027t see the point of making the code more complexe. And should they fail, I\u0027m pretty sure the code won\u0027t be able to make it past the phobos_put anyway. So the request will very likely fail.",
+      "parentUuid": "d37c72da_307e8e3d",
+      "range": {
+        "startLine": 78,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44076444_f2c68c91",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07b2679d_021de97b",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 21
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "50eb0592_bf341b84",
         "filename": "src/layout.c",
         "patchSetId": 1
@@ -325,6 +613,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "50ef5155_a46485cb",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "No because we have to free *str",
+      "parentUuid": "50eb0592_bf341b84",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 22
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b9391c4_3f80b760",
         "filename": "src/layout.c",
         "patchSetId": 1
@@ -336,6 +648,30 @@
       "writtenOn": "2022-03-08T11:26:32Z",
       "side": 1,
       "message": "typo: comma",
+      "range": {
+        "startLine": 161,
+        "startChar": 10,
+        "endLine": 161,
+        "endChar": 14
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "942c419d_ce814f39",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-09T09:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b9391c4_3f80b760",
       "range": {
         "startLine": 161,
         "startChar": 10,
