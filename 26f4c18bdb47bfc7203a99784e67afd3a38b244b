@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b312b7ce_1d14020b",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-10T12:46:06Z",
+      "side": 1,
+      "message": "minor: this should have been removed",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 472,
+        "endChar": 28
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
