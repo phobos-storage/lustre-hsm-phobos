@@ -3,6 +3,46 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94ef5990_23d904a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "(nit) it would be fine to have an example of such user_md representation in the commit message.",
+      "range": {
+        "startLine": 11,
+        "startChar": 11,
+        "endLine": 11,
+        "endChar": 68
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f14a02cc_086efb23",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "not completed the review yet.",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b312b7ce_1d14020b",
         "filename": "acceptance.sh",
         "patchSetId": 2
@@ -20,6 +60,149 @@
         "endLine": 472,
         "endChar": 28
       },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efac4fc8_ba998e86",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "Q: why did you remove the \"static\" statement?",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 24
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "049f3af6_7d3aa537",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "(-1) llapi_layout* calls do not return -errno, but follow the lib C convention: return -1 and sets errno.\n\nSo here, it should be:\n\n return -errno;\n \nI did not check and comment other llapi_layout calls in this patch. Please check them.",
+      "range": {
+        "startLine": 669,
+        "startChar": 0,
+        "endLine": 670,
+        "endChar": 18
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdf1d243_1e997fcf",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "missing licence header",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "675ba6c4_0c2f172f",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "default for lfs set_stripe size argument is 0. Are you sure it is -1 here?",
+      "range": {
+        "startLine": 82,
+        "startChar": 31,
+        "endLine": 82,
+        "endChar": 41
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faadfe6f_c76ebbce",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "add vim indentation directives",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9d043d3_55d967c1",
+        "filename": "src/layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "At least include a SPDX license header, e.g.:\n\n/*\n * Copyright (C) 2022 Commissariat a l\u0027energie atomique et aux energies\n *                    alternatives\n *\n * SPDX-License-Identifer: GPL-2.0-only\n */",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1b07669_f8ddfce0",
+        "filename": "src/layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:24:40Z",
+      "side": 1,
+      "message": "Missing vim statement to help other devs use the same indentation convention.\n\n/* vim:expandtab:shiftwidth\u003d4:tabstop\u003d4: */",
       "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
