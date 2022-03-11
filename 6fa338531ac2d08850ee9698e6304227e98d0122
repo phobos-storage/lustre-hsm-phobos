@@ -330,6 +330,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b240e9a0_eac0e809",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-11T14:34:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "80e1313b_81a7c5eb",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 50,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7750df85_dc229cb1",
@@ -390,6 +414,30 @@
       "writtenOn": "2022-03-08T15:48:15Z",
       "side": 1,
       "message": "idem",
+      "range": {
+        "startLine": 64,
+        "startChar": 8,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbddb29e_8229924b",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-11T14:34:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "eb14c2d6_876c9935",
       "range": {
         "startLine": 64,
         "startChar": 8,
@@ -496,6 +544,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a5d9d08_cc290abf",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-11T14:34:41Z",
+      "side": 1,
+      "message": "Would it be possible for you to add a list of the kept attr then ? Because I think it\u0027ll be useful for other projects I think",
+      "parentUuid": "ef1b4a44_b128ab89",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 71,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "07b2679d_021de97b",
         "filename": "src/layout.c",
         "patchSetId": 1
@@ -588,6 +660,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8b834ef_d37d337d",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-11T14:34:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "690d0555_195bf4ef",
+      "range": {
+        "startLine": 78,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 22
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50eb0592_bf341b84",
@@ -625,6 +721,30 @@
       "side": 1,
       "message": "No because we have to free *str",
       "parentUuid": "50eb0592_bf341b84",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 22
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f940c62f_3ea66fd4",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-03-11T14:34:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "50ef5155_a46485cb",
       "range": {
         "startLine": 84,
         "startChar": 8,
