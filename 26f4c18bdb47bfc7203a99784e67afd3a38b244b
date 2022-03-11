@@ -41,6 +41,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "538ba395_4e0ec0fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "review complete",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b312b7ce_1d14020b",
@@ -145,6 +162,121 @@
         "startChar": 31,
         "endLine": 82,
         "endChar": 41
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6526e8b_a1f61448",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "return -errno;\n\nsame for next calls",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 18
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "608f25a5_893c615b",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "why not using getsubopt() ?",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 1
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9312152_130ef03b",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "Here you use an error code convention which is different from other calls.\nAt least explicit it in a doxygen header of the function :-)",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 5
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9afbb0e9_79721cad",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "(defect, leak) here you don\u0027t free the string allocated by strdup, but the last value returned by csv_next_value, which is likely... NULL.",
+      "range": {
+        "startLine": 301,
+        "startChar": 4,
+        "endLine": 301,
+        "endChar": 19
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9b4bcbf_aa126b32",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-11T16:36:43Z",
+      "side": 1,
+      "message": "(defect) asprintf returns the number of bytes printed\n\nshould be:\n\nif (rc \u003d\u003d -1)",
+      "range": {
+        "startLine": 310,
+        "startChar": 4,
+        "endLine": 310,
+        "endChar": 11
       },
       "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
