@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57e019a8_65e3e5f1",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "It\u0027s a good thing to add a README to this repository.\n\nHowever, as this is the page someone gets on github when loooking at this software, it would be expected to find other common information in this file like:\n- what is the tool for?\n- how to build it, install it\n- how to start it\netc.\n\nI suggest you add this README in a previous commit, and just complete with the additional information about File striping in this commit.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 28
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42eb720c_91cbe7fb",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "(-1) llapi_layout* calls return -1 and set errno on error\n\nshould be:\n\nif (rc \u003c 0)  \n  return -errno;\n\n\nAlso, what if comp_iterate returns LLAPI_LAYOUT_ITER_STOP?\nIs is the expected behavior to return 0 with no error?",
+      "range": {
+        "startLine": 736,
+        "startChar": 12,
+        "endLine": 736,
+        "endChar": 22
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc39e1f9_1daec8d6",
+        "filename": "src/layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "unnecessary else after return",
+      "range": {
+        "startLine": 226,
+        "startChar": 4,
+        "endLine": 226,
+        "endChar": 8
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f4513ab_ba3a9251",
+        "filename": "src/layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "unnecessary else after return",
+      "range": {
+        "startLine": 228,
+        "startChar": 4,
+        "endLine": 228,
+        "endChar": 8
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

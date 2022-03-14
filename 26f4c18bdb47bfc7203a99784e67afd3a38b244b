@@ -305,6 +305,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa485a00_fd12a686",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "756ab473_552917a1",
+      "range": {
+        "startLine": 82,
+        "startChar": 31,
+        "endLine": 82,
+        "endChar": 41
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6526e8b_a1f61448",
@@ -612,6 +636,30 @@
       "side": 1,
       "message": "I see that lhsmtool_phobos.c has the copyrights from lhsmtool_posix.c. It seems to be a copy/paste mistake, should I change it ?",
       "parentUuid": "e9d043d3_55d967c1",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51f1ce3a_94213125",
+        "filename": "src/layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003874
+      },
+      "writtenOn": "2022-03-14T16:31:20Z",
+      "side": 1,
+      "message": "It depends if it is new code, or a modification of the original lhsmtool_posix.c.\nIn case it is just a modification, it should keep the original license (possibly adding new authors). Was it GPL2 too?",
+      "parentUuid": "ee10f5a3_fb2dec9a",
       "range": {
         "startLine": 1,
         "startChar": 0,
