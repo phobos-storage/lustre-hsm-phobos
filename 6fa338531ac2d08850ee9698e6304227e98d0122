@@ -566,6 +566,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc56dde8_8041c70f",
+        "filename": "src/layout.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done, I added a README.",
+      "parentUuid": "3a5d9d08_cc290abf",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 71,
+        "endChar": 19
+      },
+      "revId": "6fa338531ac2d08850ee9698e6304227e98d0122",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07b2679d_021de97b",

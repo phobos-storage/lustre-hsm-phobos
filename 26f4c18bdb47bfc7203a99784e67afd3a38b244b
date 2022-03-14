@@ -81,6 +81,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "195720c7_b9de43a5",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b312b7ce_1d14020b",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 472,
+        "endChar": 28
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efac4fc8_ba998e86",
@@ -94,6 +118,30 @@
       "writtenOn": "2022-03-11T16:24:40Z",
       "side": 1,
       "message": "Q: why did you remove the \"static\" statement?",
+      "range": {
+        "startLine": 130,
+        "startChar": 0,
+        "endLine": 130,
+        "endChar": 24
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "182574f8_247b6cda",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Because I used the CT_TRACE macro to debug layout.c but forgot to change it back.\nBut I think a seperate header for these macro would be better now that I have introduced new files.",
+      "parentUuid": "efac4fc8_ba998e86",
       "range": {
         "startLine": 130,
         "startChar": 0,
@@ -127,6 +175,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18802140_54e95282",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "049f3af6_7d3aa537",
+      "range": {
+        "startLine": 669,
+        "startChar": 0,
+        "endLine": 670,
+        "endChar": 18
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bdf1d243_1e997fcf",
@@ -140,6 +212,24 @@
       "writtenOn": "2022-03-11T16:24:40Z",
       "side": 1,
       "message": "missing licence header",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47744ee0_d02dd899",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdf1d243_1e997fcf",
       "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -169,6 +259,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "756ab473_552917a1",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Default in this function means a value which has a special meaning. For example, \u0027-E -1\u0027 which is equal to LUSTRE_EOF (0xffffffffffffffffULL) internally. I find it more readable to have \u0027extent_end\u003dEOF\u0027 instead of \u0027extent_end\u003d18446744073709551615\u0027. The same goes for stripe count.\n\nWhen I don\u0027t want to use a special string for a given value, I set both arguments to -1 and NULL to prevent this behavior. So the stripe size don\u0027t have any specific value as for extent_start. I could have used any value instead of -1 as long as the last argument is NULL.",
+      "parentUuid": "675ba6c4_0c2f172f",
+      "range": {
+        "startLine": 82,
+        "startChar": 31,
+        "endLine": 82,
+        "endChar": 41
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6526e8b_a1f61448",
         "filename": "src/layout.c",
         "patchSetId": 2
@@ -180,6 +294,30 @@
       "writtenOn": "2022-03-11T16:36:43Z",
       "side": 1,
       "message": "return -errno;\n\nsame for next calls",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 18
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3ceab77_c299d9ee",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6526e8b_a1f61448",
       "range": {
         "startLine": 126,
         "startChar": 0,
@@ -215,6 +353,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6bfb644e_ecf81d11",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "I didn\u0027t know this function. This version seems a bit simpler to use.",
+      "parentUuid": "608f25a5_893c615b",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 1
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9312152_130ef03b",
         "filename": "src/layout.c",
         "patchSetId": 2
@@ -226,6 +388,30 @@
       "writtenOn": "2022-03-11T16:36:43Z",
       "side": 1,
       "message": "Here you use an error code convention which is different from other calls.\nAt least explicit it in a doxygen header of the function :-)",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 5
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba3929b3_14434f33",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9312152_130ef03b",
       "range": {
         "startLine": 165,
         "startChar": 0,
@@ -259,6 +445,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b42fe7f6_bf6cf5e5",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done\n\nUnfortunatly, this code hasn\u0027t been tested much because I can\u0027t restore the striping yet. There\u0027s a few defects that still exist. For example, the default values such as EOF and -1 are not restored properly. But I figured it may be best to leave this to when this code will actually be used.",
+      "parentUuid": "9afbb0e9_79721cad",
+      "range": {
+        "startLine": 301,
+        "startChar": 4,
+        "endLine": 301,
+        "endChar": 19
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9b4bcbf_aa126b32",
@@ -282,6 +492,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca3ab4a6_ed2994a5",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9b4bcbf_aa126b32",
+      "range": {
+        "startLine": 310,
+        "startChar": 4,
+        "endLine": 310,
+        "endChar": 11
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "faadfe6f_c76ebbce",
@@ -295,6 +529,24 @@
       "writtenOn": "2022-03-11T16:24:40Z",
       "side": 1,
       "message": "add vim indentation directives",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e463e7b9_3346b5ac",
+        "filename": "src/layout.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faadfe6f_c76ebbce",
       "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -324,6 +576,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ee10f5a3_fb2dec9a",
+        "filename": "src/layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "I see that lhsmtool_phobos.c has the copyrights from lhsmtool_posix.c. It seems to be a copy/paste mistake, should I change it ?",
+      "parentUuid": "e9d043d3_55d967c1",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 16
+      },
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e1b07669_f8ddfce0",
         "filename": "src/layout.h",
         "patchSetId": 2
@@ -335,6 +611,24 @@
       "writtenOn": "2022-03-11T16:24:40Z",
       "side": 1,
       "message": "Missing vim statement to help other devs use the same indentation convention.\n\n/* vim:expandtab:shiftwidth\u003d4:tabstop\u003d4: */",
+      "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46562cb0_1c40ec0f",
+        "filename": "src/layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-14T09:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1b07669_f8ddfce0",
       "revId": "26f4c18bdb47bfc7203a99784e67afd3a38b244b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
