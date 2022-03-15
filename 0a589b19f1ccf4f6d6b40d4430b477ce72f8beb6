@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "418989d8_4bd7da16",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-15T11:01:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57e019a8_65e3e5f1",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 28
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42eb720c_91cbe7fb",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-03-14T16:31:20Z",
       "side": 1,
       "message": "(-1) llapi_layout* calls return -1 and set errno on error\n\nshould be:\n\nif (rc \u003c 0)  \n  return -errno;\n\n\nAlso, what if comp_iterate returns LLAPI_LAYOUT_ITER_STOP?\nIs is the expected behavior to return 0 with no error?",
+      "range": {
+        "startLine": 736,
+        "startChar": 12,
+        "endLine": 736,
+        "endChar": 22
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7d8da2a_14a0ed79",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-15T11:01:38Z",
+      "side": 1,
+      "message": "As far as I understand, this function returns LLAPI_LAYOUT_ITER_CONT on sucess which happens to be 0. I think I should modify the callback component_to_attr to explicitly return LLAPI_LAYOUT_ITER_CONT on success.\n\nAs for the error handling, in this case, llapi_layout_comp_iterate will only return either 0 on success or -1 on failure. LLAPI_LAYOUT_ITER_STOP is returned by the callback to stop the iteration on a specific component.\n\nIt should be better now.",
+      "parentUuid": "42eb720c_91cbe7fb",
       "range": {
         "startLine": 736,
         "startChar": 12,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb6a72e2_a4c6b44a",
+        "filename": "src/layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-15T11:01:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc39e1f9_1daec8d6",
+      "range": {
+        "startLine": 226,
+        "startChar": 4,
+        "endLine": 226,
+        "endChar": 8
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f4513ab_ba3a9251",
@@ -83,6 +155,30 @@
       "writtenOn": "2022-03-14T16:31:20Z",
       "side": 1,
       "message": "unnecessary else after return",
+      "range": {
+        "startLine": 228,
+        "startChar": 4,
+        "endLine": 228,
+        "endChar": 8
+      },
+      "revId": "0a589b19f1ccf4f6d6b40d4430b477ce72f8beb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbf759da_bd20447d",
+        "filename": "src/layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-15T11:01:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f4513ab_ba3a9251",
       "range": {
         "startLine": 228,
         "startChar": 4,
