@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f7545e73_831a92a0",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-03-22T08:49:14Z",
+      "side": 1,
+      "message": "The default attribute is \"trusted.hsm_fuid\", should we change it to \"trusted.fuid_xattr\" as well?",
+      "parentUuid": "eb1e9e3b_f0f0be80",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 5
+      },
+      "revId": "a4f45141ef3f35b67bb19a1ffcd9b53cae93d12e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05a94a7c_a1e21380",
         "filename": "README.md",
         "patchSetId": 1
