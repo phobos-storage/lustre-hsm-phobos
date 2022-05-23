@@ -117,6 +117,11 @@ struct options opt = {
     .o_restore_lov     = false,
 };
 
+struct buf {
+    char *data;
+    size_t len;
+};
+
 /*
  * hsm_copytool_private will hold an open FD on the lustre mount point
  * for us. Additionally open one on the archive FS root to make sure
@@ -534,13 +539,12 @@ struct hinttab {
     char v[HINTMAX];
 };
 
-static int process_hints(const char *hints,
+static int process_hints(const struct buf *hints,
                          int hinttablen,
                          struct hinttab *hinttab)
 {
     const char comma[2] = ",";
     const char equal[2] = "=";
-    char work1[HINTMAX];
     char work2[HINTMAX];
     char *saveptr1;
     char *saveptr2;
@@ -548,9 +552,13 @@ static int process_hints(const char *hints,
     char *token2;
     int pos1 = 0;
     int pos2 = 0;
+    char *work1;
 
+    /* No hints to parse */
+    if (!hints->data)
+        return 0;
 
-    strncpy(work1, hints, HINTMAX);
+    work1 = strndup(hints->data, hints->len);
 
     /* get the first token */
     token1 = strtok_r(work1, comma, &saveptr1);
@@ -560,6 +568,9 @@ static int process_hints(const char *hints,
         /*
          * strtok_r corrupts the strings
          * we must work on a copy
+         */
+        /* FIXME this doesn't work if the token is larger than 80 characters...
+         * This function needs a bit of refactoring.
          */
         strncpy(work2, token1, HINTMAX);
         pos2 = 0;
@@ -602,9 +613,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
     return sprintf(objid, "%s:"DFID, fs_name, PFID(fid));
 }
 
-static int phobos_op_del(const struct lu_fid *fid,
-                         int lenhints,
-                         const char *hints)
+static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
@@ -612,13 +621,13 @@ static int phobos_op_del(const struct lu_fid *fid,
     bool objset = false;
     char *obj = NULL;
     int nbhints;
-    int i = 0;
     int rc;
 
-
     if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+        int i = 0;
+
+        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+                 hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -641,7 +650,7 @@ static int phobos_op_del(const struct lu_fid *fid,
         obj = objid;
     }
 
-    /* DO THE UNDELETE */
+    /* DO THE DELETE */
     memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_DEL;
     xfer.xd_objid = obj;
@@ -700,8 +709,7 @@ static int phobos_op_put(const struct lu_fid *fid,
                          char *altobjid,
                          const int fd,
                          struct llapi_layout *layout,
-                         int lenhints,
-                         const char *hints)
+                         const struct buf *hints)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
@@ -759,8 +767,8 @@ static int phobos_op_put(const struct lu_fid *fid,
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+                 hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -826,8 +834,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 static int phobos_op_get(const struct lu_fid *fid,
                          char *altobjid,
-                         int lenhints,
-                         const char *hints,
+                         const struct buf *hints,
                          int fd)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
@@ -850,8 +857,8 @@ static int phobos_op_get(const struct lu_fid *fid,
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+                 hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -883,8 +890,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 
 static int phobos_op_getlayout(const struct lu_fid *fid,
                                char *altobjid,
-                               int lenhints,
-                               const char *hints,
+                               const struct buf *hints,
                                struct llapi_layout **layout)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
@@ -907,8 +913,8 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%u",
-                 hints, lenhints);
+        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+                 hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -1109,14 +1115,27 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
     return rc;
 }
 
+static void hai_get_user_data(const struct hsm_action_item *hai,
+                              struct buf *user_data)
+{
+    if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
+        user_data->data = (char *)hai->hai_data;
+        user_data->len = hai->hai_len - offsetof(struct hsm_action_item,
+                                                 hai_data);
+
+    } else {
+        user_data->data = NULL;
+        user_data->len = 0;
+    }
+}
+
 static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
     struct llapi_layout *layout;
     char src[PATH_MAX];
-    char *hints = NULL;
-    int lenhints = 0;
     int hp_flags = 0;
+    struct buf hints;
     int src_fd = -1;
     int open_flags;
     int rcf = 0;
@@ -1154,15 +1173,10 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
     if (!layout)
         CT_ERROR(-errno, "cannot read layout of '%s'", src);
 
-    /* Check if hints have been provided as hsm_archive was invoked */
-    if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
-        lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
-        hints = (char *)hai->hai_data;
-    }
+    hai_get_user_data(hai, &hints);
 
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout,
-                       lenhints, hints);
+    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints);
     CT_TRACE("phobos_put (archive): rc=%d", rc);
     if (rc)
         goto fini_major;
@@ -1189,12 +1203,12 @@ out:
 }
 
 static int get_file_layout(const struct hsm_action_item *hai,
-                           char *hints, int lenhints, int *open_flags,
+                           const struct buf *hints, int *open_flags,
                            struct llapi_layout **layout)
 {
     int rc;
 
-    rc = phobos_op_getlayout(&hai->hai_fid, NULL, lenhints, hints, layout);
+    rc = phobos_op_getlayout(&hai->hai_fid, NULL, hints, layout);
 
     *open_flags |= O_LOV_DELAY_CREATE;
 
@@ -1209,13 +1223,12 @@ static int ct_restore(const struct hsm_action_item *hai,
     struct llapi_layout *layout = NULL;
     char altobjid[PATH_MAX];
     char *altobj = NULL;
-    char *hints = NULL;
     struct lu_fid dfid;
     char dst[PATH_MAX];
     int open_flags = 0;
     int mdt_index = -1;
-    int lenhints = 0;
     int hp_flags = 0;
+    struct buf hints;
     int dst_fd = -1;
     int rc;
 
@@ -1234,14 +1247,10 @@ static int ct_restore(const struct hsm_action_item *hai,
         return rc;
     }
 
-    /* Check if hints have been provided as hsm_archive was invoked */
-    if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
-        lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
-        hints = (char *)hai->hai_data;
-    }
+    hai_get_user_data(hai, &hints);
 
     if (restore_lov) {
-        rc = get_file_layout(hai, hints, lenhints, &open_flags, &layout);
+        rc = get_file_layout(hai, &hints, &open_flags, &layout);
         if (rc < 0) {
             CT_WARN("Could not get file layout for "DFID", will proceed with "
                     "default striping.", PFID(&hai->hai_fid));
@@ -1298,7 +1307,7 @@ static int ct_restore(const struct hsm_action_item *hai,
     }
 
     /* Do phobos xfer */
-    rc = phobos_op_get(&hai->hai_fid, altobj, lenhints, hints, dst_fd);
+    rc = phobos_op_get(&hai->hai_fid, altobj, &hints, dst_fd);
     CT_TRACE("phobos_get (restore): rc=%d", rc);
     /** @todo make clear rc management */
 
@@ -1317,8 +1326,7 @@ fini:
 static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
-    char *hints = NULL;
-    int lenhints = 0;
+    struct buf hints;
     int rc;
 
     rc = ct_begin(&hcp, hai);
@@ -1327,11 +1335,7 @@ static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
 
     CT_TRACE("removing an entry");
 
-    /* Check if hints have been provided as hsm_archive was invoked */
-    if (hai->hai_len - offsetof(struct hsm_action_item, hai_data) > 0) {
-        lenhints = hai->hai_len - offsetof(struct hsm_action_item, hai_data);
-        hints = (char *)hai->hai_data;
-    }
+    hai_get_user_data(hai, &hints);
 
     /** @todo : add remove as it will be available in Phobos */
     if (opt.o_dry_run) {
@@ -1339,7 +1343,7 @@ static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
         goto fini;
     }
 
-    rc = phobos_op_del(&hai->hai_fid, lenhints, hints);
+    rc = phobos_op_del(&hai->hai_fid, &hints);
 
 fini:
     rc = ct_fini(&hcp, hai, 0, rc);
