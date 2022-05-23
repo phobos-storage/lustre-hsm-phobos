@@ -2,12 +2,14 @@
 
 VERBOSE=${VERBOSE:--vv}
 QUICK=${QUICK:-false}
+LOG_DIR=${LOG_DIR:-/tmp/lhsmtool_phobos}
+
+mkdir -p "$LOG_DIR"
 
 ARCHIVE_PATH=$(mktemp -d)
-LOG_DIR=$(mktemp -d)
 FIFO="$LOG_DIR/event_fifo"
 EVENTS="$LOG_DIR/hsm_events"
-PHOBOSD_LOG=$(mktemp -t phobosd.log.XXXXX -p "$LOG_DIR")
+PHOBOSD_LOG="$LOG_DIR/phobosd.log"
 PHOBOSD_LOCK=/tmp/phobosd.lock
 PHOBOSD_SOCKET=/tmp/lrs
 LUSTRE_ROOT=/mnt/lustre
@@ -94,6 +96,7 @@ function global_setup()
 
     mkfifo -m 644 "$FIFO"
     touch "$EVENTS"
+    touch "$PHOBOSD_LOG"
 }
 
 function global_teardown()
@@ -114,22 +117,36 @@ function run_test()
     local test_name="$1"
     local test_func="test_$test_name"
     local log_file="$LOG_DIR/$test_name.log"
+    local tmp=$(mktemp)
 
     (
      test_dir=$(mktemp -d -p "$LUSTRE_ROOT")
      trap "rm -rf $test_dir" EXIT
-     $test_func &> "$log_file"
+
+     local begin=`date +%s.%N`
+     ($test_func &> "$log_file")
+     local rc=$?
+     local end=`date +%s.%N`
+
+     echo "$end - $begin" | bc -l > "$tmp"
+     exit $rc
     )
     local rc=$?
+    local runtime=$(cat "$tmp")
+
+    rm "$tmp"
 
     if [[ $rc == 0 ]]
     then
-        echo "$test_name: PASS"
+        printf ' \033[0;30;42m PASS   \033[0;0;0m %s (%s s)\n' \
+            "$test_name" "$runtime"
     elif [[ $rc == $SKIP ]]
     then
-        echo "$test_name: SKIP"
+        printf ' \033[0;30;47m SKIP   \033[0;0;0m %s (%s s)\n' \
+            "$test_name" "$runtime"
     else
-        echo "$test_name: FAILED"
+        printf ' \033[0;30;41m FAILED \033[0;0;0m %s (%s s)\n' \
+                "$test_name" "$runtime"
         echo "Log file: $log_file"
         cat "$log_file"
     fi
@@ -169,6 +186,8 @@ function create_file()
 
     touch "$file"
     dd if=/dev/urandom of="$file" bs=4096 count=$(randint 5 20)
+
+    lfs path2fid "$file"
 }
 
 function wait_for_state()
@@ -229,10 +248,10 @@ function check_valid_restore()
 function user_md_contains()
 {
     local oid="$1"
-    local component="$2"
+    local key="$2"
     local value="$3"
 
-    phobos -q getmd "$oid" | grep "$component" | grep "$value"
+    phobos -q getmd "$oid" | grep "$key" | grep "$value"
     return $?
 }
 
@@ -258,7 +277,12 @@ function get_trap()
 
 function trap_add()
 {
-    eval "trap '$(get_trap); $1' EXIT"
+    if [ -z "$(get_trap)" ]
+    then
+        trap "$1" EXIT
+    else
+        eval "trap '$(get_trap); $1' EXIT"
+    fi
 }
 
 __lhsmtool_phobos=$(PATH="$PWD/build:$PATH" which lhsmtool_phobos)
@@ -275,6 +299,16 @@ function start_copytool()
         --daemon "$LUSTRE_ROOT"
 
     trap_add "kill -9 $(pgrep lhsmtool_phobos)"
+}
+
+function get_xattr_value()
+{
+    local file="$1"
+    local key="$2"
+
+    getfattr -n "trusted.$key" "$file" |
+        grep -v "file:" |
+        sed "s/trusted.$key=\"\(.*\)\"$/\1/"
 }
 
 trap global_teardown EXIT
@@ -498,5 +532,38 @@ function test_layout_pfl_in_user_md()
     check_layout_pfl "$file"
 }
 add_test layout_pfl_in_user_md
+
+function test_hints_fuid_xattr()
+{
+    local file="$test_dir/file"
+    local fid=$(create_file "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "hsm_fuid=$file" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    local fuid=$(get_xattr_value "$file" hsm_fuid)
+
+    if [[ $fuid = $file ]]
+    then
+        # XXX Currently the name of the object stored in Phobos is $file but
+        # the xattr trusted.hsm_fuid is not set accordingly. This is a bug but
+        # since this behavior is about to be removed, it's actually not a bug...
+        error "hsm_fuid hint was not ignored during archive"
+    elif [[ $fuid != "$(get_oid_from_path "$file")" ]]
+    then
+        error "xattr trusted.hsm_fuid should be " \
+              "'$(get_oid_from_path "$file")', not '$fuid'."
+    fi
+
+    if [[ $(phobos object list "$file" | wc -l) != 1 ]]
+    then
+        # XXX this will be changed so that 'hsm_fuid' is ignored on archive
+        error "Object should be named '$file'"
+    fi
+}
+add_test hints_fuid_xattr
 
 run_tests
