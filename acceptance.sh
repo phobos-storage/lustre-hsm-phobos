@@ -169,6 +169,8 @@ function create_file()
 
     touch "$file"
     dd if=/dev/urandom of="$file" bs=4096 count=$(randint 5 20)
+
+    lfs path2fid "$file"
 }
 
 function wait_for_state()
@@ -229,10 +231,10 @@ function check_valid_restore()
 function user_md_contains()
 {
     local oid="$1"
-    local component="$2"
+    local key="$2"
     local value="$3"
 
-    phobos -q getmd "$oid" | grep "$component" | grep "$value"
+    phobos -q getmd "$oid" | grep "$key" | grep "$value"
     return $?
 }
 
@@ -275,6 +277,16 @@ function start_copytool()
         --daemon "$LUSTRE_ROOT"
 
     trap_add "kill -9 $(pgrep lhsmtool_phobos)"
+}
+
+function get_xattr_value()
+{
+    local file="$1"
+    local key="$2"
+
+    getfattr -n "trusted.$key" "$file" |
+        grep -v "file:" |
+        sed "s/trusted.$key=\"\(.*\)\"$/\1/"
 }
 
 trap global_teardown EXIT
@@ -498,5 +510,34 @@ function test_layout_pfl_in_user_md()
     check_layout_pfl "$file"
 }
 add_test layout_pfl_in_user_md
+
+function test_hints_fuid_xattr()
+{
+    local file="$test_dir/file"
+    local fid=$(create_file "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "hsm_fuid=$file" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    local fuid=$(get_xattr_value "$file" hsm_fuid)
+
+    if [[ $fuid = $file ]]
+    then
+        # XXX Currently the name of the object stored in Phobos is $file but
+        # the xattr trusted.hsm_fuid is not set accordingly. This is a bug but
+        # since this behavior is about to be removed, it's actually not a bug...
+        error "hsm_fuid hint was not ignored during archive"
+    elif [[ $fuid != "$(get_oid_from_path "$file")" ]]
+    then
+        error "xattr trusted.hsm_fuid should be " \
+              "'$(get_oid_from_path "$file")', not '$fuid'."
+    fi
+
+    phobos object list test_name || error "Object should be named 'test_name'"
+}
+add_test hints_fuid_xattr
 
 run_tests
