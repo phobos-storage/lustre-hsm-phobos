@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fe61f299_98cd0863",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-24T09:35:39Z",
+      "side": 1,
+      "message": "No, it allows me to create a file and store its FID in one line cf. line 517 for instance.",
+      "parentUuid": "d18fb086_30c57bb0",
+      "range": {
+        "startLine": 173,
+        "startChar": 4,
+        "endLine": 173,
+        "endChar": 24
+      },
+      "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "879b8b17_020a2911",
         "filename": "acceptance.sh",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2022-05-23T14:42:34Z",
       "side": 1,
       "message": "minor: command doesn\u0027t fail even with an unknown name",
+      "range": {
+        "startLine": 539,
+        "startChar": 4,
+        "endLine": 539,
+        "endChar": 32
+      },
+      "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ff24c8b_8027b383",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-24T09:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "879b8b17_020a2911",
       "range": {
         "startLine": 539,
         "startChar": 4,
@@ -60,6 +108,24 @@
       "writtenOn": "2022-05-23T14:42:34Z",
       "side": 1,
       "message": "style: ligne vide inutile",
+      "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "040f69a9_2f020315",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1125,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-05-24T09:35:39Z",
+      "side": 1,
+      "message": "As discussed, this line is intentional for to improve readability.",
+      "parentUuid": "2e3d4fa2_39fd8743",
       "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
