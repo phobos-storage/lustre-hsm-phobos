@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5be01e06_ff232ecd",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-05-31T14:05:40Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "fe61f299_98cd0863",
+      "range": {
+        "startLine": 173,
+        "startChar": 4,
+        "endLine": 173,
+        "endChar": 24
+      },
+      "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "879b8b17_020a2911",
@@ -126,6 +150,24 @@
       "side": 1,
       "message": "As discussed, this line is intentional for to improve readability.",
       "parentUuid": "2e3d4fa2_39fd8743",
+      "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13361f06_f4eb3c4e",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1125,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-05-31T14:05:40Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "040f69a9_2f020315",
       "revId": "6666c03439908d792c06dcf193a495a16916a0cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
