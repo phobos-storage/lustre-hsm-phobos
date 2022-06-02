@@ -16,6 +16,7 @@ glib_CFLAGS=$(shell pkg-config --cflags glib-2.0)
 
 SOURCES=lhsmtool_phobos.c src/layout.c
 HEADERS=src/layout.h
+TESTS=tests/hsm_import.c
 
 CFLAGS=-g -Wall -Werror -Isrc
 LDFLAGS=-pthread -l:liblustreapi.a
@@ -29,6 +30,9 @@ build/lhsmtool_phobos: $(HEADERS) $(SOURCES) Makefile build
 
 build/lhsmtool_posix: lhsmtool_posix.c Makefile build
 	$(CC) $(CFLAGS) -o $@ lhsmtool_posix.c -lrt $(LDFLAGS)
+
+build/hsm-import: tests/hsm_import.c Makefile build
+	$(CC) $(CFLAGS) -o $@ tests/hsm_import.c $(LDFLAGS)
 
 lhsmtool_phobos.spec: lhsmtool_phobos.spec.in Makefile
 	cp $< $@
@@ -55,11 +59,11 @@ RPMDIR=`pwd`/rpms
 rpm: dist lhsmtool_phobos.spec
 	rpmbuild --define="_topdir $(RPMDIR)" -ta lhsmtool_phobos-$(VERSION).tar.gz
 
-check:
+check: all build/hsm-import
 	@bash acceptance.sh
 
 checkpatch:
-	./checkpatch.pl --no-tree -f $(SOURCES) $(HEADERS)
+	./checkpatch.pl --no-tree -f $(SOURCES) $(HEADERS) $(TESTS)
 	./checkpatch.pl --no-tree -f acceptance.sh
 
 .PHONY: all clean checkpatch dist rpm install check
