@@ -68,6 +68,29 @@
       },
       "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0627cb20_92389f25",
+        "filename": "tests/hsm_import.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-02T15:04:38Z",
+      "side": 1,
+      "message": "minor: it seems strange to me that an incomplete write is more \"problematic\" than a failed one. I think this assert isn\u0027t necessary, and the if should be \"if (rc !\u003d len)\" simply, managing both cases, and removing the assert",
+      "range": {
+        "startLine": 178,
+        "startChar": 8,
+        "endLine": 178,
+        "endChar": 14
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
