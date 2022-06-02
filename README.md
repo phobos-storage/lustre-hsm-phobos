@@ -90,3 +90,19 @@ The following values are stored:
 - `pool_name`: only present if the pool name is not empty;
 - `extent_start`, `extent_end`: only used for PFL layouts. `EOF` can be used
   for `extent_end`.
+
+## Hints
+
+The copytool supports hints though the HSM requests (e.g. `lfs hsm_archive
+--data "hsm_fuid=<myoid>"`). The hints are provided through a list of coma
+separated key value pairs (`k1=v1,k2=v2`). The supported hints are:
+
+| Name          | Accepted Values                                    | HSM Action Type |
+| ------------- | -------------------------------------------------- | --------------- |
+| `hsm_fuid`    | A printable string of characters                   | Remove          |
+| `family`      | Any valid Phobos family (e.g. `dir`, `tape`, etc.) | Archive         |
+| `layout`      | Any valid Phobos layout (e.g. `raid1`)             | Archive         |
+| `layoutparam` | Any valid parameters of the associated layout      | Archive         |
+| `tag`         | A printable string of characters                   | Archive         |
+
+**Note:** the tag hint can be specified several times to add more tags.

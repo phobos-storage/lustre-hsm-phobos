@@ -782,10 +782,6 @@ static int phobos_op_put(const struct lu_fid *fid,
                 if (xfer.xd_params.put.family == PHO_RSC_INVAL)
                     CT_TRACE("unknown hint '%s'",  hinttab[i].k);
 
-            } else if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                /* Force a given objectid */
-                obj = hinttab[i].v;
-
             } else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
                 /* Deal with storage layout */
                 xfer.xd_params.put.layout_name = hinttab[i].v;
@@ -837,12 +833,9 @@ static int phobos_op_get(const struct lu_fid *fid,
                          const struct buf *hints,
                          int fd)
 {
-    struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
     char objid[MAXNAMLEN];
     char *obj = NULL;
-    int nbhints;
-    int i = 0;
     int rc;
 
     /* If provided altobjid is used as objectid */
@@ -853,23 +846,6 @@ static int phobos_op_get(const struct lu_fid *fid,
         if (rc < 0)
             return rc;
         obj = objid;
-    }
-
-    /* Use content of hints to modify fields in xfer_desc */
-    if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%lu",
-                 hints->data, hints->len);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
-
-        for (i = 0 ; i < nbhints; i++) {
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
-
-            if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX))
-                obj = hinttab[i].v;
-            else
-                CT_TRACE("unknown hint '%s'",  hinttab[i].k);
-        }
     }
 
     memset(&xfer, 0, sizeof(xfer));
@@ -893,12 +869,9 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
                                const struct buf *hints,
                                struct llapi_layout **layout)
 {
-    struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
     char objid[MAXNAMLEN];
     char *obj = NULL;
-    int nbhints;
-    int i = 0;
     int rc;
 
     /* If provided altobjid is used as objectid */
@@ -909,23 +882,6 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
         if (rc < 0)
             return rc;
         obj = objid;
-    }
-
-    /* Use content of hints to modify fields in xfer_desc */
-    if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%lu",
-                 hints->data, hints->len);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
-
-        for (i = 0 ; i < nbhints; i++) {
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
-
-            if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                /* Force a given objectid */
-                obj = hinttab[i].v;
-            }
-        }
     }
 
     memset(&xfer, 0, sizeof(xfer));
@@ -1012,6 +968,7 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
     char xattr_buf[XATTR_SIZE_MAX + 1];
     ssize_t xattr_size;
     int fd;
+    int rc;
 
     fd = llapi_open_by_fid(opt.o_mnt, &hai->hai_fid, O_RDONLY);
     if (fd < 0)
@@ -1020,8 +977,9 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
     xattr_size = fgetxattr(fd, trusted_hsm_fsuid, xattr_buf,
                            XATTR_SIZE_MAX);
     if (xattr_size < 0) {
+        rc = -errno;
         close(fd);
-        return -errno;
+        return rc;
     }
 
     memcpy(altobjid, xattr_buf, xattr_size);
