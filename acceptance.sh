@@ -169,10 +169,12 @@ function add_test()
 
 function run_tests()
 {
+    local tests_to_run=${TESTS:-${tests[@]}}
+
     echo ""
     echo "Starting tests. Log dir: $LOG_DIR"
 
-    for t in ${tests[@]}
+    for t in $tests_to_run
     do
         run_test "$t"
     done
@@ -289,6 +291,12 @@ __lhsmtool_phobos=$(PATH="$PWD/build:$PATH" which lhsmtool_phobos)
 function ct_phobos()
 {
     "$__lhsmtool_phobos" "$@"
+}
+
+__hsm_import=$(PATH="$PWD/build:$PATH" which hsm-import)
+function hsm_import()
+{
+    "$__hsm_import" "$@"
 }
 
 function start_copytool()
@@ -548,9 +556,6 @@ function test_hints_fuid_xattr()
 
     if [[ $fuid = $file ]]
     then
-        # XXX Currently the name of the object stored in Phobos is $file but
-        # the xattr trusted.hsm_fuid is not set accordingly. This is a bug but
-        # since this behavior is about to be removed, it's actually not a bug...
         error "hsm_fuid hint was not ignored during archive"
     elif [[ $fuid != "$(get_oid_from_path "$file")" ]]
     then
@@ -558,12 +563,58 @@ function test_hints_fuid_xattr()
               "'$(get_oid_from_path "$file")', not '$fuid'."
     fi
 
-    if [[ $(phobos object list "$file" | wc -l) != 1 ]]
+    if [[ $(phobos object list "$file" | wc -l) > 0 ]]
     then
-        # XXX this will be changed so that 'hsm_fuid' is ignored on archive
-        error "Object should be named '$file'"
+        error "File '$file' was stored in phobos as '$file', hsm_fuid hint" \
+              "was not ignored. It should have been '$fuid'."
     fi
+
+    lfs hsm_release "$file"
+
+    lfs hsm_restore --data "hsm_fuid=$file" "$file"
+    # Restore should succeed as it ignores this hint
+    wait_for_event RESTORE_FINISH "$file"
 }
 add_test hints_fuid_xattr
+
+function test_hsm_import()
+{
+    local file="$test_dir/file"
+    local fid=$(create_file "$file")
+    local stat_file=$(mktemp)
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    hsm_import -s "$stat_file" -p "${file}"  --stat
+    local newfid=$(hsm_import -s "$stat_file" -p "${file}2" --undelete)
+
+    lfs hsm_restore "${file}2"
+    wait_for_event RESTORE_FINISH "${file}2"
+
+    rm "${file}" "${file}2"
+
+    # the files are now removed, we can't use the xattr to get the object ID
+    lfs hsm_remove --mntpath "$LUSTRE_ROOT" "$newfid"
+    sleep 1 # wait for remove to fail
+
+    if [[ $(phobos object list "lustre:$fid" | wc -l) != 1 ]]
+    then
+        error "Removing from archive a removed file should fail"
+    fi
+
+    lfs hsm_remove --mntpath "$LUSTRE_ROOT" \
+        --data "hsm_fuid=lustre:$fid" "$newfid"
+    sleep 1 # wait for remove to fail
+
+    if [[ $(phobos object list "lustre:$fid" | wc -l) != 0 ]]
+    then
+        error "Removing from archive a removed file with hint should succeed"
+    fi
+}
+add_test hsm_import
 
 run_tests
