@@ -187,6 +187,30 @@
       },
       "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37e8ebd6_6ebe5cd5",
+        "filename": "tests/hsm_import.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-03T11:25:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d228a20a_2c403b22",
+      "range": {
+        "startLine": 178,
+        "startChar": 8,
+        "endLine": 178,
+        "endChar": 14
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
