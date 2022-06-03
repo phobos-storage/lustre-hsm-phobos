@@ -70,6 +70,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57480dc8_bbd0345d",
+        "filename": "tests/hsm_import.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-03T07:16:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8090c7fb_59c35f8a",
+      "range": {
+        "startLine": 101,
+        "startChar": 14,
+        "endLine": 101,
+        "endChar": 23
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0627cb20_92389f25",
@@ -83,6 +107,30 @@
       "writtenOn": "2022-06-02T15:04:38Z",
       "side": 1,
       "message": "minor: it seems strange to me that an incomplete write is more \"problematic\" than a failed one. I think this assert isn\u0027t necessary, and the if should be \"if (rc !\u003d len)\" simply, managing both cases, and removing the assert",
+      "range": {
+        "startLine": 178,
+        "startChar": 8,
+        "endLine": 178,
+        "endChar": 14
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d228a20a_2c403b22",
+        "filename": "tests/hsm_import.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-03T07:16:16Z",
+      "side": 1,
+      "message": "They both terminate the process. One will just log a meaningful error while the other will just stop. If I did what you suggest, I would still have to differentiate both cases to log something meaningful. So it doesn\u0027t make the code simpler. As this is a test script, I don\u0027t think this is very important.",
+      "parentUuid": "0627cb20_92389f25",
       "range": {
         "startLine": 178,
         "startChar": 8,
