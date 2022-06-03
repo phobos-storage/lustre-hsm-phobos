@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d9ebd5a_e13a0246",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-03T07:48:34Z",
+      "side": 1,
+      "message": "Yes, what I wrote doesn\u0027t make much sense...",
+      "parentUuid": "8cfd9028_314653c4",
+      "range": {
+        "startLine": 105,
+        "startChar": 39,
+        "endLine": 105,
+        "endChar": 60
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26761880_48514d3b",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-02T14:47:52Z",
       "side": 1,
       "message": "suggest: should it be better to check \u0027\u003d\u003d 0\u0027 instead? I do not think there is a way the number of objects goes to 2 or higher?\n\nWell, this is nit-picking, I just understand it better this way.",
+      "range": {
+        "startLine": 604,
+        "startChar": 54,
+        "endLine": 604,
+        "endChar": 58
+      },
+      "revId": "d6a0553a9563903b3fb2850a318573d11c81ef28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae4ccb07_16d2d64b",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 604,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-03T07:48:34Z",
+      "side": 1,
+      "message": "Since I\u0027m not listing deprecated objects, Phobos guaranties that this command will output either 0 or 1 so yes, I can change it.",
+      "parentUuid": "26761880_48514d3b",
       "range": {
         "startLine": 604,
         "startChar": 54,
