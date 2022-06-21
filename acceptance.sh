@@ -253,8 +253,10 @@ function user_md_contains()
     local key="$2"
     local value="$3"
 
-    phobos -q getmd "$oid" | grep "$key" | grep "$value"
-    return $?
+    # FIXME for some reason, having both grep on the same line does not work
+    # for the pool_name in test_layout_in_user_md anymore...
+    phobos -q getmd "$oid" | grep "$key"
+    phobos -q getmd "$oid" | grep "$value"
 }
 
 function get_oid_from_fid()

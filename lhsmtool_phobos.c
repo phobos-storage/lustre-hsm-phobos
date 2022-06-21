@@ -74,6 +74,8 @@
 
 #define MAXTAGS 10
 
+#define UNUSED __attribute__((unused))
+
 /* Progress reporting period */
 #define REPORT_INTERVAL_DEFAULT 30
 /* HSM hash subdir permissions */
@@ -168,7 +170,7 @@ static inline double ct_now(void)
                 ct_now(), cmd_name, syscall(SYS_gettid), \
                 __func__, ## __VA_ARGS__)
 
-static void usage(const char *name, int rc)
+static void usage(int rc)
 {
     fprintf(stdout,
             "Usage: %s [options]... <mode> <lustre_mount_point>\n"
@@ -323,7 +325,7 @@ repeat:
             strncpy(trusted_hsm_fsuid, optarg, MAXNAMLEN);
             break;
         case 'h':
-            usage(argv[0], 0);
+            usage(0);
             break;
 #ifdef LLAPI_LAYOUT_SET_BY_FD
         case 'l':
@@ -355,176 +357,6 @@ repeat:
     CT_TRACE("mount_point=%s", opt.o_mnt);
 
     return 0;
-}
-
-/*
- * The following items are replicated from Lustre sources to avoid
- * dependencies with Lustre sources.
- *
- * This makes it possible to compile this copytool outside Lustre source tree
- */
-enum fid_seq {
-    FID_SEQ_OST_MDT0        = 0,
-    FID_SEQ_LLOG            = 1, /* unnamed llogs */
-    FID_SEQ_ECHO            = 2,
-    FID_SEQ_UNUSED_START    = 3,
-    FID_SEQ_UNUSED_END      = 9,
-    FID_SEQ_LLOG_NAME       = 10, /* named llogs */
-    FID_SEQ_RSVD            = 11,
-    FID_SEQ_IGIF            = 12,
-    FID_SEQ_IGIF_MAX        = 0x0ffffffffULL,
-    FID_SEQ_IDIF            = 0x100000000ULL,
-    FID_SEQ_IDIF_MAX        = 0x1ffffffffULL,
-    /* Normal FID sequence starts from this value, i.e. 1<<33 */
-    FID_SEQ_START           = 0x200000000ULL,
-    /* sequence for local pre-defined FIDs listed in local_oid */
-    FID_SEQ_LOCAL_FILE      = 0x200000001ULL,
-    FID_SEQ_DOT_LUSTRE      = 0x200000002ULL,
-    /*
-     * sequence is used for local named objects FIDs generated
-     * by local_object_storage library
-     */
-    FID_SEQ_LOCAL_NAME      = 0x200000003ULL,
-    /*
-     * Because current FLD will only cache the fid sequence, instead
-     * of oid on the client side, if the FID needs to be exposed to
-     * clients sides, it needs to make sure all of fids under one
-     * sequence will be located in one MDT.
-     */
-    FID_SEQ_SPECIAL         = 0x200000004ULL,
-    FID_SEQ_QUOTA           = 0x200000005ULL,
-    FID_SEQ_QUOTA_GLB       = 0x200000006ULL,
-    FID_SEQ_ROOT            = 0x200000007ULL,  /* Located on MDT0 */
-    FID_SEQ_LAYOUT_RBTREE   = 0x200000008ULL,
-    /* sequence is used for update logs of cross-MDT operation */
-    FID_SEQ_UPDATE_LOG      = 0x200000009ULL,
-    /*
-     * Sequence is used for the directory under which update logs
-     * are created.
-     */
-    FID_SEQ_UPDATE_LOG_DIR  = 0x20000000aULL,
-    FID_SEQ_NORMAL          = 0x200000400ULL,
-    FID_SEQ_LOV_DEFAULT     = 0xffffffffffffffffULL
-};
-
-enum root_oid {
-    FID_OID_ROOT      = 1UL,
-    FID_OID_ECHO_ROOT = 2UL,
-};
-
-static inline __u64 fid_seq(const struct lu_fid *fid)
-{
-    return fid->f_seq;
-}
-
-static inline __u32 fid_oid(const struct lu_fid *fid)
-{
-    return fid->f_oid;
-}
-
-static inline bool fid_seq_is_norm(__u64 seq)
-{
-    return (seq >= FID_SEQ_NORMAL);
-}
-
-static inline bool fid_seq_is_mdt0(__u64 seq)
-{
-    return seq == FID_SEQ_OST_MDT0;
-}
-
-static inline bool fid_is_mdt0(const struct lu_fid *fid)
-{
-    return fid_seq_is_mdt0(fid_seq(fid));
-}
-
-static inline bool fid_seq_is_igif(__u64 seq)
-{
-    return seq >= FID_SEQ_IGIF && seq <= FID_SEQ_IGIF_MAX;
-}
-
-static inline bool fid_is_igif(const struct lu_fid *fid)
-{
-    return fid_seq_is_igif(fid_seq(fid));
-}
-
-static inline bool fid_is_norm(const struct lu_fid *fid)
-{
-    return fid_seq_is_norm(fid_seq(fid));
-}
-
-static inline int fid_is_root(const struct lu_fid *fid)
-{
-    return (fid_seq(fid) == FID_SEQ_ROOT &&
-            fid_oid(fid) == FID_OID_ROOT);
-}
-
-static inline bool fid_is_md_operative(const struct lu_fid *fid)
-{
-    return fid_is_mdt0(fid) || fid_is_igif(fid) ||
-        fid_is_norm(fid) || fid_is_root(fid);
-}
-
-int llapi_fid_parse(const char *fidstr, struct lu_fid *fid, char **endptr)
-{
-    unsigned long long val;
-    bool bracket = false;
-    char *end = (char *)fidstr;
-    int rc = 0;
-
-    if (!fidstr || !fid) {
-        rc = -EINVAL;
-        goto out;
-    }
-
-    while (isspace(*fidstr))
-        fidstr++;
-    while (*fidstr == '[') {
-        bracket = true;
-        fidstr++;
-    }
-    errno = 0;
-    val = strtoull(fidstr, &end, 0);
-    if ((val == 0 && errno == EINVAL) || *end != ':') {
-        rc = -EINVAL;
-        goto out;
-    }
-    if (val >= UINT64_MAX)
-        rc = -ERANGE;
-    else
-        fid->f_seq = val;
-
-    fidstr = end + 1; /* skip first ':', checked above */
-    errno = 0;
-    val = strtoull(fidstr, &end, 0);
-    if ((val == 0 && errno == EINVAL) || *end != ':') {
-        rc = -EINVAL;
-        goto out;
-    }
-    if (val > UINT32_MAX)
-        rc = -ERANGE;
-    else
-        fid->f_oid = val;
-
-    fidstr = end + 1; /* skip second ':', checked above */
-    errno = 0;
-    val = strtoull(fidstr, &end, 0);
-    if (val == 0 && errno == EINVAL) {
-        rc = -EINVAL;
-        goto out;
-    }
-    if (val > UINT32_MAX)
-        rc = -ERANGE;
-    else
-        fid->f_ver = val;
-
-    if (bracket && *end == ']')
-        end++;
-out:
-    if (endptr)
-        *endptr = end;
-
-    errno = -rc;
-    return rc;
 }
 
 /*
@@ -830,7 +662,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 
 static int phobos_op_get(const struct lu_fid *fid,
                          char *altobjid,
-                         const struct buf *hints,
+                         UNUSED const struct buf *hints,
                          int fd)
 {
     struct pho_xfer_desc xfer = {0};
@@ -866,7 +698,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 
 static int phobos_op_getlayout(const struct lu_fid *fid,
                                char *altobjid,
-                               const struct buf *hints,
+                               UNUSED const struct buf *hints,
                                struct llapi_layout **layout)
 {
     struct pho_xfer_desc xfer = {0};
@@ -991,8 +823,9 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 /* FIXME the layout API doesn't provide a function to restore \p layout
  * from \p dst_fd directly. So this function does nothing at the moment.
  */
-static int ct_restore_layout(const char *dst, int dst_fd,
-                             struct llapi_layout *layout)
+static int ct_restore_layout(UNUSED const char *dst,
+                             UNUSED int dst_fd,
+                             UNUSED struct llapi_layout *layout)
 {
     return 0;
 }
@@ -1087,7 +920,8 @@ static void hai_get_user_data(const struct hsm_action_item *hai,
     }
 }
 
-static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
+static int ct_archive(const struct hsm_action_item *hai,
+                      UNUSED const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
     struct llapi_layout *layout;
@@ -1125,7 +959,8 @@ static int ct_archive(const struct hsm_action_item *hai, const long hal_flags)
 
     open_flags = O_WRONLY | O_NOFOLLOW;
     /* If extent is specified, don't truncate an old archived copy */
-    open_flags |= ((hai->hai_extent.length == -1) ? O_TRUNC : 0) | O_CREAT;
+    open_flags |= O_CREAT | ((hai->hai_extent.length == (unsigned long long)-1)
+                              ? O_TRUNC : 0);
 
     layout = llapi_layout_get_by_fd(src_fd, 0);
     if (!layout)
@@ -1174,7 +1009,7 @@ static int get_file_layout(const struct hsm_action_item *hai,
 }
 
 static int ct_restore(const struct hsm_action_item *hai,
-                      const long hal_flags,
+                      UNUSED const long hal_flags,
                       bool restore_lov)
 {
     struct hsm_copyaction_private *hcp = NULL;
@@ -1281,7 +1116,8 @@ fini:
     return rc;
 }
 
-static int ct_remove(const struct hsm_action_item *hai, const long hal_flags)
+static int ct_remove(const struct hsm_action_item *hai,
+                     UNUSED const long hal_flags)
 {
     struct hsm_copyaction_private *hcp = NULL;
     struct buf hints;
@@ -1484,8 +1320,8 @@ static int ct_run(void)
     while (1) {
         struct hsm_action_list *hal;
         struct hsm_action_item *hai;
+        unsigned int i = 0;
         int msgsize;
-        int i = 0;
 
         CT_TRACE("waiting for message from kernel");
 

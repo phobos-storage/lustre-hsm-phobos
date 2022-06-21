@@ -175,7 +175,7 @@ int dump_buffer(const char *base, const char *extension,
         error(rc, "Failed to write %lu bytes to '%s%s'", len, base, extension);
     } else {
         /* assume write succeed in one call */
-        assert(rc == len);
+        assert((size_t)rc == len);
         rc = 0;
     }
     close(fd);

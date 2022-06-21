@@ -18,7 +18,7 @@ SOURCES=lhsmtool_phobos.c src/layout.c
 HEADERS=src/layout.h
 TESTS=tests/hsm_import.c
 
-CFLAGS=-g -Wall -Werror -Isrc
+CFLAGS=-g -Wall -Wextra -Werror -Isrc
 LDFLAGS=-pthread -l:liblustreapi.a
 
 build:
