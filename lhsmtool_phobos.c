@@ -68,7 +68,7 @@
 #define LL_HSM_ORIGIN_MAX_ARCHIVE (sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX      "trusted."
 
-#define XATTR_TRUSTED_HSM_FUID_DEFAULT "trusted.hsm_fuid"
+#define XATTR_TRUSTED_FUID_XATTR_DEFAULT "trusted.hsm_fuid"
 
 #define HINT_HSM_FUID "hsm_fuid"
 
@@ -136,7 +136,7 @@ static int err_minor;
 
 static char cmd_name[PATH_MAX];
 static char fs_name[MAX_OBD_NAME + 1];
-static char trusted_hsm_fsuid[MAXNAMLEN];
+static char trusted_fuid_xattr[MAXNAMLEN];
 
 static struct hsm_copytool_private *ctdata;
 
@@ -191,7 +191,7 @@ static void usage(int rc)
             "    -f, --event-fifo <path>      Write events stream to fifo\n"
             "    -F, --default-family <name>  Set the default family\n"
             "    -q, --quiet                  Produce less verbose output\n"
-            "    -t, --hsm_fsuid              Change value of xattr for restore\n"
+            "    -t, --fuid-xattr             Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
 #ifdef LLAPI_LAYOUT_SET_BY_FD
             "    -l, --restore-lov            Use the striping that the file "
@@ -203,9 +203,9 @@ static void usage(int rc)
 }
 
 #ifdef LLAPI_LAYOUT_SET_BY_FD
-#define GETOPTS_STRING "A:b:c:f:F:hqt:vl"
+#define GETOPTS_STRING "A:b:c:f:F:hqx:vl"
 #else
-#define GETOPTS_STRING "A:b:c:f:F:hqt:v"
+#define GETOPTS_STRING "A:b:c:f:F:hqx:v"
 #endif
 
 static int ct_parseopts(int argc, char * const *argv)
@@ -247,7 +247,7 @@ static int ct_parseopts(int argc, char * const *argv)
             .has_arg = required_argument },
         { .val = 'v',    .name = "verbose",
             .has_arg = no_argument },
-        { .val = 't',    .name = "hsm_fsuid",
+        { .val = 'x',    .name = "fuid-xattr",
             .has_arg = required_argument},
         { .name = NULL }
     };
@@ -321,9 +321,6 @@ repeat:
         case 'F':
             opt.o_default_family = str2rsc_family(optarg);
             break;
-        case 't':
-            strncpy(trusted_hsm_fsuid, optarg, MAXNAMLEN);
-            break;
         case 'h':
             usage(0);
             break;
@@ -338,6 +335,9 @@ repeat:
         case 'v':
              opt.o_verbose++;
              break;
+        case 'x':
+            strncpy(trusted_fuid_xattr, optarg, MAXNAMLEN);
+            break;
         case 0:
              break;
         default:
@@ -585,7 +585,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     xfer.xd_flags = 0;
 
     /* set oid in xattr for later use */
-    rc = fsetxattr(xfer.xd_fd, trusted_hsm_fsuid, obj, strlen(obj),
+    rc = fsetxattr(xfer.xd_fd, trusted_fuid_xattr, obj, strlen(obj),
                    XATTR_CREATE);
     if (rc)
         CT_TRACE("failed to write xattr: %s\n", strerror(errno));
@@ -806,7 +806,7 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
     if (fd < 0)
         return -errno;
 
-    xattr_size = fgetxattr(fd, trusted_hsm_fsuid, xattr_buf,
+    xattr_size = fgetxattr(fd, trusted_fuid_xattr, xattr_buf,
                            XATTR_SIZE_MAX);
     if (xattr_size < 0) {
         rc = -errno;
@@ -1434,7 +1434,7 @@ int main(int argc, char **argv)
 {
     int rc;
 
-    strncpy(trusted_hsm_fsuid, XATTR_TRUSTED_HSM_FUID_DEFAULT, MAXNAMLEN);
+    strncpy(trusted_fuid_xattr, XATTR_TRUSTED_FUID_XATTR_DEFAULT, MAXNAMLEN);
 
     snprintf(cmd_name, sizeof(cmd_name), "%s", basename(argv[0]));
     rc = ct_parseopts(argc, argv);
@@ -1449,7 +1449,7 @@ int main(int argc, char **argv)
 
     /* Trace the lustre fsname */
     CT_TRACE("fs_name=%s", fs_name);
-    CT_TRACE("trusted_hsm_fsuid=%s", trusted_hsm_fsuid);
+    CT_TRACE("trusted_fuid_xattr=%s", trusted_fuid_xattr);
 
     rc = ct_run();
 
