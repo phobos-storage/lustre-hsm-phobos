@@ -441,8 +441,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
         return -EINVAL;
 
     /* object id is "fsname:fid" */
-    /* /!\ additionnal letter only because of pcocc side effect */
-    return sprintf(objid, "%s:"DFID, fs_name, PFID(fid));
+    return sprintf(objid, "%s:"DFID_NOBRACE, fs_name, PFID(fid));
 }
 
 static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
@@ -1151,10 +1150,10 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
 
     if (opt.o_verbose >= LLAPI_MSG_INFO || opt.o_dry_run) {
         /* Print the original path */
-        char        path[PATH_MAX];
-        long long    recno = -1;
-        int            linkno = 0;
-        char        fid[128];
+        long long recno = -1;
+        char path[PATH_MAX];
+        int linkno = 0;
+        char fid[128];
 
         sprintf(fid, DFID, PFID(&hai->hai_fid));
         CT_TRACE("'%s' action %s reclen %d, cookie=%#jx",

@@ -153,17 +153,22 @@ function run_test()
 
     rm "$tmp"
 
+    if [ ! -z "$args" ]
+    then
+        args=" $args"
+    fi
+
     if [[ $rc == 0 ]]
     then
         printf ' \033[0;30;42m PASS   \033[0;0;0m %s%s (%s s)\n' \
-            "$test_name" " $args" "$runtime"
+            "$test_name" "$args" "$runtime"
     elif [[ $rc == $SKIP ]]
     then
         printf ' \033[0;30;47m SKIP   \033[0;0;0m %s%s (%s s)\n' \
-            "$test_name" " $args" "$runtime"
+            "$test_name" "$args" "$runtime"
     else
         printf ' \033[0;30;41m FAILED \033[0;0;0m %s%s (%s s)\n' \
-                "$test_name" " $args" "$runtime"
+                "$test_name" "$args" "$runtime"
         ((FAILURES++))
         echo "Log file: $log_file"
         cat "$log_file"
@@ -217,7 +222,7 @@ function create_file()
     touch "$file"
     dd if=/dev/urandom of="$file" bs=4096 count=$(randint 5 20)
 
-    lfs path2fid "$file"
+    fid_nobrace "$file"
 }
 
 function wait_for_state()
@@ -251,7 +256,7 @@ function add_event_watch()
 function wait_for_event()
 {
     local event="$1"
-    local fid=$(lfs path2fid "$2" | sed 's/\[\(.*\)\]/\1/')
+    local fid=$(fid_nobrace "$2")
     local count=0
 
     while ! grep -B 1 -a "$fid" "$EVENTS" | grep -a "$event"
@@ -284,14 +289,14 @@ function user_md_contains()
     phobos -q getmd "$oid" | grep -F "$key" | grep -F "$value"
 }
 
-function get_oid_from_fid()
+function fid_nobrace()
 {
-    echo "$FSNAME:$1"
+    lfs path2fid "$1" | sed "s/\[\(.*\)\]/\1/"
 }
 
 function get_oid_from_path()
 {
-    echo "$FSNAME:$(lfs path2fid "$1")"
+    echo "$FSNAME:$(fid_nobrace "$1")"
 }
 
 function get_file_user_md()
