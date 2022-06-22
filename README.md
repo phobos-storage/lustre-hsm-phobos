@@ -38,7 +38,7 @@ lfs set_param mdt.<MTDNAME>.hsm_control=enabled
 
 ```
 lhsmtool_phobos --default-family tape \
-                --hsm_fsuid      "trusted.hsm_fuid" \
+                --fuid-xattr     "trusted.hsm_fuid" \
                 --event-fifo     /tmp/fifo \
                 --archive        1 \
                 --archive        2 \
@@ -50,7 +50,7 @@ lhsmtool_phobos --default-family tape \
   The Phobos family used by this copytool to store objects. phobosd's
   configuration has to be compatible with this family. Otherwise, phobosd will
   not handle any request.
-- `-t|--hsm_fsuid`: name of the extended attribute which stores the mapping
+- `-x|--fuid-xattr`: name of the extended attribute which stores the mapping
   between filename and object ID. This attribute is set on the file during the
   archive process.
 - `-A|--archive`: archive number handled by this copytool. HSM Archive requests
@@ -93,7 +93,7 @@ The following values are stored:
 
 ## Hints
 
-The copytool supports hints though the HSM requests (e.g. `lfs hsm_archive
+The copytool supports hints though the HSM requests (e.g. `lfs hsm_remove
 --data "hsm_fuid=<myoid>"`). The hints are provided through a list of coma
 separated key value pairs (`k1=v1,k2=v2`). The supported hints are:
 

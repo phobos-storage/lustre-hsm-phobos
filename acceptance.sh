@@ -112,19 +112,36 @@ function global_teardown()
     rm -f "$FIFO" "$EVENTS"
 }
 
+function args_to_filename()
+{
+    local args=$1
+
+    if [ -z "$args" ]
+    then
+        echo ""
+    else
+        # Replace space with '_'
+        echo "_${args// /_}"
+    fi
+}
+
 function run_test()
 {
     local test_name="$1"
     local test_func="test_$test_name"
-    local log_file="$LOG_DIR/$test_name.log"
     local tmp=$(mktemp)
+
+    shift
+
+    local args="$*"
+    local log_file="$LOG_DIR/${test_name}$(args_to_filename "$args").log"
 
     (
      test_dir=$(mktemp -d -p "$LUSTRE_ROOT")
      trap "rm -rf $test_dir" EXIT
 
      local begin=`date +%s.%N`
-     ($test_func &> "$log_file")
+     ($test_func "$args" &> "$log_file")
      local rc=$?
      local end=`date +%s.%N`
 
@@ -138,15 +155,16 @@ function run_test()
 
     if [[ $rc == 0 ]]
     then
-        printf ' \033[0;30;42m PASS   \033[0;0;0m %s (%s s)\n' \
-            "$test_name" "$runtime"
+        printf ' \033[0;30;42m PASS   \033[0;0;0m %s%s (%s s)\n' \
+            "$test_name" " $args" "$runtime"
     elif [[ $rc == $SKIP ]]
     then
-        printf ' \033[0;30;47m SKIP   \033[0;0;0m %s (%s s)\n' \
-            "$test_name" "$runtime"
+        printf ' \033[0;30;47m SKIP   \033[0;0;0m %s%s (%s s)\n' \
+            "$test_name" " $args" "$runtime"
     else
-        printf ' \033[0;30;41m FAILED \033[0;0;0m %s (%s s)\n' \
-                "$test_name" "$runtime"
+        printf ' \033[0;30;41m FAILED \033[0;0;0m %s%s (%s s)\n' \
+                "$test_name" " $args" "$runtime"
+        ((FAILURES++))
         echo "Log file: $log_file"
         cat "$log_file"
     fi
@@ -161,23 +179,33 @@ function randint()
 }
 
 tests=()
+test_args=()
 
 function add_test()
 {
     tests+=($1)
+    shift
+    test_args+=("$*")
 }
 
 function run_tests()
 {
-    local tests_to_run=${TESTS:-${tests[@]}}
-
     echo ""
     echo "Starting tests. Log dir: $LOG_DIR"
 
-    for t in $tests_to_run
-    do
-        run_test "$t"
-    done
+    FAILURES=0
+    if [ ! -z "$TESTS" ]
+    then
+        for t in "$TESTS"
+        do
+            run_test "$t"
+        done
+    else
+        for i in $(seq 0 $((${#tests[@]} - 1)))
+        do
+            run_test "${tests[$i]}" "${test_args[$i]}"
+        done
+    fi
 
     echo ""
 }
@@ -253,10 +281,7 @@ function user_md_contains()
     local key="$2"
     local value="$3"
 
-    # FIXME for some reason, having both grep on the same line does not work
-    # for the pool_name in test_layout_in_user_md anymore...
-    phobos -q getmd "$oid" | grep "$key"
-    phobos -q getmd "$oid" | grep "$value"
+    phobos -q getmd "$oid" | grep -Fe "$key" -e "$value"
 }
 
 function get_oid_from_fid()
@@ -438,25 +463,22 @@ function check_layout()
 function test_layout_in_user_md()
 {
     local file="$test_dir/file"
+    local pool=${1:-""}
 
     create_file "$file"
 
     add_event_watch
     start_copytool
 
-    lfs hsm_archive "$file"
-    wait_for_event ARCHIVE_FINISH "$file"
+    lfs migrate -p "$pool" "$file" ||
+        error "Could not migrate '$file' to '$pool'"
 
-    check_layout "$file"
-
-    lfs migrate -p test_pool "$file" ||
-        error "Could not migrate '$file' to 'test_pool'"
-    lfs hsm_set --dirty "$file"
     lfs hsm_archive "$file"
     wait_for_event ARCHIVE_FINISH "$file"
 
     check_layout "$file"
 }
+add_test layout_in_user_md test_pool
 add_test layout_in_user_md
 
 function invalid_component_error()
@@ -619,4 +641,26 @@ function test_hsm_import()
 }
 add_test hsm_import
 
+function test_fuid_xattr()
+{
+    local file="$test_dir/file"
+    local attr=test_xattr
+    local arg=${1:--x}
+
+    add_event_watch
+    start_copytool "$arg" "trusted.$attr"
+
+    create_file "$file"
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    get_xattr_value "$file" "$attr" | grep -F "$(get_oid_from_path "$file")" ||
+        error "Object ID should be stored in 'trusted.$attr'"
+}
+add_test fuid_xattr --fuid-xattr
+add_test fuid_xattr -x
+
 run_tests
+
+exit $FAILURES
