@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5172bc3d_71a34efb",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-23T07:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54123224_3369b525",
+      "range": {
+        "startLine": 284,
+        "startChar": 29,
+        "endLine": 284,
+        "endChar": 62
+      },
+      "revId": "0979383918973b390f2d10577cb42821a08293f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caf51863_6c1d0e42",
@@ -37,6 +61,30 @@
       "writtenOn": "2022-06-23T07:14:00Z",
       "side": 1,
       "message": "major: -x",
+      "range": {
+        "startLine": 194,
+        "startChar": 17,
+        "endLine": 194,
+        "endChar": 19
+      },
+      "revId": "0979383918973b390f2d10577cb42821a08293f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f2f45cd_cb704162",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-23T07:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caf51863_6c1d0e42",
       "range": {
         "startLine": 194,
         "startChar": 17,
