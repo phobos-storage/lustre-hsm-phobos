@@ -16,6 +16,24 @@
       "message": "If you are sure that still compiles without lustre sources, I am okay with it!",
       "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72b9a36c_1131f7dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-23T07:29:51Z",
+      "side": 1,
+      "message": "It has been tested on Lustre 2.12.8. I\u0027ll test it on 2.15 when phobos is packaged for CentOS 8.",
+      "parentUuid": "287af9ec_28cfa260",
+      "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
