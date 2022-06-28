@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f0ad08e_7c9bed2e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-28T10:51:54Z",
+      "side": 1,
+      "message": "Yes it does since this flags checks for unused function. All the changes made here are a consequence of adding this flag. Except for the style adjustment line 1323.",
+      "parentUuid": "bc3227a8_a7a9624d",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 22
+      },
+      "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "287af9ec_28cfa260",
@@ -72,6 +96,30 @@
       "writtenOn": "2022-06-28T10:10:12Z",
       "side": 1,
       "message": "major? both these and the old version don\u0027t do exactly what you want no ? Here you check that the metadata contain \"key\" and \"value\", but you don\u0027t check that the value associated to \"key\" is \"value\" no ?\nThe proper way to do it would rather be a grep on \"${key}\u003d${value}\" I think.",
+      "range": {
+        "startLine": 256,
+        "startChar": 6,
+        "endLine": 256,
+        "endChar": 11
+      },
+      "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a7176b7_afdb9af1",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2022-06-28T10:51:54Z",
+      "side": 1,
+      "message": "No because key is `layout` and value is `pool_name\u003dtest_pool` for example. So in practice this would test something like this:\n\n```\nlayout\u003d......,pool_name\u003dtest_pool,....\n```\n\nI didn\u0027t want to build the whole layout info an grep for it because then the test would depend on how the code is written. So I do one check per attribute I want to find.",
+      "parentUuid": "795618c0_43a6c8ed",
       "range": {
         "startLine": 256,
         "startChar": 6,
