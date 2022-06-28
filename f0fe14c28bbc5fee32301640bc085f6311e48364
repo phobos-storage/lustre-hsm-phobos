@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b70a260d_ef53d4cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-28T10:56:56Z",
+      "side": 1,
+      "message": "So those functions were not used before ? I see, thanks",
+      "parentUuid": "5f0ad08e_7c9bed2e",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 22
+      },
+      "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "287af9ec_28cfa260",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -120,6 +144,30 @@
       "side": 1,
       "message": "No because key is `layout` and value is `pool_name\u003dtest_pool` for example. So in practice this would test something like this:\n\n```\nlayout\u003d......,pool_name\u003dtest_pool,....\n```\n\nI didn\u0027t want to build the whole layout info an grep for it because then the test would depend on how the code is written. So I do one check per attribute I want to find.",
       "parentUuid": "795618c0_43a6c8ed",
+      "range": {
+        "startLine": 256,
+        "startChar": 6,
+        "endLine": 256,
+        "endChar": 11
+      },
+      "revId": "f0fe14c28bbc5fee32301640bc085f6311e48364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3c3c96f_257ed14e",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-06-28T10:56:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8a7176b7_afdb9af1",
       "range": {
         "startLine": 256,
         "startChar": 6,
