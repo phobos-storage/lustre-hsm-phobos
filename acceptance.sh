@@ -52,6 +52,18 @@ function phobos_setup()
         error "Could not add $ARCHIVE_PATH"
     phobos dir format --fs posix --unlock "$ARCHIVE_PATH" ||
         error "Could not format $ARCHIVE_PATH"
+
+    for i in {1..2}
+    do
+        mkdir "${ARCHIVE_PATH}$i"
+        phobos dir add "${ARCHIVE_PATH}$i"
+        phobos dir format --fs posix --unlock "${ARCHIVE_PATH}$i"
+    done
+
+    echo '' >> /etc/phobos.conf
+    echo '[alias "test_alias"]' >> /etc/phobos.conf
+    echo 'layout = raid1' >> /etc/phobos.conf
+    echo 'lyt-params = repl_count=3' >> /etc/phobos.conf
 }
 
 function phobos_teardown()
@@ -59,6 +71,8 @@ function phobos_teardown()
     kill "$PHOBOSD_PID"
     phobos_db drop_tables
     sudo -u postgres phobos_db drop_db
+
+    rm -rf "$ARCHIVE_PATH" "${ARCHIVE_PATH}1" "${ARCHIVE_PATH}2"
 }
 
 function lustre_is_mounted()
@@ -665,6 +679,30 @@ function test_fuid_xattr()
 }
 add_test fuid_xattr --fuid-xattr
 add_test fuid_xattr -x
+
+function test_phobos_alias()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    local oid=$(get_oid_from_path "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "alias=test_alias" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    phobos extent list -o all "$oid"
+    local repl_count=$(phobos extent list -o ext_count "$oid")
+    if [[ $repl_count != 3 ]]
+    then
+        error "Invalid repl_count for alias 'test_alias'." \
+              "Expected '3', got '$repl_count'"
+    fi
+}
+add_test phobos_alias
 
 run_tests
 
