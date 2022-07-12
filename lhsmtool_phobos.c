@@ -617,8 +617,8 @@ static int phobos_op_put(const struct lu_fid *fid,
                 /* Deal with storage layout */
                 xfer.xd_params.put.layout_name = hinttab[i].v;
 
-            } else if (!strncmp(hinttab[i].k, "layoutparam", HINTMAX)) {
-                /* Deal with storage layout parameters */
+            } else if (!strncmp(hinttab[i].k, "alias", HINTMAX)) {
+                xfer.xd_params.put.alias = hinttab[i].v;
 
             } else if (!strncmp(hinttab[i].k, "tag", HINTMAX)) {
                 /* Deal with storage tags */
