@@ -19,7 +19,7 @@ HEADERS=src/layout.h
 TESTS=tests/hsm_import.c
 
 CFLAGS=-g -Wall -Wextra -Werror -Isrc
-LDFLAGS=-pthread -l:liblustreapi.a
+LDFLAGS=-pthread -llustreapi
 
 build:
 	mkdir -p build
@@ -48,6 +48,7 @@ clean:
 dist: all
 	mkdir -p $(DISTDIR)
 	cp lhsmtool_phobos.c $(DISTDIR)
+	cp -R src $(DISTDIR)
 	cp lhsmtool_phobos.spec $(DISTDIR)
 	cp lhsmtool_phobos.spec.in $(DISTDIR)
 	cp Makefile $(DISTDIR)

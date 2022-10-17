@@ -703,6 +703,12 @@ function test_phobos_alias()
 }
 add_test phobos_alias
 
+function test_rpm()
+{
+    make rpm
+}
+add_test rpm
+
 run_tests
 
 exit $FAILURES
