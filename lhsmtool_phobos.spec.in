@@ -36,6 +36,12 @@ runs Phobos' LRS daemon (version > 1.93).
 
 %changelog
 
+* Mon Oct 24 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.1-1
+- Rename CLI option --hsm_fuid/-t to --fuid-xattr/-x
+- Store the file layout in Phobos' user_md
+- Remove braces around FID in FUID
+- Add support for alias in "--data"
+
 * Thu Feb 03 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.0-1
 - Implementation of Archive/Restore/Delete HSM actions
 - Support for hints through the "--data" option of "lfs hsm_archive"
