@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c92b65_1390376d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1299,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-12-01T14:32:05Z",
+      "side": 1,
+      "message": "minor: you must indicate a mode when using the `O_CREAT` flag",
+      "range": {
+        "startLine": 1299,
+        "startChar": 13,
+        "endLine": 1299,
+        "endChar": 49
+      },
+      "revId": "8cd182f416d5091e6bb7612c75393d7df5f1b768",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "590ff2e7_5ddd3437",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1319,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2022-12-01T14:32:05Z",
+      "side": 1,
+      "message": "defect: missing a `close()`",
+      "revId": "8cd182f416d5091e6bb7612c75393d7df5f1b768",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
