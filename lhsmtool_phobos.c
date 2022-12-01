@@ -110,6 +110,7 @@ struct options {
     int              o_mnt_fd;
     enum rsc_family  o_default_family;
     bool             o_restore_lov;
+    const char      *o_pid_file;
 };
 
 /* everything else is zeroed */
@@ -237,6 +238,8 @@ static int ct_parseopts(int argc, char * const *argv)
             .flag = &opt.o_dry_run },
         { .val = 'h',    .name = "help",
             .has_arg = no_argument },
+        { .val = 'P',    .name = "pid-file",
+            .has_arg = required_argument },
 #ifdef LLAPI_LAYOUT_SET_BY_FD
         { .val = 'l',    .name = "restore-lov",
             .has_arg = no_argument },
@@ -331,6 +334,9 @@ repeat:
 #endif
         case 'q':
              opt.o_verbose--;
+             break;
+        case 'P':
+             opt.o_pid_file = optarg;
              break;
         case 'v':
              opt.o_verbose++;
@@ -1273,7 +1279,45 @@ static void handler(int signal)
     if (opt.o_event_fifo != NULL)
         llapi_hsm_unregister_event_fifo(opt.o_event_fifo);
 
-    _exit(1);
+    _exit(0);
+}
+
+static void create_pid_file(void)
+{
+    pid_t mypid = getpid();
+    int mypid_str_len;
+    char *mypid_str;
+    int save_errno;
+    int fd;
+    int rc;
+
+    if (!opt.o_pid_file)
+        return;
+
+    CT_TRACE("Pid file '%s'", opt.o_pid_file);
+
+    fd = open(opt.o_pid_file, O_WRONLY | O_CREAT);
+    if (fd == -1) {
+        CT_ERROR(-errno, "Could not create pid file '%s', will continue",
+                 opt.o_pid_file);
+        return;
+    }
+
+    rc = asprintf(&mypid_str, "%u", mypid);
+    if (rc == -1) {
+        CT_ERROR(-errno, "Failed to allocate string");
+        return;
+    }
+
+    mypid_str_len = strlen(mypid_str);
+    rc = write(fd, mypid_str, mypid_str_len);
+    save_errno = errno;
+    free(mypid_str);
+    if (rc != mypid_str_len || rc == -1)
+        CT_ERROR(-save_errno, "Failed to write pid to '%s', will continue",
+                 opt.o_pid_file);
+
+    return;
 }
 
 /* Daemon waits for messages from the kernel; run it in the background. */
@@ -1290,6 +1334,8 @@ static int ct_run(void)
             return rc;
         }
     }
+
+    create_pid_file();
 
     setbuf(stdout, NULL);
 
