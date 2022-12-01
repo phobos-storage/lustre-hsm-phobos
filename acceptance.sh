@@ -15,6 +15,12 @@ PHOBOSD_SOCKET=/tmp/lrs
 LUSTRE_ROOT=/mnt/lustre
 FSNAME=lustre
 SKIP=77
+COPYTOOL_PID=
+if [ ! -z ${VALGRIND+x} ]
+then
+    VALGRIND=${VALGRIND:-valgrind --leak-check=full --show-leak-kinds=all \
+                                  --track-origins=yes --error-exitcode=1}
+fi
 
 # Safe check QUICK variable
 if [[ $QUICK != true && $QUICK != false ]]
@@ -185,7 +191,6 @@ function run_test()
                 "$test_name" "$args" "$runtime"
         ((FAILURES++))
         echo "Log file: $log_file"
-        cat "$log_file"
     fi
 }
 
@@ -336,7 +341,8 @@ function trap_add()
 __lhsmtool_phobos=$(PATH="$PWD/build:$PATH" which lhsmtool_phobos)
 function ct_phobos()
 {
-    "$__lhsmtool_phobos" "$@"
+    $VALGRIND "$__lhsmtool_phobos" "$@" &
+    COPYTOOL_PID=$!
 }
 
 __hsm_import=$(PATH="$PWD/build:$PATH" which hsm-import)
@@ -345,14 +351,27 @@ function hsm_import()
     "$__hsm_import" "$@"
 }
 
+function kill_copytool()
+{
+    declare rc
+
+    kill $COPYTOOL_PID || error "Daemon was not running"
+    wait $COPYTOOL_PID
+    rc=$?
+
+    COPYTOOL_PID=0
+
+    exit $rc
+}
+
 function start_copytool()
 {
     ct_phobos "$@" "$VERBOSE"   \
         --default-family dir    \
         --event-fifo "$FIFO"    \
-        --daemon "$LUSTRE_ROOT"
+        "$LUSTRE_ROOT"
 
-    trap_add "kill -9 $(pgrep lhsmtool_phobos)"
+    trap_add kill_copytool
 }
 
 function get_xattr_value()
