@@ -1,7 +1,0 @@
-sudo /usr/sbin/lhsmtool_posix -v  --hsm_root /tmp/arch/ /mnt/lustre
-
- sudo lfs hsm_archive --data family=dir,tag=a  fichier
-
- sudo ./lhsmtool_phobos -F dir /mnt/lustre
-
-
