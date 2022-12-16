@@ -460,10 +460,10 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     int nbhints;
     int rc;
 
-    if (hints) {
+    if (hints->data) {
         int i = 0;
 
-        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+        CT_TRACE("hints provided hints='%s', len=%lu",
                  hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
@@ -546,7 +546,8 @@ static int phobos_op_put(const struct lu_fid *fid,
                          char *altobjid,
                          const int fd,
                          struct llapi_layout *layout,
-                         const struct buf *hints)
+                         const struct buf *hints,
+                         char **oid)
 {
     struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
@@ -567,6 +568,8 @@ static int phobos_op_put(const struct lu_fid *fid,
             return rc;
         obj = objid;
     }
+    /* only used for logging, not an error if allocation failed */
+    *oid = strdup(obj);
 
     /**
      * @todo:
@@ -603,8 +606,8 @@ static int phobos_op_put(const struct lu_fid *fid,
     xfer.xd_params.put.family = opt.o_default_family;
 
     /* Use content of hints to modify fields in xfer_desc */
-    if (hints) {
-        CT_TRACE("hints provided !!! hints='%s', len=%lu",
+    if (hints->data) {
+        CT_TRACE("hints provided hints='%s', len=%lu",
                  hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
@@ -933,6 +936,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     char src[PATH_MAX];
     int hp_flags = 0;
     struct buf hints;
+    char *oid = NULL;
     int src_fd = -1;
     int open_flags;
     int rcf = 0;
@@ -974,7 +978,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     hai_get_user_data(hai, &hints);
 
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints);
+    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints, &oid);
     CT_TRACE("phobos_put (archive): rc=%d", rc);
     if (rc)
         goto fini_major;
@@ -996,6 +1000,16 @@ out:
 
     rcf = rc;
     rc = ct_fini(&hcp, hai, hp_flags, rcf);
+    if (rc) {
+        int rc2;
+
+        CT_ERROR(rc, "failed to end ARCHIVE action, deleting '%s' from phobos",
+                 oid);
+        rc2 = phobos_op_del(&hai->hai_fid, &hints);
+        if (rc2)
+            CT_ERROR(rc2, "Failed to remove '%s'", oid);
+    }
+    free(oid);
 
     return rc;
 }
