@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ebb0d1e_c8aeeff3",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2022-12-16T11:11:19Z",
+      "side": 1,
+      "message": "suggest: remove \"hints\u003d\", just \"hints provided \u003d \u0027%s\u0027, len\u003d%lu\" is good enough",
+      "range": {
+        "startLine": 466,
+        "startChar": 33,
+        "endLine": 466,
+        "endChar": 39
+      },
+      "revId": "26657d7893f89f838066295eb5bcc98deaa9f5e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
