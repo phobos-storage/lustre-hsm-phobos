@@ -62,8 +62,10 @@
 
 /* Phobos headers */
 #include "phobos_store.h"
+#include "pho_common.h"
 
 #include "layout.h"
+#include "common.h"
 
 #define LL_HSM_ORIGIN_MAX_ARCHIVE (sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX      "trusted."
@@ -95,22 +97,6 @@ enum ct_action {
     CA_IMPORT = 1,
     CA_REBIND,
     CA_MAXSEQ,
-};
-
-struct options {
-    int              o_daemonize;
-    int              o_dry_run;
-    int              o_abort_on_error;
-    int              o_verbose;
-    int              o_archive_id_used;
-    int              o_archive_id_cnt;
-    int             *o_archive_id;
-    char            *o_event_fifo;
-    char            *o_mnt;
-    int              o_mnt_fd;
-    enum rsc_family  o_default_family;
-    bool             o_restore_lov;
-    const char      *o_pid_file;
 };
 
 /* everything else is zeroed */
@@ -149,27 +135,6 @@ static inline double ct_now(void)
 
     return tv.tv_sec + 0.000001 * tv.tv_usec;
 }
-
-#define CT_ERROR(_rc, _format, ...)       \
-    llapi_error(LLAPI_MSG_ERROR, _rc,     \
-                "%f %s[%ld]: "_format,    \
-                ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
-
-#define CT_DEBUG(_format, ...)                           \
-    llapi_error(LLAPI_MSG_DEBUG | LLAPI_MSG_NO_ERRNO, 0, \
-                "%f %s[%ld]: "_format,                   \
-                ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
-
-#define CT_WARN(_format, ...)                           \
-    llapi_error(LLAPI_MSG_WARN | LLAPI_MSG_NO_ERRNO, 0, \
-                "%f %s[%ld]: "_format,                  \
-                ct_now(), cmd_name, syscall(SYS_gettid), ## __VA_ARGS__)
-
-#define CT_TRACE(_format, ...)                           \
-    llapi_error(LLAPI_MSG_INFO | LLAPI_MSG_NO_ERRNO, 0,  \
-                "%f %s[%ld] %s: "_format,                \
-                ct_now(), cmd_name, syscall(SYS_gettid), \
-                __func__, ## __VA_ARGS__)
 
 static void usage(int rc)
 {
@@ -277,8 +242,7 @@ repeat:
 
             if (*end != '\0') {
                 rc = -EINVAL;
-                CT_ERROR(rc, "invalid archive-id: '%s'",
-                         optarg);
+                pho_error(rc, "invalid archive-id: '%s'", optarg);
                 return rc;
             }
             /* if archiveID is zero, any archiveID is accepted */
@@ -291,8 +255,7 @@ repeat:
                 opt.o_archive_id_cnt = 0;
                 opt.o_archive_id_used = 0;
                 all_id = true;
-                CT_WARN("archive-id = 0 is found,"
-                        " any backend will be served\n");
+                pho_info("archive-id = 0 found, any backend will be served\n");
                 goto repeat;
             }
 
@@ -353,14 +316,14 @@ repeat:
 
     if (argc != optind + 1) {
         rc = -EINVAL;
-        CT_ERROR(rc, "no mount point specified");
+        pho_error(rc, "no mount point specified");
         return rc;
     }
 
     opt.o_mnt = argv[optind];
     opt.o_mnt_fd = -1;
 
-    CT_TRACE("mount_point=%s", opt.o_mnt);
+    pho_info("mount_point: %s", opt.o_mnt);
 
     return 0;
 }
@@ -463,13 +426,13 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     if (hints->data) {
         int i = 0;
 
-        CT_TRACE("hints provided hints='%s', len=%lu",
-                 hints->data, hints->len);
+        pho_verb("hints provided hints='%s', len=%lu",
+                    hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
+            pho_verb("hints #%d  key='%s' val='%s'",
+                        i, hinttab[i].k, hinttab[i].v);
 
             if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
                 /* Deal with storage family */
@@ -498,7 +461,7 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     pho_xfer_desc_clean(&xfer);
 
     if (rc)
-        CT_ERROR(rc, "DEL failed");
+        pho_error(rc, "Failed to delete '%s' from Phobos", obj);
 
     return rc;
 }
@@ -530,7 +493,7 @@ static int component_to_attr(struct llapi_layout *layout, void *user_data)
     else
         rc = pho_attr_set(attrs, "layout", component_str);
 
-    CT_TRACE("adding layout information key='%s', value='%s'",
+    pho_info("adding layout information key='%s', value='%s'",
              id_str ? : "layout", component_str);
 
     free(component_str);
@@ -596,7 +559,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     rc = fsetxattr(xfer.xd_fd, trusted_fuid_xattr, obj, strlen(obj),
                    XATTR_CREATE);
     if (rc)
-        CT_TRACE("failed to write xattr: %s\n", strerror(errno));
+        pho_error(rc, "failed to write xattr");
 
     /* fstat on lustre fd seems to fail */
     fstat(xfer.xd_fd, &st);
@@ -607,20 +570,20 @@ static int phobos_op_put(const struct lu_fid *fid,
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints->data) {
-        CT_TRACE("hints provided hints='%s', len=%lu",
-                 hints->data, hints->len);
+        pho_verb("hints provided hints='%s', len=%lu",
+                    hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
-            CT_TRACE("hints #%d  key='%s' val='%s'",
-                     i, hinttab[i].k, hinttab[i].v);
+            pho_verb("hints #%d  key='%s' val='%s'",
+                        i, hinttab[i].k, hinttab[i].v);
 
             if (!strncmp(hinttab[i].k, "family", HINTMAX)) {
                 /* Deal with storage family */
                 xfer.xd_params.put.family = str2rsc_family(hinttab[i].v);
 
                 if (xfer.xd_params.put.family == PHO_RSC_INVAL)
-                    CT_TRACE("unknown hint '%s'",  hinttab[i].k);
+                    pho_warn("unknown hint '%s'",  hinttab[i].k);
 
             } else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
                 /* Deal with storage layout */
@@ -635,20 +598,20 @@ static int phobos_op_put(const struct lu_fid *fid,
                     xfer.xd_params.put.tags.tags = malloc(sizeof(char **));
 
                     if (!xfer.xd_params.put.tags.tags)
-                        CT_ERROR(errno, "Out of memory !! Malloc failed");
+                        pho_error(-errno, "failed to allocate tags");
                 }
 
                 /* I use this #define to deal with loooooong structures names */
 #define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
                 EASIER = malloc(HINTMAX);
                 if (!EASIER)
-                    CT_ERROR(errno, "Out of memory !! Malloc failed");
+                    pho_error(-errno, "failed to allocate tags");
 
                 strncpy(EASIER, hinttab[i].v, HINTMAX);
                 xfer.xd_params.put.tags.n_tags += 1;
 #undef EASIER
             } else {
-                CT_TRACE("unknown hint '%s'",  hinttab[i].k);
+                pho_warn("unknown hint '%s'",  hinttab[i].k);
             }
         }
     }
@@ -663,7 +626,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     pho_xfer_desc_clean(&xfer);
 
     if (rc)
-        CT_ERROR(rc, "PUT failed");
+        pho_error(rc, "Failed to write '%s' in Phobos", obj);
 
     return rc;
 }
@@ -699,7 +662,7 @@ static int phobos_op_get(const struct lu_fid *fid,
     pho_xfer_desc_clean(&xfer);
 
     if (rc)
-        CT_ERROR(rc, "GET failed");
+        pho_error(rc, "failed to read '%s' from Phobos", obj);
 
     return rc;
 }
@@ -731,7 +694,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
 
     rc = phobos_getmd(&xfer, 1, NULL, NULL);
     if (rc) {
-        CT_ERROR(rc, "GETMD failed");
+        pho_error(rc, "failed to get metadata of '%s' from Phobos", obj);
         return rc;
     }
 
@@ -861,7 +824,7 @@ static int ct_begin_restore(struct hsm_copyaction_private **phcp,
                                 false);
     if (rc < 0) {
         ct_path_lustre(src, sizeof(src), opt.o_mnt, &hai->hai_fid);
-        CT_ERROR(rc, "llapi_hsm_action_begin() on '%s' failed", src);
+        pho_error(rc, "llapi_hsm_action_begin() failed for '%s'", src);
     }
 
     return rc;
@@ -884,7 +847,7 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
     char lstr[PATH_MAX];
     int rc;
 
-    CT_TRACE("Action completed, notifying coordinator "
+    pho_info("Action completed, notifying coordinator "
              "cookie=%#jx, FID="DFID", hp_flags=%d err=%d",
              (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid),
              hp_flags, -ct_rc);
@@ -894,7 +857,7 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
     if (phcp == NULL || *phcp == NULL) {
         rc = llapi_hsm_action_begin(&hcp, ctdata, hai, -1, 0, true);
         if (rc < 0) {
-            CT_ERROR(rc, "llapi_hsm_action_begin() on '%s' failed",
+            pho_error(rc, "llapi_hsm_action_begin() failed for '%s'",
                      lstr);
             return rc;
         }
@@ -903,13 +866,13 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
 
     rc = llapi_hsm_action_end(phcp, &hai->hai_extent, hp_flags, abs(ct_rc));
     if (rc == -ECANCELED)
-        CT_ERROR(rc, "completed action on '%s' has been canceled: "
-                 "cookie=%#jx, FID="DFID, lstr,
+        pho_error(rc, "completed action on '%s' has been canceled: "
+                      "cookie=%#jx, FID="DFID, lstr,
                  (uintmax_t)hai->hai_cookie, PFID(&hai->hai_fid));
     else if (rc < 0)
-        CT_ERROR(rc, "llapi_hsm_action_end() on '%s' failed", lstr);
+        pho_error(rc, "llapi_hsm_action_end() failed for '%s'", lstr);
     else
-        CT_TRACE("llapi_hsm_action_end() on '%s' ok (rc=%d)", lstr, rc);
+        pho_info("llapi_hsm_action_end() on '%s' ok (rc=%d)", lstr, rc);
 
     return rc;
 }
@@ -952,7 +915,7 @@ static int ct_archive(const struct hsm_action_item *hai,
      */
     ct_path_lustre(src, sizeof(src), opt.o_mnt, &hai->hai_dfid);
 
-    CT_TRACE("archiving '%s'", src);
+    pho_info("archiving '%s'", src);
 
     if (opt.o_dry_run) {
         rc = 0;
@@ -962,7 +925,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     src_fd = llapi_hsm_action_get_fd(hcp);
     if (src_fd < 0) {
         rc = src_fd;
-        CT_ERROR(rc, "cannot open '%s' for read", src);
+        pho_error(rc, "cannot open '%s' for read", src);
         goto fini_major;
     }
 
@@ -973,18 +936,17 @@ static int ct_archive(const struct hsm_action_item *hai,
 
     layout = llapi_layout_get_by_fd(src_fd, 0);
     if (!layout)
-        CT_ERROR(-errno, "cannot read layout of '%s'", src);
+        pho_error(-errno, "cannot read layout of '%s'", src);
 
     hai_get_user_data(hai, &hints);
 
     /* Do phobos xfer */
     rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints, &oid);
-    CT_TRACE("phobos_put (archive): rc=%d", rc);
+    pho_info("phobos_put (archive): rc=%d: %s", rc, strerror(-rc));
     if (rc)
         goto fini_major;
     /** @todo make clear rc management */
 
-    CT_TRACE("data archiving for '%s' done", src);
     if (!rc)
         goto out;
 
@@ -1003,11 +965,11 @@ out:
     if (rc && !rcf) {
         int rc2;
 
-        CT_ERROR(rc, "failed to end ARCHIVE action, deleting '%s' from phobos",
-                 oid);
+        pho_error(rc, "failed to end ARCHIVE action, deleting '%s' from phobos",
+                  oid);
         rc2 = phobos_op_del(&hai->hai_fid, &hints);
         if (rc2)
-            CT_ERROR(rc2, "Failed to remove '%s'", oid);
+            pho_error(rc2, "Failed to remove '%s'", oid);
     }
     free(oid);
 
@@ -1054,8 +1016,8 @@ static int ct_restore(const struct hsm_action_item *hai,
     rc = llapi_get_mdt_index_by_fid(opt.o_mnt_fd, &hai->hai_fid,
                                     &mdt_index);
     if (rc < 0) {
-        CT_ERROR(rc, "cannot get mdt index "DFID"",
-                 PFID(&hai->hai_fid));
+        pho_error(rc, "cannot get mdt index "DFID"",
+                  PFID(&hai->hai_fid));
         return rc;
     }
 
@@ -1064,8 +1026,8 @@ static int ct_restore(const struct hsm_action_item *hai,
     if (restore_lov) {
         rc = get_file_layout(hai, &hints, &open_flags, &layout);
         if (rc < 0) {
-            CT_WARN("Could not get file layout for "DFID", will proceed with "
-                    "default striping.", PFID(&hai->hai_fid));
+            pho_warn("Could not get file layout for "DFID", will proceed with "
+                     "default striping.", PFID(&hai->hai_fid));
             /* use the default layout if not found in user metadata */
             restore_lov = false;
         }
@@ -1079,16 +1041,16 @@ static int ct_restore(const struct hsm_action_item *hai,
     /* get the FID of the volatile file */
     rc = llapi_hsm_action_get_dfid(hcp, &dfid);
     if (rc < 0) {
-        CT_ERROR(rc, "restoring "DFID", "
-                 "cannot get FID of created volatile file",
-                 PFID(&hai->hai_fid));
+        pho_error(rc, "restoring " DFID ", "
+                      "cannot get FID of created volatile file",
+                  PFID(&hai->hai_fid));
         goto fini;
     }
 
-    /* build volatile "file name", for messages */
     snprintf(dst, sizeof(dst), DFID, PFID(&dfid));
 
-    CT_TRACE("restoring data from to '%s'", dst);
+    pho_info("restoring data from '" DFID "' to '%s'",
+             PFID(&hai->hai_fid), dst);
 
     if (opt.o_dry_run) {
         rc = 0;
@@ -1098,13 +1060,13 @@ static int ct_restore(const struct hsm_action_item *hai,
     dst_fd = llapi_hsm_action_get_fd(hcp);
     if (dst_fd < 0) {
         rc = dst_fd;
-        CT_ERROR(rc, "cannot open '%s' for write", dst);
+        pho_error(rc, "cannot open '%s' for write", dst);
         goto fini;
     }
 
     rc = ct_get_altobjid(hai, altobjid);
     if (!rc) {
-        CT_TRACE("Found objid as xattr for "DFID" : %s",
+        pho_verb("Found objid from xattr of "DFID" : %s",
                  PFID(&hai->hai_fid), altobjid);
         altobj = altobjid;
     } else {
@@ -1114,16 +1076,14 @@ static int ct_restore(const struct hsm_action_item *hai,
     if (restore_lov) {
         rc = ct_restore_layout(dst, dst_fd, layout);
         if (rc < 0)
-            CT_WARN("cannot restore file layout for '%s', will use default "
-                    "(rc=%d)", dst, rc);
+            pho_warn("cannot restore file layout for '%s', will use default "
+                     "(rc=%d)", dst, rc);
     }
 
     /* Do phobos xfer */
     rc = phobos_op_get(&hai->hai_fid, altobj, &hints, dst_fd);
-    CT_TRACE("phobos_get (restore): rc=%d", rc);
+    pho_info("phobos_get: rc=%d", rc);
     /** @todo make clear rc management */
-
-    CT_TRACE("data restore to '%s' done", dst);
 
 fini:
     llapi_layout_free(layout);
@@ -1146,11 +1106,10 @@ static int ct_remove(const struct hsm_action_item *hai,
     if (rc < 0)
         goto fini;
 
-    CT_TRACE("removing an entry");
+    pho_info("removing '" DFID "'", PFID(&hai->hai_fid));
 
     hai_get_user_data(hai, &hints);
 
-    /** @todo : add remove as it will be available in Phobos */
     if (opt.o_dry_run) {
         rc = 0;
         goto fini;
@@ -1169,22 +1128,12 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
     int rc = 0;
 
     if (opt.o_verbose >= LLAPI_MSG_INFO || opt.o_dry_run) {
-        /* Print the original path */
-        long long recno = -1;
-        char path[PATH_MAX];
-        int linkno = 0;
-        char fid[128];
+        char fid[FID_LEN];
 
         sprintf(fid, DFID, PFID(&hai->hai_fid));
-        CT_TRACE("'%s' action %s reclen %d, cookie=%#jx",
+        pho_info("'%s' action %s reclen %d, cookie=%#jx",
                  fid, hsm_copytool_action2name(hai->hai_action),
                  hai->hai_len, (uintmax_t)hai->hai_cookie);
-        rc = llapi_fid2path(opt.o_mnt, fid, path,
-                            sizeof(path), &recno, &linkno);
-        if (rc < 0)
-            CT_ERROR(rc, "cannot get path of FID %s", fid);
-        else
-            CT_TRACE("processing file '%s'", path);
     }
 
     switch (hai->hai_action) {
@@ -1199,7 +1148,7 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
         rc = ct_remove(hai, hal_flags);
         break;
     case HSMA_CANCEL:
-        CT_TRACE("cancel not implemented for file system '%s'",
+        pho_warn("cancel not implemented for file system '%s'",
                  opt.o_mnt);
         /*
          * Don't report progress to coordinator for this cookie:
@@ -1211,8 +1160,8 @@ static int ct_process_item(struct hsm_action_item *hai, const long hal_flags)
         break;
     default:
         rc = -EINVAL;
-        CT_ERROR(rc, "unknown action %d, on '%s'", hai->hai_action,
-                 opt.o_mnt);
+        pho_error(rc, "unknown action %d, on '%s'", hai->hai_action,
+                  opt.o_mnt);
         err_minor++;
         ct_fini(NULL, hai, 0, rc);
     }
@@ -1260,8 +1209,8 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 
     rc = pthread_attr_init(&attr);
     if (rc != 0) {
-        CT_ERROR(rc, "pthread_attr_init failed for '%s' service",
-                 opt.o_mnt);
+        pho_error(rc, "pthread_attr_init failed for '%s' service",
+                  opt.o_mnt);
         free(data->hai);
         free(data);
         return -rc;
@@ -1271,8 +1220,8 @@ static int ct_process_item_async(const struct hsm_action_item *hai,
 
     rc = pthread_create(&thread, &attr, ct_thread, data);
     if (rc != 0)
-        CT_ERROR(rc, "cannot create thread for '%s' service",
-                 opt.o_mnt);
+        pho_error(rc, "cannot create thread for '%s' service",
+                  opt.o_mnt);
 
     pthread_attr_destroy(&attr);
     return 0;
@@ -1308,18 +1257,18 @@ static void create_pid_file(void)
     if (!opt.o_pid_file)
         return;
 
-    CT_TRACE("Pid file '%s'", opt.o_pid_file);
+    pho_verb("Pid file '%s'", opt.o_pid_file);
 
     fd = open(opt.o_pid_file, O_WRONLY | O_CREAT, 0640);
     if (fd == -1) {
-        CT_ERROR(-errno, "Could not create pid file '%s', will continue",
-                 opt.o_pid_file);
+        pho_error(-errno, "Could not create pid file '%s', will continue",
+                  opt.o_pid_file);
         return;
     }
 
     rc = asprintf(&mypid_str, "%u", mypid);
     if (rc == -1) {
-        CT_ERROR(-errno, "Failed to allocate string");
+        pho_error(-errno, "Failed to allocate string");
         return;
     }
 
@@ -1329,7 +1278,7 @@ static void create_pid_file(void)
     close(fd);
     free(mypid_str);
     if (rc != mypid_str_len || rc == -1)
-        CT_ERROR(-save_errno, "Failed to write pid to '%s', will continue",
+        pho_error(-save_errno, "Failed to write pid to '%s', will continue",
                  opt.o_pid_file);
 }
 
@@ -1343,10 +1292,11 @@ static int ct_run(void)
         rc = daemon(1, 1);
         if (rc < 0) {
             rc = -errno;
-            CT_ERROR(rc, "cannot daemonize");
+            pho_error(rc, "cannot daemonize");
             return rc;
         }
     }
+    ct_log_configure(&opt);
 
     create_pid_file();
 
@@ -1355,17 +1305,17 @@ static int ct_run(void)
     if (opt.o_event_fifo != NULL) {
         rc = llapi_hsm_register_event_fifo(opt.o_event_fifo);
         if (rc < 0) {
-            CT_ERROR(rc, "failed to register event fifo");
+            pho_error(rc, "failed to register event fifo");
             return rc;
         }
-        llapi_error_callback_set(llapi_hsm_log_error);
+        // llapi_error_callback_set(llapi_hsm_log_error);
     }
 
     rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
                                      opt.o_archive_id_used,
                                      opt.o_archive_id, 0);
     if (rc < 0) {
-        CT_ERROR(rc, "cannot start copytool interface");
+        pho_error(rc, "failed to register service as a copytool");
         return rc;
     }
 
@@ -1381,15 +1331,14 @@ static int ct_run(void)
         unsigned int i = 0;
         int msgsize;
 
-        CT_TRACE("waiting for message from kernel");
+        pho_info("waiting for message from kernel");
 
         rc = llapi_hsm_copytool_recv(ctdata, &hal, &msgsize);
         if (rc == -ESHUTDOWN) {
-            CT_TRACE("shutting down");
+            pho_warn("coordinator stopped, shutting down");
             break;
         } else if (rc < 0) {
-            CT_WARN("cannot receive action list: %s",
-                    strerror(-rc));
+            pho_error(rc, "llapi_hsm_copytool_recv failed");
             err_major++;
             if (opt.o_abort_on_error)
                 break;
@@ -1397,13 +1346,13 @@ static int ct_run(void)
                 continue;
         }
 
-        CT_TRACE("copytool fs=%s archive#=%d item_count=%d",
+        pho_info("copytool fs=%s archive#=%d item_count=%d",
                  hal->hal_fsname, hal->hal_archive_id, hal->hal_count);
 
         if (strcmp(hal->hal_fsname, fs_name) != 0) {
             rc = -EINVAL;
-            CT_ERROR(rc, "'%s' invalid fs name, expecting: %s",
-                     hal->hal_fsname, fs_name);
+            pho_error(rc, "'%s' invalid fs name, expecting: %s",
+                      hal->hal_fsname, fs_name);
             err_major++;
             if (opt.o_abort_on_error)
                 break;
@@ -1415,16 +1364,15 @@ static int ct_run(void)
         while (++i <= hal->hal_count) {
             if ((char *)hai - (char *)hal > msgsize) {
                 rc = -EPROTO;
-                CT_ERROR(rc,
-                         "'%s' item %d past end of message!",
-                         opt.o_mnt, i);
+                pho_error(rc, "'%s' item %d past end of message",
+                          opt.o_mnt, i);
                 err_major++;
                 break;
             }
             rc = ct_process_item_async(hai, hal->hal_flags);
             if (rc < 0)
-                CT_ERROR(rc, "'%s' item %d process",
-                         opt.o_mnt, i);
+                pho_error(rc, "error while processing '"DFID"'",
+                          PFID(&hai->hai_fid));
             if (opt.o_abort_on_error && err_major)
                 break;
             hai = hai_next(hai);
@@ -1450,16 +1398,15 @@ static int ct_setup(void)
 
     rc = llapi_search_fsname(opt.o_mnt, fs_name);
     if (rc < 0) {
-        CT_ERROR(rc, "cannot find a Lustre filesystem mounted at '%s'",
-                 opt.o_mnt);
+        pho_error(rc, "cannot find a Lustre filesystem mounted at '%s'",
+                  opt.o_mnt);
         return rc;
     }
 
     opt.o_mnt_fd = open(opt.o_mnt, O_RDONLY);
     if (opt.o_mnt_fd < 0) {
         rc = -errno;
-        CT_ERROR(rc, "cannot open mount point at '%s'",
-                 opt.o_mnt);
+        pho_error(rc, "cannot open mount point at '%s'", opt.o_mnt);
         return rc;
     }
 
@@ -1474,7 +1421,7 @@ static int ct_cleanup(void)
         rc = close(opt.o_mnt_fd);
         if (rc < 0) {
             rc = -errno;
-            CT_ERROR(rc, "cannot close mount point");
+            pho_error(rc, "cannot close mount point");
             return rc;
         }
     }
@@ -1497,7 +1444,9 @@ int main(int argc, char **argv)
     snprintf(cmd_name, sizeof(cmd_name), "%s", basename(argv[0]));
     rc = ct_parseopts(argc, argv);
     if (rc < 0) {
-        CT_WARN("try '%s --help' for more information", cmd_name);
+        pho_error(rc, "Failed to parse command line arguments. "
+                  "Try '%s --help' for more information",
+                  cmd_name);
         return -rc;
     }
 
@@ -1506,14 +1455,13 @@ int main(int argc, char **argv)
         goto error_cleanup;
 
     /* Trace the lustre fsname */
-    CT_TRACE("fs_name=%s", fs_name);
-    CT_TRACE("trusted_fuid_xattr=%s", trusted_fuid_xattr);
+    pho_info("fs_name=%s", fs_name);
+    pho_info("trusted_fuid_xattr=%s", trusted_fuid_xattr);
 
     rc = ct_run();
 
-    CT_TRACE("process finished, errs: %d major, %d minor, "
-             "rc=%d (%s)", err_major, err_minor, rc,
-             strerror(-rc));
+    pho_info("process finished, errs: %d major, %d minor, rc=%d (%s)",
+             err_major, err_minor, rc, strerror(-rc));
 
 error_cleanup:
     ct_cleanup();

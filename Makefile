@@ -14,8 +14,8 @@ all: \
 glib_LDFLAGS=$(shell pkg-config --libs glib-2.0)
 glib_CFLAGS=$(shell pkg-config --cflags glib-2.0)
 
-SOURCES=lhsmtool_phobos.c src/layout.c
-HEADERS=src/layout.h
+SOURCES=lhsmtool_phobos.c src/layout.c src/log.c
+HEADERS=src/layout.h src/common.h
 TESTS=tests/hsm_import.c
 
 CFLAGS=-g -Wall -Wextra -Werror -Isrc
@@ -27,9 +27,6 @@ build:
 build/lhsmtool_phobos: $(HEADERS) $(SOURCES) Makefile build
 	$(CC) $(CFLAGS) $(glib_CFLAGS) -o $@ $(SOURCES) \
 		$(LDFLAGS) $(glib_LDFLAGS) -lphobos_store
-
-build/lhsmtool_posix: lhsmtool_posix.c Makefile build
-	$(CC) $(CFLAGS) -o $@ lhsmtool_posix.c -lrt $(LDFLAGS)
 
 build/hsm-import: tests/hsm_import.c Makefile build
 	$(CC) $(CFLAGS) -o $@ tests/hsm_import.c $(LDFLAGS)
