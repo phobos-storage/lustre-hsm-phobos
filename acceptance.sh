@@ -54,7 +54,9 @@ function stop_phobosd()
 
 function phobos_setup()
 {
-    systemctl start postgresql
+    sudo systemctl status postgresql >/dev/null 2>&1 ||
+        error "postgresql service not started"
+    HAVE_POSTGRES=y
     sudo -u postgres phobos_db setup_db -p phobos
     phobos_db setup_tables
 
@@ -85,6 +87,11 @@ function phobos_setup()
 
 function phobos_teardown()
 {
+    if [ "$HAVE_POSTGRES" != "y" ]
+    then
+        return
+    fi
+
     stop_phobosd
     phobos_db drop_tables
     sudo -u postgres phobos_db drop_db
