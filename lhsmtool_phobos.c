@@ -1492,6 +1492,9 @@ int main(int argc, char **argv)
 {
     int rc;
 
+    phobos_init();
+    atexit(phobos_fini);
+
     strncpy(trusted_fuid_xattr, XATTR_TRUSTED_FUID_XATTR_DEFAULT, MAXNAMLEN);
 
     snprintf(cmd_name, sizeof(cmd_name), "%s", basename(argv[0]));
