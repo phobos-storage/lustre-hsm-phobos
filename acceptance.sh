@@ -3,6 +3,7 @@
 VERBOSE=${VERBOSE:--vv}
 QUICK=${QUICK:-false}
 LOG_DIR=${LOG_DIR:-/tmp/lhsmtool_phobos}
+SERVERNAME=${SERVERNAME:-localhost}
 
 mkdir -p "$LOG_DIR"
 
@@ -42,6 +43,7 @@ function skip()
 
 function phobos_setup()
 {
+    systemctl start postgresql
     sudo -u postgres phobos_db setup_db -p phobos
     phobos_db setup_tables
 
@@ -87,7 +89,27 @@ function lustre_is_mounted()
     return $?
 }
 
-function lustre_setup()
+# Run a function on the server
+function frun_server()
+{
+    local func=$1
+
+    if [ "$SERVERNAME" = $(hostname) ]
+    then
+        $func
+        return
+    fi
+
+    ssh "$SERVERNAME" "
+export PATH="$PATH:/usr/lib64/lustre/tests"
+# FIXME variables are not passed through ssh
+FSNAME=$FSNAME
+$(declare -f error)
+$(declare -f $func)
+$func"
+}
+
+function lustre_server_setup()
 {
     llmount.sh
     lctl set_param mdt.*.hsm_control=enabled
@@ -97,6 +119,23 @@ function lustre_setup()
         error "Failed to create pool 'test_pool'"
     lctl pool_add "${FSNAME}.test_pool" OST[0] ||
         error "Failed to add 'OST0' to 'test_pool'"
+}
+
+function lustre_client_setup()
+{
+    if [ "$SERVERNAME" = "$(hostname)" ]
+    then
+        return
+    fi
+
+    mkdir -p /mnt/lustre
+    mount -t lustre "${SERVERNAME}@tcp:/${FSNAME}" /mnt/lustre
+}
+
+function lustre_setup()
+{
+    frun_server lustre_server_setup
+    lustre_client_setup
 }
 
 function global_setup()
