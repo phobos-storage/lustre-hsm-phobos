@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "611bf6bf_523dba7c",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-01-24T07:19:29Z",
+      "side": 1,
+      "message": "typo? except for a double newline, we do not need it",
+      "range": {
+        "startLine": 258,
+        "startChar": 74,
+        "endLine": 258,
+        "endChar": 76
+      },
+      "revId": "d9e0cc2a24c04b3a4fb631e54ba37bcf310fd5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc0b20a8_156b4b6d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-01-24T07:19:29Z",
+      "side": 1,
+      "message": "style: alignment seems strange, same below",
+      "range": {
+        "startLine": 430,
+        "startChar": 17,
+        "endLine": 430,
+        "endChar": 20
+      },
+      "revId": "d9e0cc2a24c04b3a4fb631e54ba37bcf310fd5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d33f689_45cae5ba",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-01-24T07:19:29Z",
+      "side": 1,
+      "message": "style: alignment seems strange, same below",
+      "range": {
+        "startLine": 574,
+        "startChar": 17,
+        "endLine": 574,
+        "endChar": 20
+      },
+      "revId": "d9e0cc2a24c04b3a4fb631e54ba37bcf310fd5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb4db66_dc4d6a08",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-01-24T07:19:29Z",
+      "side": 1,
+      "message": "style: alignment seems strange, same belwo",
+      "range": {
+        "startLine": 861,
+        "startChar": 21,
+        "endLine": 861,
+        "endChar": 25
+      },
+      "revId": "d9e0cc2a24c04b3a4fb631e54ba37bcf310fd5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8193906_e76d6609",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1282,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-01-24T07:19:29Z",
+      "side": 1,
+      "message": "style: alignment",
+      "range": {
+        "startLine": 1282,
+        "startChar": 17,
+        "endLine": 1282,
+        "endChar": 31
+      },
+      "revId": "d9e0cc2a24c04b3a4fb631e54ba37bcf310fd5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
