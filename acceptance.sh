@@ -41,6 +41,17 @@ function skip()
     exit $SKIP
 }
 
+function start_phobosd()
+{
+    phobosd $VERBOSE &> "$PHOBOSD_LOG" ||
+        error "Failed to start phobosd"
+}
+
+function stop_phobosd()
+{
+    kill $(pgrep phobosd)
+}
+
 function phobos_setup()
 {
     systemctl start postgresql
@@ -52,9 +63,7 @@ function phobos_setup()
     rm -f "$PHOBOSD_LOCK"
 
     echo "Starting phobosd, log file: $PHOBOSD_LOG"
-    phobosd $VERBOSE &> "$PHOBOSD_LOG" ||
-        error "Failed to start phobosd"
-    PHOBOSD_PID=$(pgrep phobosd)
+    start_phobosd
 
     phobos dir add "$ARCHIVE_PATH" ||
         error "Could not add $ARCHIVE_PATH"
@@ -76,7 +85,7 @@ function phobos_setup()
 
 function phobos_teardown()
 {
-    kill $PHOBOSD_PID
+    stop_phobosd
     phobos_db drop_tables
     sudo -u postgres phobos_db drop_db
 
@@ -423,6 +432,32 @@ global_setup
 ###########
 ## Tests ##
 ###########
+
+function test_no_daemon()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    trap_add "start_phobosd"
+    stop_phobosd
+
+    lfs hsm_release "$file"
+    # This request will fail because phobosd is not here but the copytool should
+    # stay up.
+    lfs hsm_restore "$file"
+    wait_for_event RESTORE_ERROR "$file"
+
+    ps -p $COPYTOOL_PID ||
+        error "Copytool crashed in the absence of phobosd"
+}
+add_test no_daemon
 
 function test_archive_release_restore()
 {
