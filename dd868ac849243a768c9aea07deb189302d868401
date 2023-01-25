@@ -39,6 +39,30 @@
       },
       "revId": "dd868ac849243a768c9aea07deb189302d868401",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "279d45ac_516ea300",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-01-25T13:31:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a78279a_1b977cef",
+      "range": {
+        "startLine": 465,
+        "startChar": 39,
+        "endLine": 465,
+        "endChar": 47
+      },
+      "revId": "dd868ac849243a768c9aea07deb189302d868401",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
