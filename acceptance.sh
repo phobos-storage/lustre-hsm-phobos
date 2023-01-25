@@ -310,8 +310,15 @@ function add_event_watch()
 
 function wait_for_event()
 {
-    local event="$1"
     local fid=$(fid_nobrace "$2")
+
+    wait_for_event_fid "$1" "$fid"
+}
+
+function wait_for_event_fid()
+{
+    local event="$1"
+    local fid="$2"
     local count=0
 
     while ! grep -B 1 -a "$fid" "$EVENTS" | grep -a "$event"
@@ -727,7 +734,7 @@ function test_hsm_import()
 
     # the files are now removed, we can't use the xattr to get the object ID
     lfs hsm_remove --mntpath "$LUSTRE_ROOT" "$newfid"
-    sleep 1 # wait for remove to fail
+    wait_for_event_fid REMOVE_ERROR "$newfid"
 
     if [[ $(phobos object list "lustre:$fid" | wc -l) == 0 ]]
     then
@@ -736,7 +743,7 @@ function test_hsm_import()
 
     lfs hsm_remove --mntpath "$LUSTRE_ROOT" \
         --data "hsm_fuid=lustre:$fid" "$newfid"
-    sleep 1 # wait for remove to succeed
+    wait_for_event_fid REMOVE_FINISH "$newfid"
 
     if [[ $(phobos object list "lustre:$fid" | wc -l) != 0 ]]
     then
