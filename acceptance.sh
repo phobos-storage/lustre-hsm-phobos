@@ -30,13 +30,13 @@ fi
 
 function error()
 {
-    echo $*
+    echo "$*"
     exit 1
 }
 
 function skip()
 {
-    echo $*
+    echo "$*"
     exit $SKIP
 }
 
@@ -74,7 +74,7 @@ function phobos_setup()
 
 function phobos_teardown()
 {
-    kill "$PHOBOSD_PID"
+    kill $PHOBOSD_PID
     phobos_db drop_tables
     sudo -u postgres phobos_db drop_db
 
@@ -145,6 +145,14 @@ function args_to_filename()
     fi
 }
 
+# Traps are a bit tricky. Since the exit status of the subshell running the test
+# can be overwritten by a trapped function, we cannot simply trap any command we
+# want to execute at the end of the test. Otherwise a test that fails may be
+# interpreted as successful. To work around this issue, a global 'traps' array
+# will keep track of which commands should be executed at the end of the test.
+# They will be executed by 'at_exit' which is trapped in the same subshell that
+# runs the test. The main process executing the whole test suite will only trap
+# global_teardown.
 function run_test()
 {
     local test_name="$1"
@@ -158,10 +166,10 @@ function run_test()
 
     (
      test_dir=$(mktemp -d -p "$LUSTRE_ROOT")
-     trap "rm -rf $test_dir" EXIT
+     trap_add "rm -r $test_dir"
 
      local begin=`date +%s.%N`
-     ($test_func "$args" &> "$log_file")
+     (trap at_exit EXIT; $test_func "$args" &> "$log_file")
      local rc=$?
      local end=`date +%s.%N`
 
@@ -244,27 +252,6 @@ function create_file()
     fid_nobrace "$file"
 }
 
-function wait_for_state()
-{
-    local file="$1"
-    local expected="$2"
-    local Max=10
-    local N=0
-
-    while ! lfs hsm_state "$file" | grep -e "$expected"
-    do
-        if [[ $N == $Max ]]
-        then
-            local state=$(lfs hsm_state "$file" | cut -d: -f2)
-
-            error "After 5s, $file was still not in state $expected but $state"
-        fi
-
-        sleep 0.5
-        ((N++))
-    done
-}
-
 function add_event_watch()
 {
     echo "Registering events from $FIFO in $EVENTS"
@@ -323,19 +310,30 @@ function get_file_user_md()
     phobos -q getmd "$(get_oid_from_path "$1")"
 }
 
-function get_trap()
+# Executes all the traps at the end of each test
+function at_exit()
 {
-    echo $(trap -p EXIT | sed "s/trap -- '\(.*\)' EXIT/\1/")
+    local rc=$?
+
+    if (( rc != 0 && rc != SKIP ))
+    then
+        echo "Cleanup test..."
+    fi
+
+    for (( i = 0; i < ${#traps[@]}; i++ ))
+    do
+        if (( rc != 0 && rc != SKIP ))
+        then
+            echo "${traps[i]}"
+        fi
+        ${traps[i]}
+    done
+    exit $rc
 }
 
 function trap_add()
 {
-    if [ -z "$(get_trap)" ]
-    then
-        trap "$1" EXIT
-    else
-        eval "trap '$(get_trap); $1' EXIT"
-    fi
+    traps+=("$1")
 }
 
 __lhsmtool_phobos=$(PATH="$PWD/build:$PATH" which lhsmtool_phobos)
@@ -353,15 +351,10 @@ function hsm_import()
 
 function kill_copytool()
 {
-    declare rc
-
     kill $COPYTOOL_PID || error "Daemon was not running"
     wait $COPYTOOL_PID
-    rc=$?
 
     COPYTOOL_PID=0
-
-    exit $rc
 }
 
 function start_copytool()
@@ -411,7 +404,6 @@ function test_archive_release_restore()
     wait_for_event ARCHIVE_FINISH "$file"
 
     lfs hsm_release "$file"
-    wait_for_state "$file" "released"
 
     lfs hsm_restore "$file"
     wait_for_event RESTORE_FINISH "$file"
@@ -450,7 +442,6 @@ function test_archive_release_restore_with_lov()
     wait_for_event ARCHIVE_FINISH "$file"
 
     lfs hsm_release "$file"
-    wait_for_state "$file" "released"
 
     lfs hsm_restore "$file"
     wait_for_event RESTORE_FINISH "$file"
