@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dec8dbd_e3cfe9f8",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:46:38Z",
+      "side": 1,
+      "message": "question: how is set the phobos_context()-\u003elog_level value ? To you need to parse the phobos conf for having it correctly set ?",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 25
+      },
+      "revId": "1e9b3f4bced1614ff2cdad2d8430eaaee2aba81c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
