@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcaabca1_1564c9b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:38:12Z",
+      "side": 1,
+      "message": "Only one reluctance about the management of the default \"localhost\" value .",
+      "revId": "4dfec6134b9d34fdd2b05fe3af082c81a3c1fd8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85100d91_65a7ab35",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:38:12Z",
+      "side": 1,
+      "message": "question: why not using $(hostname) ? this would have the advantage of conforming to your following tests.",
+      "range": {
+        "startLine": 6,
+        "startChar": 25,
+        "endLine": 6,
+        "endChar": 34
+      },
+      "revId": "4dfec6134b9d34fdd2b05fe3af082c81a3c1fd8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b01c3f3_4d5b46e3",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:38:12Z",
+      "side": 1,
+      "message": "comment: how behaves the default \"localhost\" value against this test ? Aren\u0027t you on the path of executing an useless \"ssh localhost\"",
+      "range": {
+        "startLine": 97,
+        "startChar": 9,
+        "endLine": 97,
+        "endChar": 36
+      },
+      "revId": "4dfec6134b9d34fdd2b05fe3af082c81a3c1fd8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d50ab6f_5b1183ab",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:38:12Z",
+      "side": 1,
+      "message": "comment: idem. Are-you sure of how the default \"localhost\" value is managed against this test ?",
+      "range": {
+        "startLine": 127,
+        "startChar": 9,
+        "endLine": 127,
+        "endChar": 38
+      },
+      "revId": "4dfec6134b9d34fdd2b05fe3af082c81a3c1fd8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
