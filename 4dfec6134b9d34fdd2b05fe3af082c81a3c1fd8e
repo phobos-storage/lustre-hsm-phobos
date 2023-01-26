@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "207187ec_d183e7cf",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-01-26T09:39:51Z",
+      "side": 1,
+      "message": "I didn\u0027t test it actually. But I think you are right. I should use the result of hostname here.",
+      "parentUuid": "85100d91_65a7ab35",
+      "range": {
+        "startLine": 6,
+        "startChar": 25,
+        "endLine": 6,
+        "endChar": 34
+      },
+      "revId": "4dfec6134b9d34fdd2b05fe3af082c81a3c1fd8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3b01c3f3_4d5b46e3",
         "filename": "acceptance.sh",
         "patchSetId": 2
