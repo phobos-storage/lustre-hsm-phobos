@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a7c977c_015f94bd",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T10:00:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "eae717dd_acd08ef6",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 18
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d8808df_9f8555f7",
@@ -78,6 +102,30 @@
       "side": 1,
       "message": "The version \"for t in ${traps[@]}\" had issues with spaces. This one seems to work. Bash is intuitive. :)",
       "parentUuid": "2d8808df_9f8555f7",
+      "range": {
+        "startLine": 323,
+        "startChar": 4,
+        "endLine": 329,
+        "endChar": 19
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68a00867_321a7ff0",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T10:00:25Z",
+      "side": 1,
+      "message": "You can list content of the array with double quotes.\n\n$ a[0]\u003d\"toto\"\n$ a[1]\u003d\"tata tutu\"\n$ for w in ${a[@]}; do   echo $w; done\ntoto\ntata\ntutu\n$ for w in \"${a[@]}\"; do   echo $w; done\ntoto\ntata tutu\n$ for w in \"${a[*]}\"; do   echo $w; done\ntoto tata tutu\n$",
+      "parentUuid": "6b4d3fd0_9058f315",
       "range": {
         "startLine": 323,
         "startChar": 4,
