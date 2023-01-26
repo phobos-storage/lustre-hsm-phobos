@@ -22,6 +22,30 @@
       },
       "revId": "1e9b3f4bced1614ff2cdad2d8430eaaee2aba81c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9ab9318_01a225f6",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-01-26T09:52:43Z",
+      "side": 1,
+      "message": "It is set by ct_log_configure at startup (in ct_run).",
+      "parentUuid": "6dec8dbd_e3cfe9f8",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 25
+      },
+      "revId": "1e9b3f4bced1614ff2cdad2d8430eaaee2aba81c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
