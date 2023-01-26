@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac860193_05be76db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:31:50Z",
+      "side": 1,
+      "message": "Nice bugfix !",
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eae717dd_acd08ef6",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:31:50Z",
+      "side": 1,
+      "message": "comment: +1 Very good comment !",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 155,
+        "endChar": 18
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d8808df_9f8555f7",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-01-26T09:31:50Z",
+      "side": 1,
+      "message": "comment: why using an integer index instead of listing the content of the array ... Nevermind, your version is OK.",
+      "range": {
+        "startLine": 323,
+        "startChar": 4,
+        "endLine": 329,
+        "endChar": 19
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
