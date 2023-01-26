@@ -62,6 +62,30 @@
       },
       "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b4d3fd0_9058f315",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-01-26T09:38:37Z",
+      "side": 1,
+      "message": "The version \"for t in ${traps[@]}\" had issues with spaces. This one seems to work. Bash is intuitive. :)",
+      "parentUuid": "2d8808df_9f8555f7",
+      "range": {
+        "startLine": 323,
+        "startChar": 4,
+        "endLine": 329,
+        "endChar": 19
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
