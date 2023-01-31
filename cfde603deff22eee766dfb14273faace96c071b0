@@ -16,6 +16,24 @@
       "message": "I\u0027m fine with the changes, but doesn\u0027t this mean this repo now requires Phobos-devel to work ? On the github, It only specifies Phobos as requirements",
       "revId": "cfde603deff22eee766dfb14273faace96c071b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c375ffb_ba9014a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-01-31T14:45:01Z",
+      "side": 1,
+      "message": "My bad, I\u0027m blind and didn\u0027t see the spec file which already have it...",
+      "parentUuid": "4db1ab01_6230f467",
+      "revId": "cfde603deff22eee766dfb14273faace96c071b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
