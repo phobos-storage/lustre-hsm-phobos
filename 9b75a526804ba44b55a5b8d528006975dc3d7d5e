@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c748e0d1_e2ab45b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-01-31T14:34:59Z",
+      "side": 1,
+      "message": "Why not let the systemctl start ? I understand the idea, but case could be made that the whole phobos_setup should be done beforehand in this case no ? IMO, it\u0027s better to let the start of postgre also in the script, in case it\u0027s not on, just as a QoL improvement",
+      "revId": "9b75a526804ba44b55a5b8d528006975dc3d7d5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
