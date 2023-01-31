@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "251c8695_190599bc",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-01-31T14:03:19Z",
+      "side": 1,
+      "message": "The issue is that trap_add will concatenate commands one at a time. So I will build something like this:\n```\ntrap_add cmd1\ntrap_add cmd2\n\n-\u003e cmd1; cmd2\n```\n\nWhat I want to do is `rc\u003d$?; cmd1; cmd2; return $rc` which I think is what you are suggesting. But it make the code of trap_add a bit more complex. While the current approach make trap_add trivial to implement and understand at the cost of having to write `at_exit`.",
+      "parentUuid": "134f5479_a87d6b67",
+      "range": {
+        "startLine": 148,
+        "startChar": 26,
+        "endLine": 150,
+        "endChar": 40
+      },
+      "revId": "53d6d67418dc05b50bf80293499918cbb9a9c2c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eae717dd_acd08ef6",
         "filename": "acceptance.sh",
         "patchSetId": 1
