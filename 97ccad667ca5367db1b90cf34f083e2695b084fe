@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06b50a6f_a2e423f3",
+        "filename": "acceptance.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-01-31T14:04:09Z",
+      "side": 1,
+      "message": "suggest: put between quotes",
+      "range": {
+        "startLine": 97,
+        "startChar": 25,
+        "endLine": 97,
+        "endChar": 36
+      },
+      "revId": "97ccad667ca5367db1b90cf34f083e2695b084fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
