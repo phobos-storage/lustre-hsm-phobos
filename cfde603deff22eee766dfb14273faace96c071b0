@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4db1ab01_6230f467",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-01-31T14:19:13Z",
+      "side": 1,
+      "message": "I\u0027m fine with the changes, but doesn\u0027t this mean this repo now requires Phobos-devel to work ? On the github, It only specifies Phobos as requirements",
+      "revId": "cfde603deff22eee766dfb14273faace96c071b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
