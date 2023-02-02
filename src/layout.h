@@ -32,5 +32,17 @@ int layout_from_object_md(struct pho_attrs *attrs,
  */
 int layout_component2str(struct llapi_layout *layout, char **str);
 
+/**
+ * Convert the string pointed to by value into a uint64_t
+ *
+ * \param[in]  value  string representing an unsigned integer
+ * \param[out] result integer value represented by the string
+ *
+ * \return            0 on sucess, negative POSIX error code on error
+ */
+int str2uint64_t(const char *value, uint64_t *result);
+
 #endif
-/* vim:expandtab:shiftwidth=4:tabstop=4: */
+/*
+ * vim:expandtab:shiftwidth=4:tabstop=4:
+ */

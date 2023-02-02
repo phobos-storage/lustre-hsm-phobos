@@ -2,15 +2,14 @@
 #define _COMMON_H
 
 #include <phobos_store.h>
+#include <glib.h>
 
 struct options {
     int              o_daemonize;
     int              o_dry_run;
     int              o_abort_on_error;
     int              o_verbose;
-    int              o_archive_id_used;
-    int              o_archive_id_cnt;
-    int             *o_archive_id;
+    GArray          *o_archive_ids;
     char            *o_event_fifo;
     char            *o_mnt;
     int              o_mnt_fd;

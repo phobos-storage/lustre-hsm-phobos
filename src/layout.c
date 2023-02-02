@@ -219,6 +219,10 @@ int str2uint64_t(const char *value, uint64_t *result)
 {
     char *end;
 
+    if (*value == '-')
+        return -ERANGE;
+
+    errno = 0;
     *result = strtoull(value, &end, 10);
 
     if ((!*result && end == value) || *end != '\0')

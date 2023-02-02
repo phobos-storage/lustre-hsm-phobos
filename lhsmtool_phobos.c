@@ -168,6 +168,66 @@ static void usage(int rc)
     exit(rc);
 }
 
+static bool garray_contains(GArray *array, int value)
+{
+    guint i;
+
+    for (i = 0; i < array->len; i++)
+        if (g_array_index(array, int, i) == value)
+            return true;
+
+    return false;
+}
+
+static bool support_all_archive_ids(GArray *archive_ids)
+{
+    return archive_ids->len == 1 &&
+        g_array_index(archive_ids, int, 0) == 0;
+}
+
+static void get_archive_id_array(GArray *archive_ids,
+                                 int **values, int *size)
+{
+    if (support_all_archive_ids(archive_ids)) {
+        *values = NULL;
+        *size = 0;
+    } else {
+        *values = (int *)archive_ids->data;
+        *size = archive_ids->len;
+    }
+}
+
+static int parse_archive_id(const char *archive_value, GArray *archive_ids)
+{
+    uint64_t archive_id;
+    int value;
+    int rc;
+
+    rc = str2uint64_t(archive_value, &archive_id);
+    if (rc)
+        return rc;
+
+    pho_info("%d", INT_MAX);
+    if (archive_id > INT_MAX)
+        return -ERANGE;
+
+    if (support_all_archive_ids(archive_ids))
+        return 0;
+
+    value = (int) archive_id;
+    if (value == 0) {
+        g_array_remove_range(archive_ids, 0, archive_ids->len);
+        g_array_append_val(archive_ids, value);
+
+        return 0;
+    }
+
+    if (!garray_contains(archive_ids, value))
+        g_array_append_val(archive_ids, value);
+
+    return 0;
+}
+
 #ifdef LLAPI_LAYOUT_SET_BY_FD
 #define GETOPTS_STRING "A:b:c:f:F:hqx:vl"
 #else
@@ -219,68 +279,26 @@ static int ct_parseopts(int argc, char * const *argv)
             .has_arg = required_argument},
         { .name = NULL }
     };
-    bool all_id = false;
     int rc;
     int c;
-    int i;
 
     optind = 0;
 
-    opt.o_archive_id_cnt = LL_HSM_ORIGIN_MAX_ARCHIVE;
-    opt.o_archive_id = malloc(opt.o_archive_id_cnt *
-                              sizeof(*opt.o_archive_id));
-    if (opt.o_archive_id == NULL)
+    opt.o_archive_ids = g_array_new(false, false, sizeof(int));
+    if (opt.o_archive_ids == NULL)
         return -ENOMEM;
 
-repeat:
     while ((c = getopt_long(argc, argv, GETOPTS_STRING,
                             long_opts, NULL)) != -1) {
         switch (c) {
-        case 'A': {
-            char *end = NULL;
-            int val = strtol(optarg, &end, 10);
-
-            if (*end != '\0') {
-                rc = -EINVAL;
-                pho_error(rc, "invalid archive-id: '%s'", optarg);
+        case 'A':
+            rc = parse_archive_id(optarg, opt.o_archive_ids);
+            if (rc) {
+                pho_error(rc, "Invalid archive ID '%s'", optarg);
+                g_array_free(opt.o_archive_ids, true);
                 return rc;
             }
-            /* if archiveID is zero, any archiveID is accepted */
-            if (all_id == true)
-                goto repeat;
-
-            if (val == 0) {
-                free(opt.o_archive_id);
-                opt.o_archive_id = NULL;
-                opt.o_archive_id_cnt = 0;
-                opt.o_archive_id_used = 0;
-                all_id = true;
-                pho_info("archive-id = 0 found, any backend will be served");
-                goto repeat;
-            }
-
-            /* skip the duplicated id */
-            for (i = 0; i < opt.o_archive_id_used; i++) {
-                if (opt.o_archive_id[i] == val)
-                    goto repeat;
-            }
-            /* extend the space */
-            if (opt.o_archive_id_used >= opt.o_archive_id_cnt) {
-                int *tmp;
-
-                opt.o_archive_id_cnt *= 2;
-                tmp = realloc(opt.o_archive_id,
-                              sizeof(*opt.o_archive_id) *
-                              opt.o_archive_id_cnt);
-                if (tmp == NULL)
-                    return -ENOMEM;
-
-                opt.o_archive_id = tmp;
-            }
-
-            opt.o_archive_id[opt.o_archive_id_used++] = val;
             break;
-        }
         case 'f':
             opt.o_event_fifo = optarg;
             break;
@@ -395,8 +413,11 @@ static int process_hints(const struct buf *hints,
         pos1 += 1;
 
         if (pos1 == hinttablen)
-            return pos1;
+            goto free_work1;
     }
+
+free_work1:
+    free(work1);
 
     return pos1;
 }
@@ -426,8 +447,8 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     if (hints->data) {
         int i = 0;
 
-        pho_verb("hints provided hints='%s', len=%lu",
-                 hints->data, hints->len);
+        pho_verb("hints provided hints='%.*s', len=%lu",
+                 (int)hints->len, hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -570,8 +591,8 @@ static int phobos_op_put(const struct lu_fid *fid,
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints->data) {
-        pho_verb("hints provided hints='%s', len=%lu",
-                 hints->data, hints->len);
+        pho_verb("hints provided hints='%.*s', len=%lu",
+                 (int)hints->len, hints->data, hints->len);
         nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
 
         for (i = 0 ; i < nbhints; i++) {
@@ -942,6 +963,7 @@ static int ct_archive(const struct hsm_action_item *hai,
 
     /* Do phobos xfer */
     rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints, &oid);
+    llapi_layout_free(layout);
     pho_info("phobos_put (archive): rc=%d: %s", rc, strerror(-rc));
     if (rc)
         goto fini_major;
@@ -1286,6 +1308,8 @@ static void create_pid_file(void)
 static int ct_run(void)
 {
     struct sigaction cleanup_sigaction;
+    int archive_ids_count;
+    int *archive_ids;
     int rc;
 
     if (opt.o_daemonize) {
@@ -1311,9 +1335,10 @@ static int ct_run(void)
         // llapi_error_callback_set(llapi_hsm_log_error);
     }
 
+    get_archive_id_array(opt.o_archive_ids, &archive_ids, &archive_ids_count);
     rc = llapi_hsm_copytool_register(&ctdata, opt.o_mnt,
-                                     opt.o_archive_id_used,
-                                     opt.o_archive_id, 0);
+                                     archive_ids_count, archive_ids, 0);
+    g_array_free(opt.o_archive_ids, true);
     if (rc < 0) {
         pho_error(rc, "failed to register service as a copytool");
         return rc;
@@ -1424,12 +1449,6 @@ static int ct_cleanup(void)
             pho_error(rc, "cannot close mount point");
             return rc;
         }
-    }
-
-    if (opt.o_archive_id_cnt > 0) {
-        free(opt.o_archive_id);
-        opt.o_archive_id = NULL;
-        opt.o_archive_id_cnt = 0;
     }
 
     return 0;
