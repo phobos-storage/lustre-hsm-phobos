@@ -6,6 +6,10 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr
 endif
 
+ifeq ($(SYSCONFDIR),)
+	SYSCONFDIR := /etc
+endif
+
 all: \
 	build \
 	build/lhsmtool_phobos \
@@ -38,6 +42,11 @@ lhsmtool_phobos.spec: lhsmtool_phobos.spec.in Makefile
 install: all
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 0755 build/lhsmtool_phobos $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)$(shell pkg-config systemd --variable=systemdsystemunitdir)
+	install -m 0644 lhsmtool_phobos.service \
+		$(DESTDIR)$(shell pkg-config systemd --variable=systemdsystemunitdir)
+	install -d $(DESTDIR)$(SYSCONFDIR)/sysconfig
+	install -m 0644 lhsmtool_phobos.conf $(DESTDIR)$(SYSCONFDIR)/sysconfig/
 
 clean:
 	rm -f build/* *.tar.gz
@@ -49,6 +58,8 @@ dist: all
 	cp lhsmtool_phobos.spec $(DISTDIR)
 	cp lhsmtool_phobos.spec.in $(DISTDIR)
 	cp Makefile $(DISTDIR)
+	cp systemd/lhsmtool_phobos.service $(DISTDIR)
+	cp systemd/lhsmtool_phobos.conf $(DISTDIR)
 	tar -zcvf $(DISTDIR).tar.gz $(DISTDIR)
 	rm -rf $(DISTDIR)
 

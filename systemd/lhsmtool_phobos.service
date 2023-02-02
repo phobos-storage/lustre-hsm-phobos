@@ -1,0 +1,16 @@
+[Unit]
+Description=Lustre HSM Copytool daemon
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/sysconfig/lhsmtool_phobos.conf
+RuntimeDirectory=lhsmtool_phobos
+ExecStart=/bin/sh -c '\
+            LHSMTOOL_PHOBOS_PID_FILEPATH=$LHSMTOOL_PHOBOS_PID_FILEPATH \
+            /usr/bin/lhsmtool_phobos $VERBOSE_LEVEL \
+            --default-family $DEFAULT_FAMILY \
+            --fuid-xattr $TRUSTED_HSM_FUID_FIELD \
+            $LUSTRE_MNTPOINT'
+
+[Install]
+WantedBy=multi-user.target
