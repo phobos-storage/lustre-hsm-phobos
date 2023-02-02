@@ -4,6 +4,7 @@ VERBOSE=${VERBOSE:--vv}
 QUICK=${QUICK:-false}
 LOG_DIR=${LOG_DIR:-/tmp/lhsmtool_phobos}
 SERVERNAME=${SERVERNAME:-$(hostname)}
+USE_DAEMON=${USE_DAEMON:-false}
 
 mkdir -p "$LOG_DIR"
 
@@ -24,9 +25,15 @@ then
 fi
 
 # Safe check QUICK variable
-if [[ $QUICK != true && $QUICK != false ]]
+if [[ "$QUICK" != "true" ]]
 then
     QUICK=false
+fi
+
+# Safe check USE_DAEMON variable
+if [[ "$USE_DAEMON" != "true" ]]
+then
+    USE_DAEMON=false
 fi
 
 function error()
@@ -173,6 +180,12 @@ function global_setup()
     mkfifo -m 644 "$FIFO"
     touch "$EVENTS"
     touch "$PHOBOSD_LOG"
+
+    if $USE_DAEMON
+    then
+        make rpm
+        rpm -i rpms/RPMS/x86_64/lhsmtool_phobos-1*
+    fi
 }
 
 function global_teardown()
@@ -186,6 +199,11 @@ function global_teardown()
     fi
 
     rm -f "$FIFO" "$EVENTS"
+
+    if $USE_DAEMON
+    then
+        rpm -e lhsmtool_phobos
+    fi
 }
 
 function args_to_filename()
@@ -414,18 +432,29 @@ function hsm_import()
 
 function kill_copytool()
 {
-    kill $COPYTOOL_PID || error "Daemon was not running"
-    wait $COPYTOOL_PID
+    if ! $USE_DAEMON
+    then
+        kill $COPYTOOL_PID || error "Daemon was not running"
+        wait $COPYTOOL_PID
 
-    COPYTOOL_PID=0
+        COPYTOOL_PID=0
+    else
+        systemctl stop lhsmtool_phobos
+    fi
 }
 
 function start_copytool()
 {
-    ct_phobos "$@" "$VERBOSE"   \
-        --default-family dir    \
-        --event-fifo "$FIFO"    \
-        "$LUSTRE_ROOT"
+    if ! $USE_DAEMON
+    then
+        ct_phobos "$@" "$VERBOSE"   \
+            --default-family dir    \
+            --event-fifo "$FIFO"    \
+            "$LUSTRE_ROOT"
+    else
+        systemctl start lhsmtool_phobos
+        systemctl daemon-reload
+    fi
 
     trap_add kill_copytool
 }
@@ -764,6 +793,11 @@ function test_fuid_xattr()
     local file="$test_dir/file"
     local attr=test_xattr
     local arg=${1:--x}
+
+    if $USE_DAEMON
+    then
+        skip "Cannot be tested with lhsmtool_phobos as a daemon"
+    fi
 
     add_event_watch
     start_copytool "$arg" "trusted.$attr"
