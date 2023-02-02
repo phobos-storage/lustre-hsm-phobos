@@ -4,6 +4,7 @@ VERBOSE=${VERBOSE:--vv}
 QUICK=${QUICK:-false}
 LOG_DIR=${LOG_DIR:-/tmp/lhsmtool_phobos}
 SERVERNAME=${SERVERNAME:-$(hostname)}
+USE_DAEMON=${USE_DAEMON:-false}
 
 mkdir -p "$LOG_DIR"
 
@@ -26,9 +27,15 @@ then
 fi
 
 # Safe check QUICK variable
-if [[ $QUICK != true && $QUICK != false ]]
+if [[ "$QUICK" != "true" ]]
 then
     QUICK=false
+fi
+
+# Safe check USE_DAEMON variable
+if [[ "$USE_DAEMON" != "true" ]]
+then
+    USE_DAEMON=false
 fi
 
 function error()
@@ -56,11 +63,9 @@ function stop_phobosd()
 
 function phobos_setup()
 {
-    sudo systemctl status postgresql >/dev/null 2>&1 ||
-        error "postgresql service not started"
-    HAVE_POSTGRES=y
-    sudo -u postgres phobos_db setup_db -p phobos
+    sudo -u postgres phobos_db setup_db -p phobos || error "failed to setup db"
     phobos_db setup_tables
+    HAVE_POSTGRES=y
 
     export PHOBOS_LRS_lock_file="$PHOBOSD_LOCK"
     export PHOBOS_LRS_server_socket="$PHOBOSD_SOCKET"
@@ -175,6 +180,15 @@ function global_setup()
     mkfifo -m 644 "$FIFO"
     touch "$EVENTS"
     touch "$PHOBOSD_LOG"
+
+    if $USE_DAEMON
+    then
+        cp tests/lhsmtool_phobos@.service \
+            /usr/lib/systemd/system/lhsmtool_phobos@.service
+        sed -i "s|/usr/bin|$PWD/build|" \
+            /usr/lib/systemd/system/lhsmtool_phobos@.service
+        cp tests/lhsmtool_phobos.sysconfig /etc/sysconfig/
+    fi
 }
 
 function global_teardown()
@@ -188,6 +202,12 @@ function global_teardown()
     fi
 
     rm -f "$FIFO" "$EVENTS"
+
+    if $USE_DAEMON
+    then
+        rm /etc/sysconfig/lhsmtool_phobos.sysconfig
+        rm /usr/lib/systemd/system/lhsmtool_phobos@.service
+    fi
 }
 
 function args_to_filename()
@@ -416,18 +436,47 @@ function hsm_import()
 
 function kill_copytool()
 {
-    kill $COPYTOOL_PID || error "Daemon was not running"
-    wait $COPYTOOL_PID
+    if ! $USE_DAEMON
+    then
+        kill $COPYTOOL_PID || error "Copytool process was not running"
+        wait $COPYTOOL_PID
+    else
+        systemctl stop lhsmtool_phobos@mnt-lustre
+    fi
 
     COPYTOOL_PID=0
 }
 
+function wait_for_copytool()
+{
+    local count=0
+
+    while ! pgrep lhsmtool_phobos
+    do
+        sleep 0.1
+        ((count++))
+        if ((count > 50))
+        then
+            error "Copytool daemon not started after 5s"
+        fi
+    done
+}
+
 function start_copytool()
 {
-    ct_phobos "$@" "$VERBOSE"   \
-        --default-family dir    \
-        --event-fifo "$FIFO"    \
-        "$LUSTRE_ROOT"
+    if ! $USE_DAEMON
+    then
+        ct_phobos "$@" "$VERBOSE"   \
+            --default-family dir    \
+            --event-fifo "$FIFO"    \
+            "$LUSTRE_ROOT"
+    else
+        systemctl daemon-reload
+        systemctl start lhsmtool_phobos@mnt-lustre
+
+        wait_for_copytool
+        COPYTOOL_PID=$(pgrep lhsmtool_phobos)
+    fi
 
     trap_add kill_copytool
 }
@@ -766,6 +815,11 @@ function test_fuid_xattr()
     local file="$test_dir/file"
     local attr=test_xattr
     local arg=${1:--x}
+
+    if $USE_DAEMON
+    then
+        skip "Cannot be tested with lhsmtool_phobos as a systemd service"
+    fi
 
     add_event_watch
     start_copytool "$arg" "trusted.$attr"
