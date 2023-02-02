@@ -1,0 +1,74 @@
+{
+   <_dl_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_init
+   obj:/usr/lib64/ld-*.so
+}
+{
+   <gss_acquire_cred>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   obj:/usr/lib64/libgssapi_krb5.so*
+   fun:gss_acquire_cred
+   ...
+}
+{
+   <pho_cfg_init_local>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:pho_cfg_init_local
+   ...
+}
+{
+   <load_module>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:mod_lazy_load
+   fun:load_module
+   ...
+}
+{
+   <parse_supported_tape_models>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:parse_supported_tape_models
+   fun:dss_init
+   ...
+}
+{
+   <dlopen>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:dlopen@@GLIBC_2.2.5
+   ...
+}
+{
+   <pho_context_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:pho_context_init
+   ...
+}
+{
+   <llapi_hsm_action_begin>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:get_lmd_info_fd
+   fun:ct_md_getattr
+   fun:llapi_hsm_action_begin
+   fun:ct_begin_restore
+   fun:ct_restore
+   fun:ct_process_item
+   fun:ct_thread
+   fun:start_thread
+   fun:clone
+}

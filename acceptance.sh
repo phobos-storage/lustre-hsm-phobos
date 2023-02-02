@@ -20,7 +20,9 @@ COPYTOOL_PID=
 if [ ! -z ${VALGRIND+x} ]
 then
     VALGRIND=${VALGRIND:-valgrind --leak-check=full --show-leak-kinds=all \
-                                  --track-origins=yes --error-exitcode=1}
+--track-origins=yes --error-exitcode=1 \
+--suppressions=tests/valgrind.supp \
+--gen-suppressions=all}
 fi
 
 # Safe check QUICK variable
@@ -801,6 +803,48 @@ function test_phobos_alias()
     fi
 }
 add_test phobos_alias
+
+# XXX /!\ unfortunatly, valgrind returns the exit code of the process if its
+# exit status is non zero. Which means that we cannot easily automate memory
+# testing for this test. Currently, this test will pass even if valgrind detects
+# errors. Therefore, one should check the logs of this test when using valgrind.
+function test_invalid_archive_id()
+{
+    local arg=${1:--1}
+    local ERANGE=34
+    local EINVAL=22
+    local rc
+
+    timeout --preserve-status 1 \
+        $VALGRIND "$__lhsmtool_phobos" -A 1 -A "$arg" "$LUSTRE_ROOT"
+    rc=$?
+    echo $rc
+    (( rc == ERANGE || rc == EINVAL )) &&
+        exit 0
+}
+add_test invalid_archive_id -1
+add_test invalid_archive_id invalid
+add_test invalid_archive_id 2147483648 # INT_MAX + 1
+
+function test_all_archive_ids()
+{
+    local file="$test_dir/file"
+    local copy="$test_dir/copy"
+
+    create_file "$file"
+
+    local defaultstripe=$(lfs getstripe -cSp "$file")
+
+    lfs migrate -c 2 -S 4096K "$file" ||
+        error "Could not migrate '$file'"
+
+    add_event_watch
+    start_copytool -A 0
+
+    lfs hsm_archive --archive 17 "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+}
+add_test all_archive_ids
 
 function test_rpm()
 {
