@@ -84,6 +84,26 @@ executable(
 )
 acceptance = find_program('acceptance.sh', required: true)
 
+systemd = dependency('systemd', required: false)
+systemd_system_unit_dir = systemd.get_pkgconfig_variable('systemdsystemunitdir')
+
+if systemd.found()
+    configure_file(
+        copy: true,
+        input: 'systemd/lhsmtool_phobos@.service',
+        install: true,
+        install_dir: systemd_system_unit_dir,
+        output: 'lhsmtool_phobos@.service',
+    )
+    configure_file(
+        copy: true,
+        input: 'systemd/lhsmtool_phobos.sysconfig',
+        install: true,
+        install_dir: '/etc/sysconfig',
+        output: 'lhsmtool_phobos.sysconfig',
+    )
+endif
+
 # FIXME for some reason, the tests fail when run using ninja but still pass if
 # acceptance is run by hand.
 # test('acceptance', acceptance)
