@@ -33,6 +33,8 @@ runs Phobos' LRS daemon (version > 1.93).
 
 %files
 %{_bindir}/lhsmtool_phobos
+%{_unitdir}/lhsmtool_phobos.service
+%config(noreplace) %{_sysconfdir}/sysconfig/lhsmtool_phobos.conf
 
 %changelog
 
