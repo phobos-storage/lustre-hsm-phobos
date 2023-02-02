@@ -1,0 +1,15 @@
+[Unit]
+Description=Lustre HSM Copytool daemon
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/sysconfig/lhsmtool_phobos.conf
+RuntimeDirectory=lhsmtool_phobos
+PIDFile=/run/lhsmtool_phobos/lhsmtool_phobos.pid
+ExecStart=/bin/sh -c 'PHOBOS_LRS_server_socket=$PHOBOS_LRS_server_socket \
+            LHSMTOOL_PHOBOS_PID_FILEPATH=$LHSMTOOL_PHOBOS_PID_FILEPATH \
+            /usr/bin/lhsmtool_phobos $VERBOSE_LEVEL --default-family \
+            $DEFAULT_FAMILY --event-fifo $EVENT_FIFO $LUSTRE_MNTPOINT'
+
+[Install]
+WantedBy=multi-user.target
