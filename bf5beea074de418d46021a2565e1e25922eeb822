@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4d8eb57_ae427058",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-02T14:48:37Z",
+      "side": 1,
+      "message": "question: wouldn\u0027t it be possible then to have the test grep in the logs to see if a Valgrind error arose ?",
+      "range": {
+        "startLine": 809,
+        "startChar": 25,
+        "endLine": 810,
+        "endChar": 80
+      },
+      "revId": "bf5beea074de418d46021a2565e1e25922eeb822",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e782f04b_d9a4563d",
+        "filename": "tests/valgrind.supp",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-02T14:48:37Z",
+      "side": 1,
+      "message": "minor: uhhhh",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 34
+      },
+      "revId": "bf5beea074de418d46021a2565e1e25922eeb822",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
