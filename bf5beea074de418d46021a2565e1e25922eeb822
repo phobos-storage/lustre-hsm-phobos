@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13bbe26c_c0c2e1bd",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-02T15:05:25Z",
+      "side": 1,
+      "message": "Probably, but it seems a bit complicated to me. So for now, this will do. I don\u0027t think this part of the code will change anytime soon so as long as it works now and this is the only test that cannot use valgrind, I don\u0027t want to over complicate things.",
+      "parentUuid": "e4d8eb57_ae427058",
+      "range": {
+        "startLine": 809,
+        "startChar": 25,
+        "endLine": 810,
+        "endChar": 80
+      },
+      "revId": "bf5beea074de418d46021a2565e1e25922eeb822",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e782f04b_d9a4563d",
         "filename": "tests/valgrind.supp",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2023-02-02T14:48:37Z",
       "side": 1,
       "message": "minor: uhhhh",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 34
+      },
+      "revId": "bf5beea074de418d46021a2565e1e25922eeb822",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6fac292_1b472c36",
+        "filename": "tests/valgrind.supp",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-02T15:05:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e782f04b_d9a4563d",
       "range": {
         "startLine": 45,
         "startChar": 4,
