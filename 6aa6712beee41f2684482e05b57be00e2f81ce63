@@ -1,0 +1,228 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc0bca44_ea61836b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "it can already be used as a daemon. You added a unit file for running it with systemd.",
+      "range": {
+        "startLine": 7,
+        "startChar": 27,
+        "endLine": 7,
+        "endChar": 49
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "332ca5b4_542b3708",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: usable with systemd",
+      "range": {
+        "startLine": 10,
+        "startChar": 17,
+        "endLine": 10,
+        "endChar": 34
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98d6ebe0_4b32f8bc",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: use yum localinstall. rpm -i alters the state of the system without yum knowing. Also, have you tried using systemctl-run ? I think it would make the installation of the rpm and possibily it build useless.",
+      "range": {
+        "startLine": 187,
+        "startChar": 7,
+        "endLine": 187,
+        "endChar": 50
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caed45f5_67e733a3",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "yum remove",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 6
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceeae606_7912c257",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "question: does systemctl stop returns an error in case of failure?",
+      "range": {
+        "startLine": 442,
+        "startChar": 8,
+        "endLine": 442,
+        "endChar": 38
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b58e9bef_93d169a5",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: this should be done before the start not after.",
+      "range": {
+        "startLine": 456,
+        "startChar": 10,
+        "endLine": 456,
+        "endChar": 31
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d895e76d_a9e234ca",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: as a systemd service",
+      "range": {
+        "startLine": 799,
+        "startChar": 52,
+        "endLine": 799,
+        "endChar": 63
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61052cde_a080979a",
+        "filename": "lhsmtool_phobos.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: this is a test setup therefore you should put it in tests.",
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d47e091_d08aef6c",
+        "filename": "lhsmtool_phobos.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "major: this can differ from the one in the configuration. I don\u0027t know if you can use the environment variable here.",
+      "range": {
+        "startLine": 8,
+        "startChar": 8,
+        "endLine": 8,
+        "endChar": 48
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27467c37_4d3f555d",
+        "filename": "lhsmtool_phobos.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-06T15:11:02Z",
+      "side": 1,
+      "message": "most of these configuration information are for tests only. I don\u0027t like that the rpm installs a test setup on the system",
+      "range": {
+        "startLine": 9,
+        "startChar": 22,
+        "endLine": 12,
+        "endChar": 70
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
