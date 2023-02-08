@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dadb007_e3468715",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc0bca44_ea61836b",
+      "range": {
+        "startLine": 7,
+        "startChar": 27,
+        "endLine": 7,
+        "endChar": 49
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "332ca5b4_542b3708",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-02-06T15:11:02Z",
       "side": 1,
       "message": "major: usable with systemd",
+      "range": {
+        "startLine": 10,
+        "startChar": 17,
+        "endLine": 10,
+        "endChar": 34
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fd33815_7e372ea3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "332ca5b4_542b3708",
       "range": {
         "startLine": 10,
         "startChar": 17,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8477a48_a98c3aac",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "As talked about, we decided to go with two different .conf et .service files, and the ones dedicated for testing will simply be copied to the correct locations.",
+      "parentUuid": "98d6ebe0_4b32f8bc",
+      "range": {
+        "startLine": 187,
+        "startChar": 7,
+        "endLine": 187,
+        "endChar": 50
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caed45f5_67e733a3",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-02-06T15:11:02Z",
       "side": 1,
       "message": "yum remove",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 6
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "098a0224_d1b2e510",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "caed45f5_67e733a3",
       "range": {
         "startLine": 205,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5c5cc78_92165c02",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "I\u0027m not sure, but since the other case does not make use of a potential error either, as we talked, no need to bother with retrieving the error.",
+      "parentUuid": "ceeae606_7912c257",
+      "range": {
+        "startLine": 442,
+        "startChar": 8,
+        "endLine": 442,
+        "endChar": 38
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b58e9bef_93d169a5",
@@ -129,6 +249,30 @@
       "writtenOn": "2023-02-06T15:11:02Z",
       "side": 1,
       "message": "major: this should be done before the start not after.",
+      "range": {
+        "startLine": 456,
+        "startChar": 10,
+        "endLine": 456,
+        "endChar": 31
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eac26b48_13c898ab",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b58e9bef_93d169a5",
       "range": {
         "startLine": 456,
         "startChar": 10,
@@ -162,6 +306,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73596c91_bdb25dac",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d895e76d_a9e234ca",
+      "range": {
+        "startLine": 799,
+        "startChar": 52,
+        "endLine": 799,
+        "endChar": 63
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61052cde_a080979a",
@@ -175,6 +343,24 @@
       "writtenOn": "2023-02-06T15:11:02Z",
       "side": 1,
       "message": "major: this is a test setup therefore you should put it in tests.",
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d423566_1eca539c",
+        "filename": "lhsmtool_phobos.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61052cde_a080979a",
       "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -202,6 +388,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02ac1def_635914d6",
+        "filename": "lhsmtool_phobos.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "File was not used actually, so we removed it, as talked about.",
+      "parentUuid": "1d47e091_d08aef6c",
+      "range": {
+        "startLine": 8,
+        "startChar": 8,
+        "endLine": 8,
+        "endChar": 48
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27467c37_4d3f555d",
@@ -215,6 +425,30 @@
       "writtenOn": "2023-02-06T15:11:02Z",
       "side": 1,
       "message": "most of these configuration information are for tests only. I don\u0027t like that the rpm installs a test setup on the system",
+      "range": {
+        "startLine": 9,
+        "startChar": 22,
+        "endLine": 12,
+        "endChar": 70
+      },
+      "revId": "6aa6712beee41f2684482e05b57be00e2f81ce63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04571b1b_4cff8335",
+        "filename": "lhsmtool_phobos.service",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27467c37_4d3f555d",
       "range": {
         "startLine": 9,
         "startChar": 22,

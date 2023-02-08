@@ -22,6 +22,30 @@
       },
       "revId": "9b75a526804ba44b55a5b8d528006975dc3d7d5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e0bb291_6b837ca4",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-08T09:36:11Z",
+      "side": 0,
+      "message": "If quick is neither true nor false, then it\u0027s false. So if it\u0027s anything but true, it\u0027s false, that\u0027s easier.",
+      "parentUuid": "cd014b75_6325b4f0",
+      "range": {
+        "startLine": 27,
+        "startChar": 20,
+        "endLine": 27,
+        "endChar": 40
+      },
+      "revId": "9b75a526804ba44b55a5b8d528006975dc3d7d5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
