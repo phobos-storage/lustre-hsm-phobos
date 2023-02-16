@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c138404b_89437565",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-16T14:43:54Z",
+      "side": 1,
+      "message": "On CentOS 8, this is the wrong name. We should try both and quit if both of the status fail. But you can also just remove this check but add an \"|| error\" to the setup_db",
+      "range": {
+        "startLine": 64,
+        "startChar": 36,
+        "endLine": 64,
+        "endChar": 40
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b05a09d_837a93f4",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-16T14:43:54Z",
+      "side": 1,
+      "message": "question: Why not simply execute sed on the file after the copy?",
+      "range": {
+        "startLine": 186,
+        "startChar": 8,
+        "endLine": 186,
+        "endChar": 48
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b11fd7e0_22777615",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-16T14:43:54Z",
+      "side": 1,
+      "message": "suggest: pgrep lhsmtool_phobos",
+      "range": {
+        "startLine": 462,
+        "startChar": 23,
+        "endLine": 462,
+        "endChar": 79
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c55d1bf7_6f1f51bd",
+        "filename": "systemd/lhsmtool_phobos.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-16T14:43:54Z",
+      "side": 1,
+      "message": "major: this does not work",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 9
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fd60c6b_b924feb3",
+        "filename": "systemd/lhsmtool_phobos.service",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-16T14:43:54Z",
+      "side": 1,
+      "message": "This does not work, just remove it for now. I will do a patch later to test if the LD_PRELOAD can be set in the environment file directly.",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
