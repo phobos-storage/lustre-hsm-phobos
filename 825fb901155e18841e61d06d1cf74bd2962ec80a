@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1b08ae0_4336f241",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-02-17T13:57:44Z",
+      "side": 1,
+      "message": "comment: what I understood is, if we set the error-exitcode to a value different from 0, like one which can not be returned by lhsmtool, we ensure to distinguish errors found with valgrind to others?",
+      "range": {
+        "startLine": 807,
+        "startChar": 0,
+        "endLine": 810,
+        "endChar": 80
+      },
+      "revId": "825fb901155e18841e61d06d1cf74bd2962ec80a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
