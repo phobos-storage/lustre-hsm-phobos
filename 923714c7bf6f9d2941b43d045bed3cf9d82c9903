@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "33822820_b5264155",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-02-17T14:47:01Z",
+      "side": 1,
+      "message": "question: this file needs an X access? why not allowing its modification?",
+      "range": {
+        "startLine": 46,
+        "startChar": 17,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c138404b_89437565",
         "filename": "acceptance.sh",
         "patchSetId": 2
@@ -42,6 +65,29 @@
         "startChar": 8,
         "endLine": 186,
         "endChar": 48
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "582a228c_c0315e66",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-02-17T14:47:01Z",
+      "side": 1,
+      "message": "nit: you may precise which \"daemon\" here\n\nAlso, we are not in the `USE_DAEMON` case, maybe `\"Copytool process was not running\"` is sufficient.",
+      "range": {
+        "startLine": 442,
+        "startChar": 37,
+        "endLine": 442,
+        "endChar": 43
       },
       "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -111,6 +157,29 @@
         "startChar": 12,
         "endLine": 10,
         "endChar": 20
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce528969_7ef97bc3",
+        "filename": "tests/lhsmtool_phobos.service",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-02-17T14:47:01Z",
+      "side": 1,
+      "message": "question: why this number of spaces?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 12
       },
       "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
