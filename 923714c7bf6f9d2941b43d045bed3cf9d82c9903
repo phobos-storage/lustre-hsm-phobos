@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4016301e_05b17d7a",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33822820_b5264155",
+      "range": {
+        "startLine": 46,
+        "startChar": 17,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c138404b_89437565",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-02-16T14:43:54Z",
       "side": 1,
       "message": "On CentOS 8, this is the wrong name. We should try both and quit if both of the status fail. But you can also just remove this check but add an \"|| error\" to the setup_db",
+      "range": {
+        "startLine": 64,
+        "startChar": 36,
+        "endLine": 64,
+        "endChar": 40
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a03421fc_f6de3744",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c138404b_89437565",
       "range": {
         "startLine": 64,
         "startChar": 36,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80027787_3dc4a89f",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b05a09d_837a93f4",
+      "range": {
+        "startLine": 186,
+        "startChar": 8,
+        "endLine": 186,
+        "endChar": 48
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "582a228c_c0315e66",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-02-17T14:47:01Z",
       "side": 1,
       "message": "nit: you may precise which \"daemon\" here\n\nAlso, we are not in the `USE_DAEMON` case, maybe `\"Copytool process was not running\"` is sufficient.",
+      "range": {
+        "startLine": 442,
+        "startChar": 37,
+        "endLine": 442,
+        "endChar": 43
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dc0f25d_234a81c9",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "582a228c_c0315e66",
       "range": {
         "startLine": 442,
         "startChar": 37,
@@ -116,6 +212,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bf8f868_18ed216d",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b11fd7e0_22777615",
+      "range": {
+        "startLine": 462,
+        "startChar": 23,
+        "endLine": 462,
+        "endChar": 79
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c55d1bf7_6f1f51bd",
@@ -129,6 +249,30 @@
       "writtenOn": "2023-02-16T14:43:54Z",
       "side": 1,
       "message": "major: this does not work",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 9
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "279256e8_eea51f15",
+        "filename": "systemd/lhsmtool_phobos.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Removed, as you explained for the .service file",
+      "parentUuid": "c55d1bf7_6f1f51bd",
       "range": {
         "startLine": 16,
         "startChar": 0,
@@ -162,6 +306,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14c7fe1e_90614370",
+        "filename": "systemd/lhsmtool_phobos.service",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fd60c6b_b924feb3",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce528969_7ef97bc3",
@@ -175,6 +343,30 @@
       "writtenOn": "2023-02-17T14:47:01Z",
       "side": 1,
       "message": "question: why this number of spaces?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 12
+      },
+      "revId": "923714c7bf6f9d2941b43d045bed3cf9d82c9903",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a1d69b5_03b0fe52",
+        "filename": "tests/lhsmtool_phobos.service",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-21T13:57:43Z",
+      "side": 1,
+      "message": "No reason in particular",
+      "parentUuid": "ce528969_7ef97bc3",
       "range": {
         "startLine": 9,
         "startChar": 0,
