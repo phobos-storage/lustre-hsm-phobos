@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2022 Commissariat a l'energie atomique et aux energies
+ * Copyright (C) 2023 Commissariat a l'energie atomique et aux energies
  *                    alternatives
  *
  * SPDX-License-Identifer: GPL-2.0-only
  */
-#define _GNU_SOURCE /* asprintf */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "layout.h"
 
 #include <errno.h>

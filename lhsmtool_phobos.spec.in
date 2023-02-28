@@ -1,16 +1,17 @@
 Name:    lhsmtool_phobos
-Version: @VERSION@
+Version: @version@
 Release: 1%{?dist}
 Summary: Lustre HSM Copytool for Phobos
 
 Group:   Applications/System
 License: LGPLv3
 URL:     https://github.com/phobos-storage/lustre-hsm-phobos
-Source0: %{name}-%{version}.tar.gz
+Source0: %{name}-%{version}.tar.xz
 
 Requires: phobos >= 1.93
 Requires: lustre-client
 
+BuildRequires: meson
 BuildRequires: gcc
 BuildRequires: lustre-client
 BuildRequires: glib2-devel >= 2.28
@@ -23,13 +24,14 @@ A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
 runs Phobos' LRS daemon (version > 1.93).
 
 %prep
-%setup -q
+%autosetup
 
 %build
-%make_build
+%meson
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %files
 %{_bindir}/lhsmtool_phobos
