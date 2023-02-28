@@ -1,5 +1,16 @@
+/*
+ * Copyright (C) 2023 Commissariat a l'energie atomique et aux energies
+ *                    alternatives
+ *
+ * SPDX-License-Identifer: GPL-2.0-only
+ */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "common.h"
 #include "pho_common.h"
+
 #include <lustre/lustreapi.h>
 
 static void ct_log_callback_fifo_wrapper(const struct pho_logrec *rec, ...)
@@ -25,6 +36,8 @@ static void ct_log_callback_fifo_wrapper(const struct pho_logrec *rec, ...)
     case PHO_LOG_DEBUG:
         level = LLAPI_MSG_DEBUG;
         break;
+    default:
+        return;
     }
 
     va_start(list, rec);
