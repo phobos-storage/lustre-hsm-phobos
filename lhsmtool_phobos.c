@@ -27,17 +27,17 @@
  *
  * Copyright (c) 2013, 2016, Intel Corporation.
  */
-/* HSM copytool program for Phobos HSM's.
+/* HSM copytool program for Phobos.
  *
  * An HSM copytool daemon acts on action requests from Lustre to copy files
  * to and from an HSM archive system. This one in particular makes regular
- * call to Phobos
- *
+ * call to Phobos.
  */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
+
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -159,7 +159,7 @@ static void usage(int rc)
             "    -q, --quiet                  Produce less verbose output\n"
             "    -x, --fuid-xattr             Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
-#ifdef LLAPI_LAYOUT_SET_BY_FD
+#ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
             "    -l, --restore-lov            Use the striping that the file "
             "had when archived (off by default)\n"
 #endif
@@ -207,7 +207,6 @@ static int parse_archive_id(const char *archive_value, GArray *archive_ids)
     if (rc)
         return rc;
 
-    pho_info("%d", INT_MAX);
     if (archive_id > INT_MAX)
         return -ERANGE;
 
@@ -228,7 +227,7 @@ static int parse_archive_id(const char *archive_value, GArray *archive_ids)
     return 0;
 }
 
-#ifdef LLAPI_LAYOUT_SET_BY_FD
+#ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
 #define GETOPTS_STRING "A:b:c:f:F:hqx:vl"
 #else
 #define GETOPTS_STRING "A:b:c:f:F:hqx:v"
@@ -265,7 +264,7 @@ static int ct_parseopts(int argc, char * const *argv)
             .has_arg = no_argument },
         { .val = 'P',    .name = "pid-file",
             .has_arg = required_argument },
-#ifdef LLAPI_LAYOUT_SET_BY_FD
+#ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
         { .val = 'l',    .name = "restore-lov",
             .has_arg = no_argument },
 #endif
@@ -308,7 +307,7 @@ static int ct_parseopts(int argc, char * const *argv)
         case 'h':
             usage(0);
             break;
-#ifdef LLAPI_LAYOUT_SET_BY_FD
+#ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
         case 'l':
             opt.o_restore_lov = true;
             break;
@@ -1458,8 +1457,10 @@ int main(int argc, char **argv)
 {
     int rc;
 
+#ifdef HAVE_PHOBOS_INIT
     phobos_init();
     atexit(phobos_fini);
+#endif
 
     strncpy(trusted_fuid_xattr, XATTR_TRUSTED_FUID_XATTR_DEFAULT, MAXNAMLEN);
 

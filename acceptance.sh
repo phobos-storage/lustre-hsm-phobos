@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 VERBOSE=${VERBOSE:--vv}
 QUICK=${QUICK:-false}
@@ -401,14 +401,14 @@ function trap_add()
     traps+=("$1")
 }
 
-__lhsmtool_phobos=$(PATH="$PWD/build:$PATH" which lhsmtool_phobos)
+__lhsmtool_phobos=$(PATH="$PWD:$PWD/build:$PATH" which lhsmtool_phobos)
 function ct_phobos()
 {
     $VALGRIND "$__lhsmtool_phobos" "$@" &
     COPYTOOL_PID=$!
 }
 
-__hsm_import=$(PATH="$PWD/build:$PATH" which hsm-import)
+__hsm_import=$(PATH="$PWD:$PWD/build:$PATH" which hsm-import)
 function hsm_import()
 {
     "$__hsm_import" "$@"
@@ -848,7 +848,9 @@ add_test all_archive_ids
 
 function test_rpm()
 {
-    make rpm
+    cd build
+
+    meson compile rpm
 }
 add_test rpm
 
