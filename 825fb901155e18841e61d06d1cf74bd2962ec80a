@@ -22,6 +22,30 @@
       },
       "revId": "825fb901155e18841e61d06d1cf74bd2962ec80a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fb1aaf9_afefe446",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-02-28T14:14:29Z",
+      "side": 1,
+      "message": "The issue is that I get the return code of the process (i.e. EINVAL or ERANGE) not 1 if there is a memory related error. valgrind doesn\u0027t seem to return 1 as it should in this case.",
+      "parentUuid": "f1b08ae0_4336f241",
+      "range": {
+        "startLine": 807,
+        "startChar": 0,
+        "endLine": 810,
+        "endChar": 80
+      },
+      "revId": "825fb901155e18841e61d06d1cf74bd2962ec80a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
