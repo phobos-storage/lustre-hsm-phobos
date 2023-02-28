@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8a0ad6a_b3a4ab90",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-02-28T15:47:48Z",
+      "side": 1,
+      "message": "minor: reste de debug",
+      "range": {
+        "startLine": 852,
+        "startChar": 4,
+        "endLine": 852,
+        "endChar": 13
+      },
+      "revId": "7e3fc139bcb595246c94f99a327956cba4f7f4de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
