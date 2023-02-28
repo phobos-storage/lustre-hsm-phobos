@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2023 Commissariat a l'energie atomique et aux energies
+ *                    alternatives
+ *
+ * SPDX-License-Identifer: GPL-2.0-only
+ */
 #ifndef _COMMON_H
 #define _COMMON_H
 

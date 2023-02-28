@@ -1,0 +1,6 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
+#mesondefine HAVE_PHOBOS_INIT
+#mesondefine HAVE_LLAPI_LAYOUT_SET_BY_FD
