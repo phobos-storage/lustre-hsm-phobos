@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1809db37_74e799c5",
+        "filename": "meson.build",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-03-15T09:47:30Z",
+      "side": 1,
+      "message": "question: don\u0027t we need to specify it here?",
+      "range": {
+        "startLine": 10,
+        "startChar": 4,
+        "endLine": 10,
+        "endChar": 11
+      },
+      "revId": "a4a04ae3d3b3e59c2e9f29b2a5f37f255fe7ac28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
