@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c90fb2b7_d8ff5d1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-03-22T14:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87bd69cc_aad31c5f",
+      "revId": "733c5dfe86ae4d7bfb9b0bc23c13df9dedc3db97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0e0a9e1_5e07a7d9",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-03-03T08:41:11Z",
       "side": 1,
       "message": "comment: I was thinking that we could use the same mecanism as the coordinatool to specify the mount path: systemctl start lhsmtool_phobos@mnt-lustre for example would run the copytool on /mnt/lustre. You can take a look at the file systemd/coordinatool@.service in the coordinatool\u0027s source code.",
+      "range": {
+        "startLine": 13,
+        "startChar": 11,
+        "endLine": 13,
+        "endChar": 28
+      },
+      "revId": "733c5dfe86ae4d7bfb9b0bc23c13df9dedc3db97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0db914dc_9382b13f",
+        "filename": "systemd/lhsmtool_phobos.service",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-03-22T14:39:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0e0a9e1_5e07a7d9",
       "range": {
         "startLine": 13,
         "startChar": 11,
