@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82a4b676_9ca4aa01",
+        "filename": "acceptance.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-05T09:04:51Z",
+      "side": 1,
+      "message": "minor: you can define a BUILDDIR variable at the top of the script to ease potential updates of the scripts location.",
+      "range": {
+        "startLine": 188,
+        "startChar": 27,
+        "endLine": 188,
+        "endChar": 37
+      },
+      "revId": "9947188fdb277e7424eb5e1fb2f741d07ecc2d4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
