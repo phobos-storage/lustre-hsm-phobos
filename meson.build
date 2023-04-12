@@ -49,15 +49,35 @@ configure_file(
     configuration: config,
 )
 
+libcopytool = static_library(
+    'copytool',
+    sources: [
+        'src/layout.c',
+        'src/hints.c',
+        'src/log.c',
+    ],
+    dependencies: [
+        phobos_store,
+        phobos_admin,
+        glib2,
+        lustre,
+        pthread,
+    ],
+    include_directories: include_directories('.', 'src')
+)
+
+copytool_dependency = declare_dependency(
+    link_with: libcopytool,
+    include_directories: include_directories('.', 'src')
+)
+
 executable(
     'lhsmtool_phobos',
     sources: [
-        'src/layout.c',
-        'src/log.c',
         'lhsmtool_phobos.c',
     ],
     include_directories: include_directories('.', 'src'),
-    dependencies: [ phobos_store, phobos_admin, glib2, lustre, pthread ],
+    dependencies: [ glib2, copytool_dependency ],
     install: true,
 )
 
@@ -87,3 +107,14 @@ acceptance = find_program('acceptance.sh', required: true)
 # FIXME for some reason, the tests fail when run using ninja but still pass if
 # acceptance is run by hand.
 # test('acceptance', acceptance)
+
+cmocka = dependency('cmocka', required: false)
+
+if cmocka.found()
+    unit = executable(
+        'unit',
+        sources: 'tests/unit.c',
+        dependencies: [ glib2, cmocka, copytool_dependency ]
+    )
+    test('unit', unit)
+endif

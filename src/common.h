@@ -29,4 +29,26 @@ struct options {
  */
 void ct_log_configure(struct options *opts);
 
+struct buf {
+    char *data;
+    size_t len;
+};
+
+struct hinttab {
+    size_t count;
+    struct {
+        const char *key;
+        const char *value;
+    } *hints;
+    char *context;
+};
+
+char *get_key_value(char *input, char **key, char **value);
+
+int process_hints(const struct buf *hints, struct hinttab *hinttab);
+
+void hinttab_free(struct hinttab *hinttab);
+
+int pho_xfer_add_tag(struct pho_xfer_desc *xfer, const char *new_tag);
+
 #endif

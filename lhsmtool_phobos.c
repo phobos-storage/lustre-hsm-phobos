@@ -74,41 +74,13 @@
 
 #define HINT_HSM_FUID "hsm_fuid"
 
-#define MAXTAGS 10
-
 #define UNUSED __attribute__((unused))
-
-/* Progress reporting period */
-#define REPORT_INTERVAL_DEFAULT 30
-/* HSM hash subdir permissions */
-#define DIR_PERM 0700
-/* HSM hash file permissions */
-#define FILE_PERM 0600
-
-#define ONE_MB 0x100000
-
-#ifndef NSEC_PER_SEC
-# define NSEC_PER_SEC 1000000000UL
-#endif
-
-#define NB_HINTS_MAX 10
-
-enum ct_action {
-    CA_IMPORT = 1,
-    CA_REBIND,
-    CA_MAXSEQ,
-};
 
 /* everything else is zeroed */
 struct options opt = {
     .o_verbose         = LLAPI_MSG_INFO,
     .o_default_family  = PHO_RSC_INVAL,
     .o_restore_lov     = false,
-};
-
-struct buf {
-    char *data;
-    size_t len;
 };
 
 /*
@@ -305,6 +277,8 @@ static int ct_parseopts(int argc, char * const *argv)
             opt.o_default_family = str2rsc_family(optarg);
             break;
         case 'h':
+            /* free the array since usage will call exit */
+            g_array_free(opt.o_archive_ids, true);
             usage(0);
             break;
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
@@ -346,82 +320,6 @@ static int ct_parseopts(int argc, char * const *argv)
 }
 
 /*
- * A strtok-r based function for parsing the
- * hints provided during an archive request
- */
-
-#define HINTMAX 80
-
-struct hinttab {
-    char k[HINTMAX];
-    char v[HINTMAX];
-};
-
-static int process_hints(const struct buf *hints,
-                         int hinttablen,
-                         struct hinttab *hinttab)
-{
-    const char comma[2] = ",";
-    const char equal[2] = "=";
-    char work2[HINTMAX];
-    char *saveptr1;
-    char *saveptr2;
-    char *token1;
-    char *token2;
-    int pos1 = 0;
-    int pos2 = 0;
-    char *work1;
-
-    /* No hints to parse */
-    if (!hints->data)
-        return 0;
-
-    work1 = strndup(hints->data, hints->len);
-
-    /* get the first token */
-    token1 = strtok_r(work1, comma, &saveptr1);
-
-    /* walk through other tokens */
-    while (token1 != NULL) {
-        /*
-         * strtok_r corrupts the strings
-         * we must work on a copy
-         */
-        /* FIXME this doesn't work if the token is larger than 80 characters...
-         * This function needs a bit of refactoring.
-         */
-        strncpy(work2, token1, HINTMAX);
-        pos2 = 0;
-
-        /* Second strtok, to get equal */
-        token2 = strtok_r(work2, equal, &saveptr2);
-
-        while (token2 != NULL) {
-            if (pos2 == 0)
-                strncpy(hinttab[pos1].k, token2, HINTMAX);
-            else if (pos2 == 1)
-                strncpy(hinttab[pos1].v, token2, HINTMAX);
-            else
-                break;
-
-            token2 = strtok_r(NULL, equal, &saveptr2);
-            pos2 += 1;
-        }
-
-        token1 = strtok_r(NULL, comma, &saveptr1);
-        pos1 += 1;
-
-        if (pos1 == hinttablen)
-            goto free_work1;
-    }
-
-free_work1:
-    free(work1);
-
-    return pos1;
-}
-
-/*
  * Phobos functions
  */
 static int fid2objid(const struct lu_fid *fid, char *objid)
@@ -435,28 +333,31 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 
 static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 {
-    struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
+    struct hinttab hinttab;
+    const char *obj = NULL;
     char objid[MAXNAMLEN];
     bool objset = false;
-    char *obj = NULL;
-    int nbhints;
     int rc;
 
     if (hints->data) {
-        int i = 0;
+        size_t i;
+        int rc;
 
         pho_verb("hints provided hints='%.*s', len=%lu",
                  (int)hints->len, hints->data, hints->len);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+        rc = process_hints(hints, &hinttab);
+        if (rc) {
+            pho_error(rc, "Failed to process hints");
+            return rc;
+        }
 
-        for (i = 0 ; i < nbhints; i++) {
-            pho_verb("hints #%d  key='%s' val='%s'",
-                        i, hinttab[i].k, hinttab[i].v);
+        for (i = 0 ; i < hinttab.count; i++) {
+            pho_verb("hints #%lu  key='%s' val='%s'",
+                        i, hinttab.hints[i].key, hinttab.hints[i].value);
 
-            if (!strncmp(hinttab[i].k, HINT_HSM_FUID, HINTMAX)) {
-                /* Deal with storage family */
-                obj = hinttab[i].v;
+            if (!strcmp(hinttab.hints[i].key, HINT_HSM_FUID)) {
+                obj = hinttab.hints[i].value;
                 objset = true;
             }
         }
@@ -464,8 +365,8 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 
     if (!objset) {
         rc = fid2objid(fid, objid);
-        if (rc < 0)
-            return rc;
+        if (rc)
+            goto free_hints;
 
         obj = objid;
     }
@@ -473,15 +374,19 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     /* DO THE DELETE */
     memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_DEL;
-    xfer.xd_objid = obj;
+    // FIXME this is probably fine, xd_objid should be const...
+    xfer.xd_objid = (char *)obj;
 
     rc = phobos_delete(&xfer, 1);
+    if (rc)
+        pho_error(rc, "Failed to delete '%s' from Phobos", obj);
 
     /* Cleanup and exit */
     pho_xfer_desc_clean(&xfer);
 
-    if (rc)
-        pho_error(rc, "Failed to delete '%s' from Phobos", obj);
+free_hints:
+    if (hints->data)
+        hinttab_free(&hinttab);
 
     return rc;
 }
@@ -526,38 +431,24 @@ out_free:
 }
 
 static int phobos_op_put(const struct lu_fid *fid,
-                         char *altobjid,
                          const int fd,
                          struct llapi_layout *layout,
                          const struct buf *hints,
                          char **oid)
 {
-    struct hinttab hinttab[NB_HINTS_MAX];
     struct pho_xfer_desc xfer = {0};
     struct pho_attrs attrs = {0};
+    struct hinttab hinttab;
     char objid[MAXNAMLEN];
-    char *obj = NULL;
     struct stat st;
-    int nbhints;
-    int i = 0;
     int rc;
 
-    /* If provided altobjid as objectid, if not set by hints */
-    if (altobjid) {
-        obj = altobjid;
-    } else {
-        rc = fid2objid(fid, objid);
-        if (rc < 0)
-            return rc;
-        obj = objid;
-    }
-    /* only used for logging, not an error if allocation failed */
-    *oid = strdup(obj);
+    rc = fid2objid(fid, objid);
+    if (rc < 0)
+        return rc;
 
-    /**
-     * @todo:
-     *    - management of the size of string objid
-     */
+    /* only used for logging, not an error if allocation failed */
+    *oid = strdup(objid);
 
     rc = pho_attr_set(&attrs, "program", "copytool");
     if (rc)
@@ -566,8 +457,10 @@ static int phobos_op_put(const struct lu_fid *fid,
     if (layout) {
         rc = llapi_layout_comp_iterate(layout, component_to_attr,
                                        (void *)&attrs);
-        if (rc < 0)
-            return -errno;
+        if (rc < 0) {
+            rc = -errno;
+            goto free_xfer;
+        }
     }
 
     memset(&xfer, 0, sizeof(xfer));
@@ -576,43 +469,51 @@ static int phobos_op_put(const struct lu_fid *fid,
     xfer.xd_flags = 0;
 
     /* set oid in xattr for later use */
-    rc = fsetxattr(xfer.xd_fd, trusted_fuid_xattr, obj, strlen(obj),
-                   XATTR_CREATE);
-    if (rc)
-        pho_error(rc, "failed to write xattr");
+    rc = fsetxattr(fd, trusted_fuid_xattr, objid, strlen(objid), XATTR_CREATE);
+    if (rc && errno != EEXIST)
+        pho_error(rc, "failed to set '%s' to '%s'", trusted_fuid_xattr, objid);
 
-    /* fstat on lustre fd seems to fail */
-    fstat(xfer.xd_fd, &st);
+    if (fstat(fd, &st) < 0) {
+        rc = -errno;
+        goto free_xfer;
+    }
+
     xfer.xd_params.put.size = st.st_size;
 
-    /* Using default family (can be amened later by a hint) */
+    /* Using default family (can be amended later by a hint) */
     xfer.xd_params.put.family = opt.o_default_family;
 
     /* Use content of hints to modify fields in xfer_desc */
     if (hints->data) {
+        size_t i;
+        int rc;
+
         pho_verb("hints provided hints='%.*s', len=%lu",
                  (int)hints->len, hints->data, hints->len);
-        nbhints = process_hints(hints, NB_HINTS_MAX, hinttab);
+        rc = process_hints(hints, &hinttab);
+        if (rc)
+            goto free_xfer;
 
-        for (i = 0 ; i < nbhints; i++) {
-            pho_verb("hints #%d  key='%s' val='%s'",
-                        i, hinttab[i].k, hinttab[i].v);
+        for (i = 0 ; i < hinttab.count; i++) {
+            pho_verb("hints #%lu  key='%s' val='%s'",
+                     i, hinttab.hints[i].key, hinttab.hints[i].value);
 
-            if (!strncmp(hinttab[i].k, "family", HINTMAX)) {
+            if (!strcmp(hinttab.hints[i].key, "family")) {
                 /* Deal with storage family */
-                xfer.xd_params.put.family = str2rsc_family(hinttab[i].v);
+                xfer.xd_params.put.family =
+                    str2rsc_family(hinttab.hints[i].value);
 
                 if (xfer.xd_params.put.family == PHO_RSC_INVAL)
-                    pho_warn("unknown hint '%s'",  hinttab[i].k);
+                    pho_warn("unknown family '%s'",  hinttab.hints[i].value);
 
-            } else if (!strncmp(hinttab[i].k, "layout", HINTMAX)) {
+            } else if (!strcmp(hinttab.hints[i].key, "layout")) {
                 /* Deal with storage layout */
-                xfer.xd_params.put.layout_name = hinttab[i].v;
+                xfer.xd_params.put.layout_name = hinttab.hints[i].value;
 
-            } else if (!strncmp(hinttab[i].k, "alias", HINTMAX)) {
-                xfer.xd_params.put.alias = hinttab[i].v;
+            } else if (!strcmp(hinttab.hints[i].key, "alias")) {
+                xfer.xd_params.put.alias = hinttab.hints[i].value;
 
-            } else if (!strncmp(hinttab[i].k, "tag", HINTMAX)) {
+            } else if (!strcmp(hinttab.hints[i].key, "tag")) {
                 /* Deal with storage tags */
                 if (xfer.xd_params.put.tags.n_tags == 0) {
                     xfer.xd_params.put.tags.tags = malloc(sizeof(char **));
@@ -623,30 +524,32 @@ static int phobos_op_put(const struct lu_fid *fid,
 
                 /* I use this #define to deal with loooooong structures names */
 #define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
-                EASIER = malloc(HINTMAX);
+                EASIER = strdup(hinttab.hints[i].value);
                 if (!EASIER)
                     pho_error(-errno, "failed to allocate tags");
 
-                strncpy(EASIER, hinttab[i].v, HINTMAX);
                 xfer.xd_params.put.tags.n_tags += 1;
 #undef EASIER
             } else {
-                pho_warn("unknown hint '%s'",  hinttab[i].k);
+                pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }
         }
     }
 
     /* Finalize xfer_desc and to the PUT operation */
-    xfer.xd_objid = obj;
+    xfer.xd_objid = objid;
     xfer.xd_attrs = attrs;
     xfer.xd_params.put.overwrite = true;
     rc = phobos_put(&xfer, 1, NULL, NULL);
 
+free_xfer:
     /* free the tags as well */
     pho_xfer_desc_clean(&xfer);
+    if (hints->data)
+        hinttab_free(&hinttab);
 
     if (rc)
-        pho_error(rc, "Failed to write '%s' in Phobos", obj);
+        pho_error(rc, "Failed to write '%s' in Phobos", objid);
 
     return rc;
 }
@@ -961,7 +864,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     hai_get_user_data(hai, &hints);
 
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, NULL, src_fd, layout, &hints, &oid);
+    rc = phobos_op_put(&hai->hai_fid, src_fd, layout, &hints, &oid);
     llapi_layout_free(layout);
     pho_info("phobos_put (archive): rc=%d: %s", rc, strerror(-rc));
     if (rc)
