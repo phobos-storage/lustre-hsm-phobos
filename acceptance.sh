@@ -7,7 +7,6 @@ SERVERNAME=${SERVERNAME:-$(hostname)}
 
 mkdir -p "$LOG_DIR"
 
-ARCHIVE_PATH=$(mktemp -d)
 FIFO="$LOG_DIR/event_fifo"
 EVENTS="$LOG_DIR/hsm_events"
 PHOBOSD_LOG="$LOG_DIR/phobosd.log"
@@ -17,6 +16,7 @@ LUSTRE_ROOT=/mnt/lustre
 FSNAME=lustre
 SKIP=77
 COPYTOOL_PID=
+declare -a dirs
 if [ ! -z ${VALGRIND+x} ]
 then
     VALGRIND=${VALGRIND:-valgrind --leak-check=full --show-leak-kinds=all \
@@ -69,16 +69,13 @@ function phobos_setup()
     echo "Starting phobosd, log file: $PHOBOSD_LOG"
     start_phobosd
 
-    phobos dir add "$ARCHIVE_PATH" ||
-        error "Could not add $ARCHIVE_PATH"
-    phobos dir format --fs posix --unlock "$ARCHIVE_PATH" ||
-        error "Could not format $ARCHIVE_PATH"
-
-    for i in {1..2}
+    for i in {0..2}
     do
-        mkdir "${ARCHIVE_PATH}$i"
-        phobos dir add "${ARCHIVE_PATH}$i"
-        phobos dir format --fs posix --unlock "${ARCHIVE_PATH}$i"
+        dirs+=($(mktemp -d))
+
+        phobos dir add "${dirs[i]}"
+        phobos dir format --fs posix --unlock "${dirs[i]}"
+        phobos dir update --tags t$i "${dirs[i]}"
     done
 
     echo '' >> /etc/phobos.conf
@@ -98,7 +95,7 @@ function phobos_teardown()
     phobos_db drop_tables
     sudo -u postgres phobos_db drop_db
 
-    rm -rf "$ARCHIVE_PATH" "${ARCHIVE_PATH}1" "${ARCHIVE_PATH}2"
+    rm -rf "${dirs[@]}"
 }
 
 function lustre_is_mounted()
@@ -853,6 +850,47 @@ function test_rpm()
     meson compile rpm
 }
 add_test rpm
+
+function test_tag_hint()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    # Lock the directory with tag t0
+    phobos dir lock "${dirs[0]}"
+    trap_add "phobos dir unlock ${dirs[0]}"
+
+    local phobosd_pid=$(pgrep phobosd)
+    stop_phobosd
+    tail --pid $phobosd_pid -f /dev/null
+    start_phobosd
+
+    lfs hsm_archive --data "tag=t0" "$file"
+
+    # The archive should fail since no unlocked directory has the tag t0
+    wait_for_event ARCHIVE_ERROR "$file"
+}
+add_test tag_hint
+
+function test_invalid_tag_hint()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "tag=t0,tag=invalid" "$file"
+
+    # The archive should fail since no directory has the tag invalid
+    wait_for_event ARCHIVE_ERROR "$file"
+}
+add_test invalid_tag_hint
 
 run_tests
 
