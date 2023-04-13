@@ -55,6 +55,7 @@ libcopytool = static_library(
         'src/layout.c',
         'src/hints.c',
         'src/log.c',
+        'src/phobos.c',
     ],
     dependencies: [
         phobos_store,
