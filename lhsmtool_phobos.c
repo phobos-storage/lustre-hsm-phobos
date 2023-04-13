@@ -438,7 +438,7 @@ static int phobos_op_put(const struct lu_fid *fid,
 {
     struct pho_xfer_desc xfer = {0};
     struct pho_attrs attrs = {0};
-    struct hinttab hinttab;
+    struct hinttab hinttab = {0};
     char objid[MAXNAMLEN];
     struct stat st;
     int rc;
@@ -515,21 +515,9 @@ static int phobos_op_put(const struct lu_fid *fid,
 
             } else if (!strcmp(hinttab.hints[i].key, "tag")) {
                 /* Deal with storage tags */
-                if (xfer.xd_params.put.tags.n_tags == 0) {
-                    xfer.xd_params.put.tags.tags = malloc(sizeof(char **));
-
-                    if (!xfer.xd_params.put.tags.tags)
-                        pho_error(-errno, "failed to allocate tags");
-                }
-
-                /* I use this #define to deal with loooooong structures names */
-#define EASIER xfer.xd_params.put.tags.tags[xfer.xd_params.put.tags.n_tags]
-                EASIER = strdup(hinttab.hints[i].value);
-                if (!EASIER)
-                    pho_error(-errno, "failed to allocate tags");
-
-                xfer.xd_params.put.tags.n_tags += 1;
-#undef EASIER
+                rc = pho_xfer_add_tag(&xfer, hinttab.hints[i].value);
+                if (rc)
+                    goto free_xfer;
             } else {
                 pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }
