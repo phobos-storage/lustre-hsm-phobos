@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49bb2812_e187cc6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:24:20Z",
+      "side": 1,
+      "message": "typo: no d",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 49
+      },
+      "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "199908b8_78213ce0",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:24:20Z",
+      "side": 1,
+      "message": "minor: given the nature of the tags and the fact multiple can be given, maybe doing an preemptive check of the number of keys \"tag\" would be better, than you only have to do a single malloc for the list of tags itself",
+      "range": {
+        "startLine": 518,
+        "startChar": 21,
+        "endLine": 518,
+        "endChar": 37
+      },
+      "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "862b75a2_06e04e3f",
+        "filename": "src/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:24:20Z",
+      "side": 1,
+      "message": "minor: to remove",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 41
+      },
+      "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
