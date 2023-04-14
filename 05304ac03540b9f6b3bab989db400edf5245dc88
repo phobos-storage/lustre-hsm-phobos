@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "732db1c7_6ef43b14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:18:56Z",
+      "side": 1,
+      "message": "major: I wouldn\u0027t say you\u0027re testing it now, you\u0027re only testing it fails when there is no directory for the given tags. Having successful tests with this feature + checking the medium used is the correct one would be nice",
+      "range": {
+        "startLine": 10,
+        "startChar": 35,
+        "endLine": 10,
+        "endChar": 63
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75edcadb_f5745546",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:18:56Z",
+      "side": 1,
+      "message": "questin: why do you restart the phobosd ?",
+      "range": {
+        "startLine": 868,
+        "startChar": 4,
+        "endLine": 870,
+        "endChar": 17
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
