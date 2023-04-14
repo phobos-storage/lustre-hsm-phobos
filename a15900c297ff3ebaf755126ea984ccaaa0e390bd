@@ -210,6 +210,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95f72d6c_0f0ef2b2",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:11:12Z",
+      "side": 1,
+      "message": "It don\u0027t think that\u0027s true since when parsing the last key/value pair, end will be NULL",
+      "parentUuid": "eed3f8f1_52aa7a13",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 16
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed54599f_36996387",
         "filename": "src/hints.c",
         "patchSetId": 1
@@ -221,6 +245,30 @@
       "writtenOn": "2023-04-14T09:06:23Z",
       "side": 1,
       "message": "minor: don\u0027t you want to do a realloc here? or you think this is not a big deal?",
+      "range": {
+        "startLine": 105,
+        "startChar": 12,
+        "endLine": 105,
+        "endChar": 31
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efee0c7e_be2d0001",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:11:12Z",
+      "side": 1,
+      "message": "The memory will be free\u0027d just after the put so I don\u0027t think that\u0027s a big deal.",
+      "parentUuid": "ed54599f_36996387",
       "range": {
         "startLine": 105,
         "startChar": 12,
@@ -267,6 +315,30 @@
       "writtenOn": "2023-04-14T09:07:25Z",
       "side": 1,
       "message": "minor: I think you could easily mutualize both functions by using an if on the expected errno",
+      "range": {
+        "startLine": 87,
+        "startChar": 5,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc98be63_578e2c50",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:11:12Z",
+      "side": 1,
+      "message": "I prefer having simple test functions to make them more clear. It\u0027s already quite annoying to debug as is since you don\u0027t know the exact test case that failed.",
+      "parentUuid": "9ee8d13a_a6a43853",
       "range": {
         "startLine": 87,
         "startChar": 5,
@@ -336,6 +408,30 @@
       "writtenOn": "2023-04-14T09:07:25Z",
       "side": 1,
       "message": "question/suggest: no check on value/key being NULL ?",
+      "range": {
+        "startLine": 122,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 25
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c07dc5c_54888d60",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:11:12Z",
+      "side": 1,
+      "message": "I don\u0027t care about the value of key and value on failure. An implementation of this interface could successfully parse the key and set it but fail to parse the value. This is not the case currently but since their value is irrelevant in a case of failure, there is no need to add them to the constraints imposed on the API.",
+      "parentUuid": "993be9da_a605bae1",
       "range": {
         "startLine": 122,
         "startChar": 8,
