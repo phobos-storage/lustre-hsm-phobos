@@ -279,6 +279,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8333c906_7f9e9901",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-04-14T13:08:03Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "efee0c7e_be2d0001",
+      "range": {
+        "startLine": 105,
+        "startChar": 12,
+        "endLine": 105,
+        "endChar": 31
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24690bd1_72644754",
