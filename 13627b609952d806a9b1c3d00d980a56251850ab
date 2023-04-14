@@ -68,6 +68,30 @@
       },
       "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd16996a_2cbbbe42",
+        "filename": "src/phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:01:07Z",
+      "side": 1,
+      "message": "Nope, this was added on purpose.",
+      "parentUuid": "862b75a2_06e04e3f",
+      "range": {
+        "startLine": 23,
+        "startChar": 4,
+        "endLine": 23,
+        "endChar": 41
+      },
+      "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
