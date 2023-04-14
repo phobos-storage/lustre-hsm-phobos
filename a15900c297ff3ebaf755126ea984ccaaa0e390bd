@@ -24,6 +24,144 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "611e07d1_4137bc1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "uhhhhh",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 61
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a61dd9e5_850ea568",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "comment: that is definitely easier",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 75
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68a0890f_9e814cab",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "suggest: that check can be done before the strchr, and no need for the \"and\"",
+      "range": {
+        "startLine": 19,
+        "startChar": 16,
+        "endLine": 19,
+        "endChar": 30
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a209aec_720f4b9d",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "suggest: \"given string does not contain a \u0027\u003d\u0027\"",
+      "range": {
+        "startLine": 20,
+        "startChar": 11,
+        "endLine": 20,
+        "endChar": 24
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4595b50_755c26c9",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "suggest: unnecessary check if you do what I suggested above",
+      "range": {
+        "startLine": 23,
+        "startChar": 8,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2098fc74_4a6c673b",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "suggest: no need for a variable here, since it is its only usage",
+      "range": {
+        "startLine": 30,
+        "startChar": 19,
+        "endLine": 30,
+        "endChar": 23
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e9de7add_7c786e4b",
@@ -42,6 +180,29 @@
         "startChar": 0,
         "endLine": 48,
         "endChar": 5
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eed3f8f1_52aa7a13",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "minor: add a log to say there was no value associated to that key",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 16
       },
       "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -72,6 +233,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "24690bd1_72644754",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "question: so you do not consider this an error ?",
+      "range": {
+        "startLine": 52,
+        "startChar": 12,
+        "endLine": 52,
+        "endChar": 35
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ee8d13a_a6a43853",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "minor: I think you could easily mutualize both functions by using an if on the expected errno",
+      "range": {
+        "startLine": 87,
+        "startChar": 5,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0f8f4468_0fd68677",
         "filename": "tests/unit.c",
         "patchSetId": 1
@@ -88,6 +295,75 @@
         "startChar": 12,
         "endLine": 99,
         "endChar": 28
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2901353f_2ae36374",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "question: I don\u0027t understand how this is en error, but \"key\u003d,\" isn\u0027t...",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 100,
+        "endChar": 37
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "993be9da_a605bae1",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "question/suggest: no check on value/key being NULL ?",
+      "range": {
+        "startLine": 122,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 25
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "368edf8c_452bf5e2",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-14T09:07:25Z",
+      "side": 1,
+      "message": "suggest: parse_hint_success",
+      "range": {
+        "startLine": 195,
+        "startChar": 25,
+        "endLine": 195,
+        "endChar": 45
       },
       "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
