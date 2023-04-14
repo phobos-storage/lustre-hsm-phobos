@@ -49,6 +49,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "334ec8ef_f6ad9002",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:16:17Z",
+      "side": 1,
+      "message": "A few mallocs compared to a read or write on a tape seems small enough to leave the code as is.",
+      "parentUuid": "199908b8_78213ce0",
+      "range": {
+        "startLine": 518,
+        "startChar": 21,
+        "endLine": 518,
+        "endChar": 37
+      },
+      "revId": "13627b609952d806a9b1c3d00d980a56251850ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "862b75a2_06e04e3f",
         "filename": "src/phobos.c",
         "patchSetId": 1
