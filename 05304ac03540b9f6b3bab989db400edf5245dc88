@@ -93,6 +93,30 @@
       },
       "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d04e311_735acccf",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-04-14T11:47:16Z",
+      "side": 1,
+      "message": "Because locking and unlocking dirs do not do any communication with the daemon, as they are considered as media.",
+      "parentUuid": "0b538949_c2d5eebe",
+      "range": {
+        "startLine": 868,
+        "startChar": 4,
+        "endLine": 870,
+        "endChar": 17
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
