@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd69cad1_f771484e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:14:33Z",
+      "side": 1,
+      "message": "I am testing that the tag is succesfully sent to phobosd. Having an archive that fails when giving invalid tags is enough to know that they are parsed and send correctly. So yes, the hint feature is tested now.",
+      "parentUuid": "732db1c7_6ef43b14",
+      "range": {
+        "startLine": 10,
+        "startChar": 35,
+        "endLine": 10,
+        "endChar": 63
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "75edcadb_f5745546",
         "filename": "acceptance.sh",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2023-04-14T09:18:56Z",
       "side": 1,
       "message": "questin: why do you restart the phobosd ?",
+      "range": {
+        "startLine": 868,
+        "startChar": 4,
+        "endLine": 870,
+        "endChar": 17
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b538949_c2d5eebe",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-04-14T10:14:33Z",
+      "side": 1,
+      "message": "Because phobosd doesn\u0027t look at the tags from some reason if they are updated dynamicaly. This is the only way to make sure that the daemon has a correct value in memory. I thought that locking and unlock the dir would be enough but apparently not.",
+      "parentUuid": "75edcadb_f5745546",
       "range": {
         "startLine": 868,
         "startChar": 4,
