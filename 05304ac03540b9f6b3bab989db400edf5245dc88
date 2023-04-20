@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14ddacd3_ae588a36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-20T09:32:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "dd69cad1_f771484e",
+      "range": {
+        "startLine": 10,
+        "startChar": 35,
+        "endLine": 10,
+        "endChar": 63
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75edcadb_f5745546",
@@ -109,6 +133,30 @@
       "side": 1,
       "message": "Because locking and unlocking dirs do not do any communication with the daemon, as they are considered as media.",
       "parentUuid": "0b538949_c2d5eebe",
+      "range": {
+        "startLine": 868,
+        "startChar": 4,
+        "endLine": 870,
+        "endChar": 17
+      },
+      "revId": "05304ac03540b9f6b3bab989db400edf5245dc88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd567936_5e134294",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-04-20T09:32:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2d04e311_735acccf",
       "range": {
         "startLine": 868,
         "startChar": 4,
