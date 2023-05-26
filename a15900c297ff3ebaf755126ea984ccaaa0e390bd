@@ -283,6 +283,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66ec6396_216a4682",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-05-26T08:47:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8ce0b520_7dfeb36c",
+      "range": {
+        "startLine": 23,
+        "startChar": 8,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2098fc74_4a6c673b",
@@ -320,6 +344,30 @@
       "side": 1,
       "message": "The code is a bit nicer to read with this variable.",
       "parentUuid": "2098fc74_4a6c673b",
+      "range": {
+        "startLine": 30,
+        "startChar": 19,
+        "endLine": 30,
+        "endChar": 23
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50ef4d75_94edf699",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-05-26T08:47:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0be0a849_345fec01",
       "range": {
         "startLine": 30,
         "startChar": 19,
@@ -390,6 +438,30 @@
       "side": 1,
       "message": "It don\u0027t think that\u0027s true since when parsing the last key/value pair, end will be NULL",
       "parentUuid": "eed3f8f1_52aa7a13",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 16
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aee1a4f_12d5dce0",
+        "filename": "src/hints.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-05-26T08:47:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "95f72d6c_0f0ef2b2",
       "range": {
         "startLine": 50,
         "startChar": 4,
@@ -565,6 +637,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21eb1473_97645557",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-05-26T08:47:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fc98be63_578e2c50",
+      "range": {
+        "startLine": 87,
+        "startChar": 5,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f8f4468_0fd68677",
@@ -696,6 +792,30 @@
       "side": 1,
       "message": "I don\u0027t care about the value of key and value on failure. An implementation of this interface could successfully parse the key and set it but fail to parse the value. This is not the case currently but since their value is irrelevant in a case of failure, there is no need to add them to the constraints imposed on the API.",
       "parentUuid": "993be9da_a605bae1",
+      "range": {
+        "startLine": 122,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 25
+      },
+      "revId": "a15900c297ff3ebaf755126ea984ccaaa0e390bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d067ce9_19b2b6d5",
+        "filename": "tests/unit.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-05-26T08:47:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8c07dc5c_54888d60",
       "range": {
         "startLine": 122,
         "startChar": 8,
