@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9547be75_917e46e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-05-31T08:04:17Z",
+      "side": 1,
+      "message": "This patch is OK for me. There is juste the \"FIXME\". Could it be done ? Or is it definitly too complex ?",
+      "revId": "d1522d87ac6b0330934dae4843094dc8b83d3d98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a7f6f1d_f38f657a",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-05-31T08:04:17Z",
+      "side": 1,
+      "message": "major: didn\u0027t we say \"no TODO or FIXME\" ?",
+      "range": {
+        "startLine": 377,
+        "startChar": 4,
+        "endLine": 377,
+        "endChar": 63
+      },
+      "revId": "d1522d87ac6b0330934dae4843094dc8b83d3d98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
