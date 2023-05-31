@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea555d48_4ab36c39",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-05-31T08:08:47Z",
+      "side": 1,
+      "message": "I vote for adding one \"positiv\" test, not only \"negativ\" ones.",
+      "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e492015_c717493f",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 949,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-05-31T08:08:47Z",
+      "side": 1,
+      "message": "major: only \"negativ\" tests are added. At least, one \"positiv\" test would be a good addition. Setting a tag and checking that the new object is really created on a medium with this tag.",
+      "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
