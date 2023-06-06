@@ -33,6 +33,24 @@
       "message": "major: only \"negativ\" tests are added. At least, one \"positiv\" test would be a good addition. Setting a tag and checking that the new object is really created on a medium with this tag.",
       "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fe6de70_5a1ddd0f",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 949,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-06-06T08:25:45Z",
+      "side": 1,
+      "message": "I\u0027ve had an exchange with Yoann on this. The test would not add much to the test suite. All I really care about is that the tag is parsed and sent correctly to phobos. Whether the tag is valid or not does not change the test coverage of the hint processing feature. What I could add that would add value to the test suite is a bunch of invalid tag formats, but since this is tested in the unit tests, I didn\u0027t do it here.",
+      "parentUuid": "6e492015_c717493f",
+      "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
