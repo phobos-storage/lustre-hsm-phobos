@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f791f1e_43851681",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2023-06-06T08:21:15Z",
+      "side": 1,
+      "message": "defect? not sure if this is important or not in this project, but objid is not released (and the xfer not cleaned) in case of error",
+      "range": {
+        "startLine": 383,
+        "startChar": 8,
+        "endLine": 383,
+        "endChar": 64
+      },
+      "revId": "33bcad10a02fe0d49bb014df36fc551bf93ba51b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
