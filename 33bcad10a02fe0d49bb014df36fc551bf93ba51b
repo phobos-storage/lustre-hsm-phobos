@@ -22,6 +22,30 @@
       },
       "revId": "33bcad10a02fe0d49bb014df36fc551bf93ba51b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0aaf45d_b5a9e6fd",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-06-06T08:29:13Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand your comment. In case of error, we call pho_xfer_dexc_clean and free xd_objid. obj is free\u0027d by hinttab_free.",
+      "parentUuid": "0f791f1e_43851681",
+      "range": {
+        "startLine": 383,
+        "startChar": 8,
+        "endLine": 383,
+        "endChar": 64
+      },
+      "revId": "33bcad10a02fe0d49bb014df36fc551bf93ba51b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
