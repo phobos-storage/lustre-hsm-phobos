@@ -51,6 +51,24 @@
       "parentUuid": "6e492015_c717493f",
       "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c07fdcc9_f04623e6",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 949,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-06-07T07:56:00Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1fe6de70_5a1ddd0f",
+      "revId": "90513601c17d1855a825fd6b1ed704d2c736d176",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
