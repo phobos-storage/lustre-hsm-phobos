@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89025d3e_15ce8c63",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-19T10:02:48Z",
+      "side": 1,
+      "message": "New copytool version (compatible phobos 1.95)",
+      "revId": "453b555d7cf8e92d170d90ec924006ec19658088",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
