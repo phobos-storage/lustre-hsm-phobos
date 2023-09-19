@@ -40,6 +40,13 @@ runs Phobos' LRS daemon (version > 1.93).
 
 %changelog
 
+* Tue Sep 19 2023 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2-1
+- hints: fix hints processing
+- rpm: allow lhsmtool_phobos to be used as systemd service
+- log: use Phobos log macros
+- phobos: update to new version of the API
+- archive: remove object from phobos if llapi_hsm_action_end fails
+
 * Mon Oct 24 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.1-1
 - Rename CLI option --hsm_fuid/-t to --fuid-xattr/-x
 - Store the file layout in Phobos' user_md
