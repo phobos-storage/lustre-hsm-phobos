@@ -8,7 +8,7 @@ License: LGPLv3
 URL:     https://github.com/phobos-storage/lustre-hsm-phobos
 Source0: %{name}-%{version}.tar.xz
 
-Requires: phobos >= 1.93
+Requires: phobos >= 1.95
 Requires: lustre-client
 
 BuildRequires: meson
@@ -16,12 +16,12 @@ BuildRequires: gcc
 BuildRequires: lustre-client
 BuildRequires: glib2-devel >= 2.28
 BuildRequires: jansson-devel >= 2.5
-BuildRequires: phobos >= 1.93
-BuildRequires: phobos-devel >= 1.93
+BuildRequires: phobos >= 1.95
+BuildRequires: phobos-devel >= 1.95
 
 %description
 A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
-runs Phobos' LRS daemon (version > 1.93).
+runs Phobos' LRS daemon (version > 1.95).
 
 %prep
 %autosetup
@@ -39,6 +39,13 @@ runs Phobos' LRS daemon (version > 1.93).
 %config(noreplace) %{_sysconfdir}/sysconfig/lhsmtool_phobos.sysconfig
 
 %changelog
+
+* Tue Sep 19 2023 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2-1
+- hints: fix hints processing
+- rpm: allow lhsmtool_phobos to be used as systemd service
+- log: use Phobos log macros
+- phobos: update to new version of the API (1.95)
+- archive: remove object from phobos if llapi_hsm_action_end fails
 
 * Mon Oct 24 2022 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.1-1
 - Rename CLI option --hsm_fuid/-t to --fuid-xattr/-x
