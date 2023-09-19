@@ -5,7 +5,7 @@
 ### Requirements
 
 The copytool needs [Phobos](https://github.com/phobos-storage/phobos) version
-1.93 or later. It has been tested with Lustre 2.12.7.
+1.95 or later. It has been tested with Lustre 2.12.7.
 
 `rpmbuild` is also required to generate the RPMs.
 
