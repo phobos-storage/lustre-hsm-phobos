@@ -13,6 +13,7 @@ FIFO="$LOG_DIR/event_fifo"
 EVENTS="$LOG_DIR/hsm_events"
 PHOBOSD_LOG="$LOG_DIR/phobosd.log"
 PHOBOSD_LOCK=/tmp/phobosd.lock
+PHOBOSD_PID=/tmp/phobosd.pid
 PHOBOSD_SOCKET=/tmp/lrs
 LUSTRE_ROOT=/mnt/lustre
 FSNAME=lustre
@@ -53,7 +54,7 @@ function skip()
 
 function start_phobosd()
 {
-    phobosd $VERBOSE &> "$PHOBOSD_LOG" ||
+    DAEMON_PID_FILEPATH=$PHOBOSD_PID phobosd $VERBOSE &> "$PHOBOSD_LOG" ||
         error "Failed to start phobosd"
 }
 
