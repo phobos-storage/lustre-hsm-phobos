@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "467a4ba1_0b20120b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-09-19T10:10:23Z",
+      "side": 1,
+      "message": "New version compatible with phobos 1.95\n\n(Change id is missing /!\\)",
+      "revId": "ee64bc4e7ec13440e04cdf83a484cb3f11443194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
