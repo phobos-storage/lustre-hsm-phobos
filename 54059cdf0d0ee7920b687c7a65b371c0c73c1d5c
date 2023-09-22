@@ -16,6 +16,29 @@
       "message": "New copytool version (It conforms with phobos 1.95.)\n\n(And we have the change id and the patch signature ...)",
       "revId": "54059cdf0d0ee7920b687c7a65b371c0c73c1d5c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bce5998_ebfe94b4",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2023-09-22T14:38:20Z",
+      "side": 1,
+      "message": "defect: yes",
+      "range": {
+        "startLine": 11,
+        "startChar": 10,
+        "endLine": 11,
+        "endChar": 24
+      },
+      "revId": "54059cdf0d0ee7920b687c7a65b371c0c73c1d5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
