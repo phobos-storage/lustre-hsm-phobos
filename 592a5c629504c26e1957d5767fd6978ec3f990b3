@@ -16,6 +16,29 @@
       "message": "Tested on local cluster.",
       "revId": "592a5c629504c26e1957d5767fd6978ec3f990b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bf8567e_e3c1c09f",
+        "filename": "README.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2023-10-03T07:20:25Z",
+      "side": 1,
+      "message": "minor: je mettrais plutôt 2.12.x and 2.15.0. Sachant qu\u0027il faudrait plutôt le tester sur 2.15.3.",
+      "range": {
+        "startLine": 8,
+        "startChar": 49,
+        "endLine": 8,
+        "endChar": 52
+      },
+      "revId": "592a5c629504c26e1957d5767fd6978ec3f990b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
