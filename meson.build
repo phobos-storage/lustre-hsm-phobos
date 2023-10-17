@@ -94,7 +94,9 @@ meson.add_dist_script('utils/add_specfile_to_dist.sh')
 custom_target('rpm',
     output: 'lhsmtool_phobos-' + meson.project_version() + '.rpm',
     command: [
-        '../utils/make_rpm.sh', meson.current_build_dir(), meson.project_version()
+        meson.current_source_dir() + '/utils/make_rpm.sh',
+        meson.current_build_dir(),
+        meson.project_version(),
     ],
 )
 
