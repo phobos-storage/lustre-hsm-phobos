@@ -13,7 +13,7 @@ Requires: lustre-client
 
 BuildRequires: meson
 BuildRequires: gcc
-BuildRequires: lustre-client
+BuildRequires: (lustre-client < 2.15 or lustre-devel)
 BuildRequires: glib2-devel >= 2.28
 BuildRequires: jansson-devel >= 2.5
 BuildRequires: phobos >= 1.95
