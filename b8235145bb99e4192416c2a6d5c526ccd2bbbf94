@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81fc0e0c_61b431c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2023-10-20T08:03:08Z",
+      "side": 1,
+      "message": "Checked on local cluster",
+      "revId": "b8235145bb99e4192416c2a6d5c526ccd2bbbf94",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
