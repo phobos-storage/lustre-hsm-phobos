@@ -112,8 +112,8 @@ int open_with_extension(const char *base, const char *extension, int flags)
         return -1;
     }
 
-    strncpy(buf, base, base_len);
-    strncpy(buf + base_len, extension, extension_len);
+    memcpy(buf, base, base_len);
+    memcpy(buf + base_len, extension, extension_len);
     buf[base_len + extension_len] = '\0';
 
     fd = open(buf, flags);
