@@ -10,6 +10,6 @@ fi
 BUILDDIR=$1
 VERSION=$2
 
-ninja -C "$BUILDDIR" dist
+meson dist -C "$BUILDDIR" --no-tests
 rpmbuild --define="_topdir $PWD/rpms" \
     -ta "$BUILDDIR/meson-dist/lhsmtool_phobos-$VERSION.tar.xz"

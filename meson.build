@@ -16,7 +16,7 @@ project(
 )
 
 add_project_arguments(
-    [ '-DHAVE_CONFIG_H', '-Wno-pedantic' ],
+    [ '-DHAVE_CONFIG_H', '-Wno-pedantic' , '-Wno-stringop-truncation' ],
     language: 'c'
 )
 
