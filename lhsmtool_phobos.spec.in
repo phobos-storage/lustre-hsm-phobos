@@ -44,6 +44,10 @@ runs Phobos' LRS daemon (version > 1.95).
 
 %changelog
 
+* Wed Sep 09 2024 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.2.1-1
+- support phobos version 1.95.1
+- support GCC 11.4.1
+
 * Tue Sep 19 2023 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2-1
 - hints: fix hints processing
 - rpm: allow lhsmtool_phobos to be used as systemd service
