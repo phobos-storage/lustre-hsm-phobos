@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b03a6b1a_308c76c7",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2024-09-11T14:08:10Z",
+      "side": 1,
+      "message": "question: why not go straight to 2.0 ?",
+      "range": {
+        "startLine": 48,
+        "startChar": 10,
+        "endLine": 48,
+        "endChar": 31
+      },
+      "revId": "8ed32302a2f3214bdaa05b98aad113c319955db5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
