@@ -416,9 +416,9 @@ static int component_to_attr(struct llapi_layout *layout, void *user_data)
         goto out_free;
 
     if (llapi_layout_is_composite(layout))
-        rc = pho_attr_set(attrs, id_str, component_str);
+        pho_attr_set(attrs, id_str, component_str);
     else
-        rc = pho_attr_set(attrs, "layout", component_str);
+        pho_attr_set(attrs, "layout", component_str);
 
     pho_info("adding layout information key='%s', value='%s'",
              id_str ? : "layout", component_str);
@@ -452,9 +452,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     /* only used for logging, not an error if allocation failed */
     *oid = strdup(objid);
 
-    rc = pho_attr_set(&attrs, "program", "copytool");
-    if (rc)
-        return rc;
+    pho_attr_set(&attrs, "program", "copytool");
 
     if (layout) {
         rc = llapi_layout_comp_iterate(layout, component_to_attr,
