@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5559b77_1a8b366e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2024-09-11T13:13:23Z",
+      "side": 1,
+      "message": "typo: careful",
+      "range": {
+        "startLine": 11,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 52
+      },
+      "revId": "444ca8655e2a05e2cf0417df77957015ac343927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "074fa3e6_ca8c4933",
+        "filename": "utils/make_rpm.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2024-09-11T13:13:23Z",
+      "side": 1,
+      "message": "question: is this normal ? If so, it should be documented in the commit message",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 36
+      },
+      "revId": "444ca8655e2a05e2cf0417df77957015ac343927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
