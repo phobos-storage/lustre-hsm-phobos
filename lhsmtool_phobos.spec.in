@@ -19,6 +19,10 @@ BuildRequires: jansson-devel >= 2.5
 BuildRequires: phobos >= 1.95
 BuildRequires: phobos-devel >= 1.95
 
+# FIXME these should be fixed in Phobos
+BuildRequires: openssl-devel >= 0.9.7
+BuildRequires: xxhash-devel
+
 %description
 A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
 runs Phobos' LRS daemon (version > 1.95).
