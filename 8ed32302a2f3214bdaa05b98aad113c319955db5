@@ -22,6 +22,30 @@
       },
       "revId": "8ed32302a2f3214bdaa05b98aad113c319955db5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af3505ad_0b978e2a",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2024-09-12T07:43:36Z",
+      "side": 1,
+      "message": "Because the compilation issue comes from this version. I haven\u0027t tried compiling it on 2.0.",
+      "parentUuid": "b03a6b1a_308c76c7",
+      "range": {
+        "startLine": 48,
+        "startChar": 10,
+        "endLine": 48,
+        "endChar": 31
+      },
+      "revId": "8ed32302a2f3214bdaa05b98aad113c319955db5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
