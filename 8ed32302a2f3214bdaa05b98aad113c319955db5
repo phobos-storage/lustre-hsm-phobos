@@ -46,6 +46,30 @@
       },
       "revId": "8ed32302a2f3214bdaa05b98aad113c319955db5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dce94e5_957c7206",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2024-09-13T13:53:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "af3505ad_0b978e2a",
+      "range": {
+        "startLine": 48,
+        "startChar": 10,
+        "endLine": 48,
+        "endChar": 31
+      },
+      "revId": "8ed32302a2f3214bdaa05b98aad113c319955db5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
