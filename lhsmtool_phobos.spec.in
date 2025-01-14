@@ -8,7 +8,7 @@ License: LGPLv3
 URL:     https://github.com/phobos-storage/lustre-hsm-phobos
 Source0: %{name}-%{version}.tar.xz
 
-Requires: phobos >= 1.95
+Requires: phobos >= 2.2
 Requires: lustre-client
 
 BuildRequires: meson
@@ -16,8 +16,8 @@ BuildRequires: gcc
 BuildRequires: (lustre-client < 2.15 or lustre-devel)
 BuildRequires: glib2-devel >= 2.28
 BuildRequires: jansson-devel >= 2.5
-BuildRequires: phobos >= 1.95
-BuildRequires: phobos-devel >= 1.95
+BuildRequires: phobos >= 2.2
+BuildRequires: phobos-devel >= 2.2
 
 # FIXME these should be fixed in Phobos
 BuildRequires: openssl-devel >= 0.9.7
@@ -25,7 +25,7 @@ BuildRequires: xxhash-devel
 
 %description
 A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
-runs Phobos' LRS daemon (version > 1.95).
+runs Phobos' LRS daemon (version >= 2.2).
 
 %prep
 %autosetup

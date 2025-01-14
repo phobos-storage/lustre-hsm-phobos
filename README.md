@@ -5,7 +5,7 @@
 ### Requirements
 
 The copytool needs [Phobos](https://github.com/phobos-storage/phobos) version
-1.95 or later. It has been tested with Lustre 2.12.x and 2.15.0.
+2.2 or later. It has been tested with Lustre 2.12.x and 2.15.0.
 
 `rpmbuild` is also required to generate the RPMs.
 
@@ -102,7 +102,10 @@ separated key value pairs (`k1=v1,k2=v2`). The supported hints are:
 | `hsm_fuid`    | A printable string of characters                   | Remove          |
 | `family`      | Any valid Phobos family (e.g. `dir`, `tape`, etc.) | Archive         |
 | `layout`      | Any valid Phobos layout (e.g. `raid1`)             | Archive         |
-| `alias`       | Any valid alias defined in the configuration       | Archive         |
+| `alias`       | Any valid profile defined in the configuration     | Archive         |
+| `profile`     | Any valid profile defined in the configuration     | Archive         |
 | `tag`         | A printable string of characters                   | Archive         |
 
+**Note:** the alias hint is the old name of the profile hint. As we may remove
+it in a future version of the copytool, please use profile instead.
 **Note:** the tag hint can be specified several times to add more tags.

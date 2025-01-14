@@ -333,6 +333,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 
 static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 {
+    struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
     struct hinttab hinttab;
     const char *obj = NULL;
@@ -372,10 +373,11 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     }
 
     /* DO THE DELETE */
-    memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_DEL;
-    xfer.xd_objid = strdup(obj);
-    if (!xfer.xd_objid)
+    xfer.xd_ntargets = 1;
+    xfer.xd_targets = &xtgt;
+    xtgt.xt_objid = strdup(obj);
+    if (!xtgt.xt_objid)
         return -errno;
 
     rc = phobos_delete(&xfer, 1);
@@ -383,8 +385,8 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
         pho_error(rc, "Failed to delete '%s' from Phobos", obj);
 
     /* Cleanup and exit */
+    free(xtgt.xt_objid);
     pho_xfer_desc_clean(&xfer);
-    free(xfer.xd_objid);
 
 free_hints:
     if (hints->data)
@@ -438,6 +440,7 @@ static int phobos_op_put(const struct lu_fid *fid,
                          const struct buf *hints,
                          char **oid)
 {
+    struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
     struct pho_attrs attrs = {0};
     struct hinttab hinttab = {0};
@@ -463,10 +466,11 @@ static int phobos_op_put(const struct lu_fid *fid,
         }
     }
 
-    memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_PUT;
-    xfer.xd_fd = fd;
     xfer.xd_flags = 0;
+    xfer.xd_ntargets = 1;
+    xfer.xd_targets = &xtgt;
+    xtgt.xt_fd = fd;
 
     /* set oid in xattr for later use */
     rc = fsetxattr(fd, trusted_fuid_xattr, objid, strlen(objid), XATTR_CREATE);
@@ -478,7 +482,7 @@ static int phobos_op_put(const struct lu_fid *fid,
         goto free_xfer;
     }
 
-    xfer.xd_params.put.size = st.st_size;
+    xtgt.xt_size = st.st_size;
 
     /* Using default family (can be amended later by a hint) */
     xfer.xd_params.put.family = opt.o_default_family;
@@ -511,7 +515,12 @@ static int phobos_op_put(const struct lu_fid *fid,
                 xfer.xd_params.put.layout_name = hinttab.hints[i].value;
 
             } else if (!strcmp(hinttab.hints[i].key, "alias")) {
-                xfer.xd_params.put.alias = hinttab.hints[i].value;
+                pho_warn("'alias' hint is deprecated, and may be removed in "
+                         "future versions; please use 'profile' instead");
+                xfer.xd_params.put.profile = hinttab.hints[i].value;
+
+            } else if (!strcmp(hinttab.hints[i].key, "profile")) {
+                xfer.xd_params.put.profile = hinttab.hints[i].value;
 
             } else if (!strcmp(hinttab.hints[i].key, "tag")) {
                 /* Deal with storage tags */
@@ -525,8 +534,8 @@ static int phobos_op_put(const struct lu_fid *fid,
     }
 
     /* Finalize xfer_desc and to the PUT operation */
-    xfer.xd_objid = objid;
-    xfer.xd_attrs = attrs;
+    xtgt.xt_objid = objid;
+    xtgt.xt_attrs = attrs;
     xfer.xd_params.put.overwrite = true;
     rc = phobos_put(&xfer, 1, NULL, NULL);
 
@@ -547,6 +556,7 @@ static int phobos_op_get(const struct lu_fid *fid,
                          UNUSED const struct buf *hints,
                          int fd)
 {
+    struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
     char objid[MAXNAMLEN];
     char *obj = NULL;
@@ -562,11 +572,12 @@ static int phobos_op_get(const struct lu_fid *fid,
         obj = objid;
     }
 
-    memset(&xfer, 0, sizeof(xfer));
     xfer.xd_op = PHO_XFER_OP_GET;
-    xfer.xd_fd = fd;
     xfer.xd_flags = 0;
-    xfer.xd_objid = obj;
+    xfer.xd_ntargets = 1;
+    xfer.xd_targets = &xtgt;
+    xtgt.xt_fd = fd;
+    xtgt.xt_objid = obj;
 
     rc = phobos_get(&xfer, 1, NULL, NULL);
 
@@ -583,6 +594,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
                                UNUSED const struct buf *hints,
                                struct llapi_layout **layout)
 {
+    struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
     char objid[MAXNAMLEN];
     char *obj = NULL;
@@ -598,10 +610,11 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
         obj = objid;
     }
 
-    memset(&xfer, 0, sizeof(xfer));
-    xfer.xd_objid = obj;
     xfer.xd_op = PHO_XFER_OP_GETMD;
     xfer.xd_flags = 0;
+    xfer.xd_ntargets = 1;
+    xfer.xd_targets = &xtgt;
+    xtgt.xt_objid = obj;
 
     rc = phobos_getmd(&xfer, 1, NULL, NULL);
     if (rc) {
@@ -609,7 +622,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
         return rc;
     }
 
-    rc = layout_from_object_md(&xfer.xd_attrs, layout);
+    rc = layout_from_object_md(&xtgt.xt_attrs, layout);
     if (rc)
         return -rc;
 
