@@ -102,7 +102,7 @@ separated key value pairs (`k1=v1,k2=v2`). The supported hints are:
 | `hsm_fuid`    | A printable string of characters                   | Remove          |
 | `family`      | Any valid Phobos family (e.g. `dir`, `tape`, etc.) | Archive         |
 | `layout`      | Any valid Phobos layout (e.g. `raid1`)             | Archive         |
-| `alias`       | Any valid alias defined in the configuration       | Archive         |
+| `profile`     | Any valid profile defined in the configuration     | Archive         |
 | `tag`         | A printable string of characters                   | Archive         |
 
 **Note:** the tag hint can be specified several times to add more tags.

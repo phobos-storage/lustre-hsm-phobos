@@ -86,7 +86,7 @@ function phobos_setup()
     done
 
     echo '' >> /etc/phobos.conf
-    echo '[alias "test_alias"]' >> /etc/phobos.conf
+    echo '[profile "test_profile"]' >> /etc/phobos.conf
     echo 'layout = raid1' >> /etc/phobos.conf
     echo 'lyt-params = repl_count=3' >> /etc/phobos.conf
 }
@@ -834,7 +834,7 @@ function test_fuid_xattr()
 add_test fuid_xattr --fuid-xattr
 add_test fuid_xattr -x
 
-function test_phobos_alias()
+function test_phobos_profile()
 {
     local file="$test_dir/file"
 
@@ -845,17 +845,17 @@ function test_phobos_alias()
     add_event_watch
     start_copytool
 
-    lfs hsm_archive --data "alias=test_alias" "$file"
+    lfs hsm_archive --data "profile=test_profile" "$file"
     wait_for_event ARCHIVE_FINISH "$file"
 
     local repl_count=$(phobos extent list -o ext_count "$oid")
     if [[ $repl_count != 3 ]]
     then
-        error "Invalid repl_count for alias 'test_alias'." \
+        error "Invalid repl_count for profile 'test_profile'." \
               "Expected '3', got '$repl_count'"
     fi
 }
-add_test phobos_alias
+add_test phobos_profile
 
 # XXX /!\ unfortunatly, valgrind returns the exit code of the process if its
 # exit status is non zero. Which means that we cannot easily automate memory
