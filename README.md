@@ -29,7 +29,7 @@ For Phobos setup see [phobos-storage/phobos](https://github.com/phobos-storage/p
 
 On the MDT:
 ```
-lfs set_param mdt.<MTDNAME>.hsm_control=enabled
+lctl set_param mdt.<MTDNAME>.hsm_control=enabled
 ```
 
 ### Start the copytool
