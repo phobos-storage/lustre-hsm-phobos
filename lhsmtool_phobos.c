@@ -48,6 +48,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <pthread.h>
+#include <pwd.h>
 #include <time.h>
 #include <unistd.h>
 #include <utime.h>
@@ -445,6 +446,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     struct pho_attrs attrs = {0};
     struct hinttab hinttab = {0};
     char objid[MAXNAMLEN];
+    struct passwd *pwd;
     struct stat st;
     int rc;
 
@@ -483,6 +485,12 @@ static int phobos_op_put(const struct lu_fid *fid,
     }
 
     xtgt.xt_size = st.st_size;
+
+    pwd = getpwuid(st.st_uid);
+    if (pwd == NULL)
+        pho_error(-errno, "failed to set username to '%s'", objid);
+    else
+        pho_attr_set(&attrs, "username", pwd->pw_name);
 
     /* Using default family (can be amended later by a hint) */
     xfer.xd_params.put.family = opt.o_default_family;

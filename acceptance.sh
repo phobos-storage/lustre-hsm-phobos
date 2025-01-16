@@ -497,6 +497,26 @@ global_setup
 ## Tests ##
 ###########
 
+function invalid_file_attr()
+{
+    local file="$1"
+    local expected="$2"
+
+    error -e "Invalid user_md for $file:\n" \
+             "got: $(get_file_user_md "$file")\n" \
+             "expected: $expected"
+}
+
+function check_file_attrs()
+{
+    local file="$1"
+    local oid="$(get_oid_from_path "$file")"
+    local username="$(id -un)"
+
+    user_md_contains "$oid" "username" "$username" ||
+        invalid_file_attr "$file" "$username"
+}
+
 function test_no_daemon()
 {
     local file="$test_dir/file"
@@ -541,6 +561,8 @@ function test_archive_release_restore()
 
     lfs hsm_archive "$file"
     wait_for_event ARCHIVE_FINISH "$file"
+
+    check_file_attrs "$file"
 
     lfs hsm_release "$file"
 
