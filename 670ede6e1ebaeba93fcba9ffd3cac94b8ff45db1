@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2de9303f_f9efb5d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-01-16T09:13:59Z",
+      "side": 1,
+      "message": "minor: you could also add the use of the string_array to manage tags in xfer .",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 11
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
