@@ -22,6 +22,69 @@
       },
       "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be4c5429_15067066",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-01-16T14:42:07Z",
+      "side": 1,
+      "message": "We should bump the minimum requirement for Phobos in the specfile.",
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69b7ad7_8098b507",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-01-16T14:42:07Z",
+      "side": 1,
+      "message": "Regarding my comment on the backward compatibility with alias, we should still mention alias here depending on how it is managed.",
+      "range": {
+        "startLine": 105,
+        "startChar": 3,
+        "endLine": 105,
+        "endChar": 10
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b76b8982_6a64d800",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-01-16T14:42:07Z",
+      "side": 1,
+      "message": "minor: to make things easier for admins, we could either still support \"alias\" here or display a message to ask to update the config if alias is found. In the second case, maybe we should refuse to do the put if alias is found in the hints.",
+      "range": {
+        "startLine": 517,
+        "startChar": 54,
+        "endLine": 517,
+        "endChar": 61
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
