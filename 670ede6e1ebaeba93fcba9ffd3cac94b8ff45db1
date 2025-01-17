@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1ed8af7e_552d0df6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2025-01-17T12:17:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2de9303f_f9efb5d2",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 11
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "be4c5429_15067066",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -64,6 +88,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d62da51_9d042dca",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2025-01-17T12:17:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f69b7ad7_8098b507",
+      "range": {
+        "startLine": 105,
+        "startChar": 3,
+        "endLine": 105,
+        "endChar": 10
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b76b8982_6a64d800",
@@ -77,6 +125,30 @@
       "writtenOn": "2025-01-16T14:42:07Z",
       "side": 1,
       "message": "minor: to make things easier for admins, we could either still support \"alias\" here or display a message to ask to update the config if alias is found. In the second case, maybe we should refuse to do the put if alias is found in the hints.",
+      "range": {
+        "startLine": 517,
+        "startChar": 54,
+        "endLine": 517,
+        "endChar": 61
+      },
+      "revId": "670ede6e1ebaeba93fcba9ffd3cac94b8ff45db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a488f59d_bb4dfd16",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2025-01-17T12:17:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b76b8982_6a64d800",
       "range": {
         "startLine": 517,
         "startChar": 54,
