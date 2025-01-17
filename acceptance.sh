@@ -515,6 +515,9 @@ function check_file_attrs()
 
     user_md_contains "$oid" "username" "$username" ||
         invalid_file_attr "$file" "$username"
+
+    user_md_contains "$oid" "fullpath" "$file" ||
+        invalid_file_attr "$file" "$file"
 }
 
 function test_no_daemon()

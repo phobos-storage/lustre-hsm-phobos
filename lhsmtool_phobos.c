@@ -436,6 +436,7 @@ out_free:
 }
 
 static int phobos_op_put(const struct lu_fid *fid,
+                         const char *path,
                          const int fd,
                          struct llapi_layout *layout,
                          const struct buf *hints,
@@ -491,6 +492,8 @@ static int phobos_op_put(const struct lu_fid *fid,
         pho_error(-errno, "failed to set username to '%s'", objid);
     else
         pho_attr_set(&attrs, "username", pwd->pw_name);
+
+    pho_attr_set(&attrs, "fullpath", path);
 
     /* Using default family (can be amended later by a hint) */
     xfer.xd_params.put.family = opt.o_default_family;
@@ -873,7 +876,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     hai_get_user_data(hai, &hints);
 
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, src_fd, layout, &hints, &oid);
+    rc = phobos_op_put(&hai->hai_fid, src, src_fd, layout, &hints, &oid);
     llapi_layout_free(layout);
     pho_info("phobos_put (archive): rc=%d: %s", rc, strerror(-rc));
     if (rc)
