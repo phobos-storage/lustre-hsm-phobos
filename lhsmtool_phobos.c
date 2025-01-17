@@ -538,6 +538,8 @@ static int phobos_op_put(const struct lu_fid *fid,
                 rc = pho_xfer_add_tag(&xfer, hinttab.hints[i].value);
                 if (rc)
                     goto free_xfer;
+            } else if (!strcmp(hinttab.hints[i].key, "grouping")) {
+                xfer.xd_params.put.grouping = hinttab.hints[i].value;
             } else {
                 pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }

@@ -882,6 +882,34 @@ function test_phobos_profile()
 }
 add_test phobos_profile
 
+function test_phobos_grouping()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    local oid=$(get_oid_from_path "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "grouping=test_grouping" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    # XXX: the grouping is not set in the object yet, so we can not use
+    # the following command to check it was correctly taken into account;
+    # it will be in a future version of Phobos
+    # local grouping=$(phobos object list -o grouping "$oid")
+    # if [[ "$grouping" != "test_grouping" ]]
+    # then
+    #     error "Invalid grouping for '$oid'." \
+    #           "Expected 'test_grouping', got '$grouping'"
+    # fi
+    phobos dir list -o groupings | grep "test_grouping" ||
+        error "Invalid grouping for '$oid'"
+}
+add_test phobos_grouping
+
 # XXX /!\ unfortunatly, valgrind returns the exit code of the process if its
 # exit status is non zero. Which means that we cannot easily automate memory
 # testing for this test. Currently, this test will pass even if valgrind detects
