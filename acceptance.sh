@@ -361,6 +361,16 @@ function wait_for_event_fid()
     done
 }
 
+function wait_for_log_event()
+{
+    local op="$1"
+    local fid=$(fid_nobrace "$2")
+    local value="$3"
+
+    grep -B 1 -a "$op" "$EVENTS" | grep -a "$fid" | grep -a "$value" ||
+        error "Log $op not found/incorrect"
+}
+
 function check_valid_restore()
 {
     local orig="$1"
@@ -559,11 +569,14 @@ function test_archive_release_restore()
         error "Could not migrate '$file'"
     cp "$file" "$copy"
 
+    local filesize=$(stat -c "%s" "$file")
+
     add_event_watch
     start_copytool
 
     lfs hsm_archive "$file"
     wait_for_event ARCHIVE_FINISH "$file"
+    wait_for_log_event "phobos_put" "$file" "$filesize"
 
     check_file_attrs "$file"
 
@@ -571,6 +584,7 @@ function test_archive_release_restore()
 
     lfs hsm_restore "$file"
     wait_for_event RESTORE_FINISH "$file"
+    wait_for_log_event "phobos_get" "$file" "$filesize"
 
     check_valid_restore "$copy" "$file"
 

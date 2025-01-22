@@ -438,6 +438,7 @@ out_free:
 static int phobos_op_put(const struct lu_fid *fid,
                          const char *path,
                          const int fd,
+                         const struct stat st,
                          struct llapi_layout *layout,
                          const struct buf *hints,
                          char **oid)
@@ -448,7 +449,6 @@ static int phobos_op_put(const struct lu_fid *fid,
     struct hinttab hinttab = {0};
     char objid[MAXNAMLEN];
     struct passwd *pwd;
-    struct stat st;
     int rc;
 
     rc = fid2objid(fid, objid);
@@ -479,11 +479,6 @@ static int phobos_op_put(const struct lu_fid *fid,
     rc = fsetxattr(fd, trusted_fuid_xattr, objid, strlen(objid), XATTR_CREATE);
     if (rc && errno != EEXIST)
         pho_error(rc, "failed to set '%s' to '%s'", trusted_fuid_xattr, objid);
-
-    if (fstat(fd, &st) < 0) {
-        rc = -errno;
-        goto free_xfer;
-    }
 
     xtgt.xt_size = st.st_size;
 
@@ -839,6 +834,7 @@ static int ct_archive(const struct hsm_action_item *hai,
     char *oid = NULL;
     int src_fd = -1;
     int open_flags;
+    struct stat st;
     int rcf = 0;
     int rc = 0;
 
@@ -877,10 +873,17 @@ static int ct_archive(const struct hsm_action_item *hai,
 
     hai_get_user_data(hai, &hints);
 
+    if (fstat(src_fd, &st) < 0) {
+        rc = -errno;
+        pho_error(rc, "cannot stat '%s'", src);
+        goto fini_major;
+    }
+
     /* Do phobos xfer */
-    rc = phobos_op_put(&hai->hai_fid, src, src_fd, layout, &hints, &oid);
+    rc = phobos_op_put(&hai->hai_fid, src, src_fd, st, layout, &hints, &oid);
     llapi_layout_free(layout);
-    pho_info("phobos_put (archive): rc=%d: %s", rc, strerror(-rc));
+    pho_info("phobos_put (archive): fid='"DFID"', size=%lu, rc=%d: %s",
+             PFID(&hai->hai_fid), st.st_size, rc, strerror(-rc));
     if (rc)
         goto fini_major;
     /** @todo make clear rc management */
@@ -942,6 +945,7 @@ static int ct_restore(const struct hsm_action_item *hai,
     int hp_flags = 0;
     struct buf hints;
     int dst_fd = -1;
+    struct stat st;
     int rc;
 
     /*
@@ -1020,7 +1024,15 @@ static int ct_restore(const struct hsm_action_item *hai,
 
     /* Do phobos xfer */
     rc = phobos_op_get(&hai->hai_fid, altobj, &hints, dst_fd);
-    pho_info("phobos_get: rc=%d", rc);
+
+    if(fstat(dst_fd, &st) < 0) {
+        rc = -errno;
+        pho_error(rc, "cannot stat dest file '%s'", dst);
+        goto fini;
+    }
+
+    pho_info("phobos_get: fid='"DFID"', sz=%lu, rc=%d",
+             PFID(&hai->hai_fid), st.st_size, rc);
     /** @todo make clear rc management */
 
 fini:
