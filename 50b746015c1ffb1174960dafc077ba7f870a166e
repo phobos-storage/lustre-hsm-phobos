@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93d396dd_a09288c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2025-01-23T15:17:36Z",
+      "side": 1,
+      "message": "Thanks for your review, but I will update the patch to include some checks during tests.",
+      "revId": "50b746015c1ffb1174960dafc077ba7f870a166e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
