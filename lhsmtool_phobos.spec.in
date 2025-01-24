@@ -44,6 +44,11 @@ runs Phobos' LRS daemon (version >= 2.2).
 
 %changelog
 
+* Fri Jan 24 2025 - Sebastien Gougeaud <sebastien.gougeaud@cea.fr> - 1.2.1-2
+- support phobos version 2.2.0
+- hints: add grouping
+- phobos: add path/username to object metadata
+
 * Wed Sep 09 2024 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.2.1-1
 - support phobos version 1.95.1
 - support GCC 11.4.1
