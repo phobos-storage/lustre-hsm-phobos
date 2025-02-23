@@ -448,10 +448,12 @@ static int phobos_op_put(const struct lu_fid *fid,
 {
     struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
+    struct passwd pwd_, *pwd = NULL;
     struct pho_attrs attrs = {0};
     struct hinttab hinttab = {0};
     char objid[MAXNAMLEN];
-    struct passwd *pwd;
+    size_t pwd_buflen;
+    char *pwd_buf;
     int rc;
 
     rc = fid2objid(fid, objid);
@@ -485,11 +487,29 @@ static int phobos_op_put(const struct lu_fid *fid,
 
     xtgt.xt_size = st.st_size;
 
-    pwd = getpwuid(st.st_uid);
+    pwd_buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+    /* should never happen but technically allowed... */
+    if ((long)pwd_buflen < 0)
+        pwd_buflen = 1024;
+    pwd_buf = malloc(pwd_buflen);
+    while (pwd_buf) {
+        rc = getpwuid_r(st.st_uid, &pwd_, pwd_buf, pwd_buflen, &pwd);
+        if (rc < 0 && errno == ERANGE) {
+            pho_warn("pwd buflen %zd was too small, might want to tune _SC_GETPW_R_SIZE_MAX", pwd_buflen);
+            pwd_buflen *= 2;
+            free(pwd_buf);
+            pwd_buf = malloc(pwd_buflen);
+            continue;
+        }
+        /* stop on success or any other error, pwd is only set on success */
+        break;
+    }
     if (pwd == NULL)
         pho_error(-errno, "failed to set username to '%s'", objid);
     else
         pho_attr_set(&attrs, "username", pwd->pw_name);
+    /* pho_attr_set copied the value */
+    free(pwd_buf);
 
     pho_attr_set(&attrs, "fullpath", path);
 
