@@ -723,14 +723,20 @@ static int ct_get_altobjid(const struct hsm_action_item *hai,
 
     return 0;
 }
-/* FIXME the layout API doesn't provide a function to restore \p layout
- * from \p dst_fd directly. So this function does nothing at the moment.
- */
-static int ct_restore_layout(UNUSED const char *dst,
-                             UNUSED int dst_fd,
-                             UNUSED struct llapi_layout *layout)
+
+static int ct_restore_layout(const char *dst,
+                             int dst_fd,
+                             struct llapi_layout *layout)
 {
-    return 0;
+    int rc;
+
+    rc = llapi_layout_set_by_fd(dst_fd, layout);
+    if (rc < 0) {
+        rc = -errno;
+        pho_error(rc, "failed to restore file striping on '%s'", dst);
+    }
+
+    return rc;
 }
 
 static int ct_path_lustre(char *buf, int sz, const char *mnt,
