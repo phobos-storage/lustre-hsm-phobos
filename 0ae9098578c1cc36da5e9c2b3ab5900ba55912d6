@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8d33455_b1f8989f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-04-22T12:38:18Z",
+      "side": 1,
+      "message": "style:\n\nrestore: use llapi_layout_set_by_fd to restore layout\n\nRestore the layout the file had when it was archived using\nthe new function llapi_layout_set_by_fd.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 11
+      },
+      "revId": "0ae9098578c1cc36da5e9c2b3ab5900ba55912d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dbe6cbc_af2674c6",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2025-04-22T12:38:18Z",
+      "side": 1,
+      "message": "minor: remove this command and add an empty line between this function and the one above.",
+      "range": {
+        "startLine": 726,
+        "startChar": 0,
+        "endLine": 728,
+        "endChar": 3
+      },
+      "revId": "0ae9098578c1cc36da5e9c2b3ab5900ba55912d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
