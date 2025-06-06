@@ -377,6 +377,7 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 
     /* DO THE DELETE */
     xfer.xd_op = PHO_XFER_OP_DEL;
+    xfer.xd_params.delete.scope = DSS_OBJ_ALIVE;
     xfer.xd_ntargets = 1;
     xfer.xd_targets = &xtgt;
     xtgt.xt_objid = strdup(obj);
@@ -583,6 +584,7 @@ static int phobos_op_get(const struct lu_fid *fid,
     }
 
     xfer.xd_op = PHO_XFER_OP_GET;
+    xfer.xd_params.get.scope = DSS_OBJ_ALIVE;
     xfer.xd_flags = 0;
     xfer.xd_ntargets = 1;
     xfer.xd_targets = &xtgt;
@@ -621,6 +623,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
     }
 
     xfer.xd_op = PHO_XFER_OP_GETMD;
+    xfer.xd_params.get.scope = DSS_OBJ_ALIVE;
     xfer.xd_flags = 0;
     xfer.xd_ntargets = 1;
     xfer.xd_targets = &xtgt;
