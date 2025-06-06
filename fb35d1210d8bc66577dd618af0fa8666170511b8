@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cbc4fe9_f0f24b2b",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-06T13:35:37Z",
+      "side": 1,
+      "message": "defect: xfer.xd_params",
+      "range": {
+        "startLine": 378,
+        "startChar": 8,
+        "endLine": 378,
+        "endChar": 14
+      },
+      "revId": "fb35d1210d8bc66577dd618af0fa8666170511b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
