@@ -806,7 +806,8 @@ static int ct_fini(struct hsm_copyaction_private **phcp,
     else if (rc < 0)
         pho_error(rc, "llapi_hsm_action_end() failed for '%s'", lstr);
     else
-        pho_info("llapi_hsm_action_end() on '%s' ok (rc=%d)", lstr, rc);
+        pho_info("llapi_hsm_action_end() on '%s' ok (action status=%d)",
+                 lstr, ct_rc);
 
     return rc;
 }
