@@ -598,6 +598,38 @@ function test_archive_release_restore()
 }
 add_test archive_release_restore
 
+function test_hsm_remove()
+{
+    local file="$test_dir/file"
+    local copy="$test_dir/copy"
+    local count
+    local fid
+    local oid
+
+    fid=$(create_file "$file")
+    oid="${FSNAME}:${fid}"
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    count=$(phobos object list "$oid" | wc -l)
+    (( count == 0 )) &&
+        error "Object '$oid' not alive after before HSM Remove"
+
+    lfs hsm_remove "$file"
+    wait_for_event REMOVE_FINISH "$file"
+
+    count=$(phobos object list "$oid" | wc -l)
+    (( count != 0 )) &&
+        error "Object '$oid' still alive after HSM Remove"
+
+    return 0
+}
+add_test hsm_remove
+
 function test_archive_release_restore_with_lov()
 {
     local file="$test_dir/file"
