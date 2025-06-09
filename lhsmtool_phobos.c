@@ -367,8 +367,10 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 
     if (!objset) {
         rc = fid2objid(fid, objid);
-        if (rc)
+        if (rc < 0) {
+            pho_error(rc, "failed to build object id for "DFID, PFID(fid));
             goto free_hints;
+        }
 
         obj = objid;
     }
