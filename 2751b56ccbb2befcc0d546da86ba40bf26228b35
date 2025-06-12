@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ff28285_6687208a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-12T10:03:45Z",
+      "side": 1,
+      "message": "I split between compat to phobos 3.0 and new version.",
+      "revId": "2751b56ccbb2befcc0d546da86ba40bf26228b35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
