@@ -44,8 +44,7 @@ runs Phobos' LRS daemon (version >= 2.2).
 
 %changelog
 
-* Thu Jun 12 2025 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2.2-1.next
-- Upcoming
+* Thu Jun 12 2025 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2.3-1
 - support phobos version 3.0.0 by adding alive objects scope to delete and get
   xfer params
 - hsm_remove fix and test

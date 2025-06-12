@@ -6,7 +6,7 @@
 project(
     'lhsmtool_phobos',
     'c',
-    version: '1.2.2',
+    version: '1.2.3',
     license: 'GPL-2.0-only',
     default_options: [
         'werror=true',
