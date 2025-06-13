@@ -31,7 +31,7 @@ runs Phobos' LRS daemon (version >= 2.2).
 %autosetup
 
 %build
-%meson
+%meson -Dwerror=false
 %meson_build
 
 %install
