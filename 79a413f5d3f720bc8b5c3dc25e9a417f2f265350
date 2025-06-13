@@ -141,6 +141,30 @@
       },
       "revId": "79a413f5d3f720bc8b5c3dc25e9a417f2f265350",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6fd15bd_b05f3cd3",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-06-13T14:11:10Z",
+      "side": 1,
+      "message": "It is better to continuously update the spec and changelog files instead of trying (after a long period of time ...) to remember what was done when we create the package patch.",
+      "parentUuid": "494c4eee_15a73754",
+      "range": {
+        "startLine": 48,
+        "startChar": 2,
+        "endLine": 48,
+        "endChar": 10
+      },
+      "revId": "79a413f5d3f720bc8b5c3dc25e9a417f2f265350",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
