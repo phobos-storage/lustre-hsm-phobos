@@ -25,7 +25,7 @@ BuildRequires: xxhash-devel
 
 %description
 A Lustre HSM Copytool to use Phobos as a backend. It runs on machines that
-runs Phobos' LRS daemon (version >= 2.2).
+runs Phobos' LRS daemon (version >= 3.0.0).
 
 %prep
 %autosetup
