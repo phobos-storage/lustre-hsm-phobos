@@ -297,7 +297,13 @@ static int ct_parseopts(int argc, char * const *argv)
              opt.o_verbose++;
              break;
         case 'x':
-            strncpy(trusted_fuid_xattr, optarg, MAXNAMLEN);
+            rc = snprintf(trusted_fuid_xattr, sizeof(trusted_fuid_xattr),
+                         "%s", optarg);
+            if (rc >= (int)sizeof(trusted_fuid_xattr)) {
+                rc = -EINVAL;
+                pho_error(rc, "trusted_fuid_xattr too long");
+                return rc;
+            }
             break;
         case 0:
              break;
