@@ -24,6 +24,8 @@ cc = meson.get_compiler('c')
 
 phobos_store = cc.find_library('phobos_store', required: true)
 phobos_admin = cc.find_library('phobos_admin', required: true)
+phobos_core = cc.find_library('pho_core', dirs: '/usr/lib64/phobos',
+                              required: true)
 lustre = cc.find_library('lustreapi', required: true)
 glib2 = dependency('glib-2.0', required: true)
 pthread = dependency('threads', required: true)
@@ -60,6 +62,7 @@ libcopytool = static_library(
     dependencies: [
         phobos_store,
         phobos_admin,
+        phobos_core,
         glib2,
         lustre,
         pthread,
