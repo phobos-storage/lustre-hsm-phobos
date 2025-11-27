@@ -942,15 +942,12 @@ function test_phobos_grouping()
     lfs hsm_archive --data "grouping=test_grouping" "$file"
     wait_for_event ARCHIVE_FINISH "$file"
 
-    # XXX: the grouping is not set in the object yet, so we can not use
-    # the following command to check it was correctly taken into account;
-    # it will be in a future version of Phobos
-    # local grouping=$(phobos object list -o grouping "$oid")
-    # if [[ "$grouping" != "test_grouping" ]]
-    # then
-    #     error "Invalid grouping for '$oid'." \
-    #           "Expected 'test_grouping', got '$grouping'"
-    # fi
+    local grouping=$(phobos object list -o grouping "$oid")
+    if [[ "$grouping" != "test_grouping" ]]
+    then
+        error "Invalid grouping for '$oid'." \
+              "Expected 'test_grouping', got '$grouping'"
+    fi
     phobos dir list -o groupings | grep "test_grouping" ||
         error "Invalid grouping for '$oid'"
 }
