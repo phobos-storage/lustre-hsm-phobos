@@ -13,6 +13,8 @@
 struct options {
     int              o_daemonize;
     int              o_dry_run;
+    int              o_enrich_grouping;
+    int              o_nb_grouping;
     int              o_abort_on_error;
     int              o_verbose;
     GArray          *o_archive_ids;

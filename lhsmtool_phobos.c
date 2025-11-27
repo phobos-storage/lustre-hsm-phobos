@@ -82,6 +82,7 @@ struct options opt = {
     .o_verbose         = LLAPI_MSG_INFO,
     .o_default_family  = PHO_RSC_INVAL,
     .o_restore_lov     = false,
+    .o_nb_grouping     = 50,
 };
 
 /*
@@ -129,6 +130,11 @@ static void usage(int rc)
             "        --dry-run                Don't run, just show what would be done\n"
             "    -f, --event-fifo <path>      Write events stream to fifo\n"
             "    -F, --default-family <name>  Set the default family\n"
+            "        --enrich-grouping        Enrich the grouping with:\n"
+            "                                 user_(hash(grouping) %% n)\n"
+            "    -n, --nb-grouping            Number of grouping different for a\n"
+            "                                 user, only use with the enrich-grouping\n"
+            "                                 option\n"
             "    -q, --quiet                  Produce less verbose output\n"
             "    -x, --fuid-xattr             Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
@@ -201,9 +207,9 @@ static int parse_archive_id(const char *archive_value, GArray *archive_ids)
 }
 
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
-#define GETOPTS_STRING "A:b:c:f:F:hqx:vl"
+#define GETOPTS_STRING "A:b:c:f:F:hn:qx:vl"
 #else
-#define GETOPTS_STRING "A:b:c:f:F:hqx:v"
+#define GETOPTS_STRING "A:b:c:f:F:hn:qx:v"
 #endif
 
 static int ct_parseopts(int argc, char * const *argv)
@@ -233,6 +239,9 @@ static int ct_parseopts(int argc, char * const *argv)
         { .val = 1,    .name = "dry-run",
             .has_arg = no_argument,
             .flag = &opt.o_dry_run },
+        { .val = 1,    .name = "enrich-grouping",
+            .has_arg = no_argument,
+            .flag = &opt.o_enrich_grouping },
         { .val = 'h',    .name = "help",
             .has_arg = no_argument },
         { .val = 'P',    .name = "pid-file",
@@ -241,6 +250,8 @@ static int ct_parseopts(int argc, char * const *argv)
         { .val = 'l',    .name = "restore-lov",
             .has_arg = no_argument },
 #endif
+        { .val = 'n',    .name = "nb-grouping",
+            .has_arg = required_argument },
         { .val = 'q',    .name = "quiet",
             .has_arg = no_argument },
         { .val = 'u',    .name = "update-interval",
@@ -287,22 +298,25 @@ static int ct_parseopts(int argc, char * const *argv)
             opt.o_restore_lov = true;
             break;
 #endif
+        case 'n':
+            opt.o_nb_grouping = atoi(optarg);
+            break;
         case 'q':
-             opt.o_verbose--;
-             break;
+            opt.o_verbose--;
+            break;
         case 'P':
-             opt.o_pid_file = optarg;
-             break;
+            opt.o_pid_file = optarg;
+            break;
         case 'v':
-             opt.o_verbose++;
-             break;
+            opt.o_verbose++;
+            break;
         case 'x':
             strncpy(trusted_fuid_xattr, optarg, MAXNAMLEN);
             break;
         case 0:
-             break;
+            break;
         default:
-             return -EINVAL;
+            return -EINVAL;
         }
     }
 
@@ -438,6 +452,28 @@ out_free:
     return rc;
 }
 
+static size_t dbj2(const char *buf, size_t size)
+{
+    size_t hash = 5381;
+    for (size_t i = 0; i < size; i++)
+        hash = ((hash << 5) + hash) + buf[i];
+    return hash;
+}
+
+static char *enrich_grouping_with_hash(const char *grouping, char *username)
+{
+    char *enrich_grouping;
+    size_t hash;
+
+    hash = dbj2(grouping, strlen(grouping));
+
+    if (asprintf(&enrich_grouping, "%s_%ld", username,
+                 hash % opt.o_nb_grouping) < 0)
+        return NULL;
+
+    return enrich_grouping;
+}
+
 static int phobos_op_put(const struct lu_fid *fid,
                          const char *path,
                          const int fd,
@@ -537,7 +573,24 @@ static int phobos_op_put(const struct lu_fid *fid,
                 if (rc)
                     goto free_xfer;
             } else if (!strcmp(hinttab.hints[i].key, "grouping")) {
-                xfer.xd_params.put.grouping = hinttab.hints[i].value;
+                if (opt.o_enrich_grouping) {
+                    if (pwd == NULL) {
+                        pho_error(-EINVAL, "Can't build the grouping without "
+                                  "the username");
+                        goto free_xfer;
+                    }
+
+                    xfer.xd_params.put.grouping =
+                        enrich_grouping_with_hash(hinttab.hints[i].value,
+                                                  pwd->pw_name);
+
+                    if (xfer.xd_params.put.grouping == NULL) {
+                        pho_error(-errno, "Failed to enrich the grouping");
+                        goto free_xfer;
+                    }
+                } else {
+                    xfer.xd_params.put.grouping = hinttab.hints[i].value;
+                }
             } else {
                 pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }

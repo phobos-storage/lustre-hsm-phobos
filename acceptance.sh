@@ -948,10 +948,53 @@ function test_phobos_grouping()
         error "Invalid grouping for '$oid'." \
               "Expected 'test_grouping', got '$grouping'"
     fi
+
     phobos dir list -o groupings | grep "test_grouping" ||
         error "Invalid grouping for '$oid'"
 }
 add_test phobos_grouping
+
+function test_phobos_enrich_grouping()
+{
+    local file="$test_dir/file"
+    local file2="$test_dir/file2"
+    local file3="$test_dir/file3"
+
+    create_file "$file"
+    create_file "$file2"
+    create_file "$file3"
+    local oid=$(get_oid_from_path "$file")
+    local oid2=$(get_oid_from_path "$file2")
+    local oid3=$(get_oid_from_path "$file3")
+
+    add_event_watch
+    start_copytool "--enrich-grouping" "-n 2"
+
+    lfs hsm_archive --data "grouping=toto" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    lfs hsm_archive --data "grouping=blob" "$file2"
+    wait_for_event ARCHIVE_FINISH "$file2"
+
+    lfs hsm_archive --data "grouping=toto" "$file3"
+    wait_for_event ARCHIVE_FINISH "$file3"
+
+    local grouping=$(phobos object list -o grouping "$oid")
+    local grouping2=$(phobos object list -o grouping "$oid2")
+    local grouping3=$(phobos object list -o grouping "$oid3")
+
+    if [[ "$grouping" != "$grouping3" ]]
+    then
+        error "The groupings are different for $oid and $oid3, it should be the"
+              "same"
+    fi
+
+    if [[ "$grouping" == "$grouping2" ]]
+    then
+        error "The grouping for $oid and $oid2 should be different"
+    fi
+}
+add_test phobos_enrich_grouping
 
 # XXX /!\ unfortunatly, valgrind returns the exit code of the process if its
 # exit status is non zero. Which means that we cannot easily automate memory
