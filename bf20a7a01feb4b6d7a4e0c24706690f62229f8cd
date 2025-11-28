@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd98ad6b_c77c9165",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-11-28T09:42:24Z",
+      "side": 1,
+      "message": "major: I\u0027m surprised to see this feature in the copytool. I think is more linked we the user need than a true copytool inner need. In my opinion, I suggest that this feature could be managed externally from the coordinatool/copytool/phobos chain by the user (ie: RBH policy engine or anyone that want to store a data into the Phobos system)",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "bf20a7a01feb4b6d7a4e0c24706690f62229f8cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e9741ef_769f3458",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 992,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-11-28T09:42:24Z",
+      "side": 1,
+      "message": "major: how could you be sure that the hash of \"blob\" and \"toto\" are different ?",
+      "range": {
+        "startLine": 992,
+        "startChar": 10,
+        "endLine": 992,
+        "endChar": 38
+      },
+      "revId": "bf20a7a01feb4b6d7a4e0c24706690f62229f8cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5839968f_f52db3a0",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2025-11-28T09:42:24Z",
+      "side": 1,
+      "message": "major: because we modify the original grouping, I think it is a good idea to remind the original grouping by for example adding a metadata attribute to the object \"original_grouping\u003d*******\" . But, one more time, from my opinion, this should done externally from the coordinatool/copytool/phobos.",
+      "range": {
+        "startLine": 583,
+        "startChar": 20,
+        "endLine": 583,
+        "endChar": 47
+      },
+      "revId": "bf20a7a01feb4b6d7a4e0c24706690f62229f8cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
