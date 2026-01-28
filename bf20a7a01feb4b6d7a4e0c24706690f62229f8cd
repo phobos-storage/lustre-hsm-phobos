@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "523b3d93_5496edca",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-01-28T08:36:22Z",
+      "side": 1,
+      "message": "major: no verification on the output ?",
+      "range": {
+        "startLine": 302,
+        "startChar": 32,
+        "endLine": 302,
+        "endChar": 36
+      },
+      "revId": "bf20a7a01feb4b6d7a4e0c24706690f62229f8cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5839968f_f52db3a0",
         "filename": "lhsmtool_phobos.c",
         "patchSetId": 1
