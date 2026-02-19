@@ -9,3 +9,5 @@ LHSMTOOL_PHOBOS_PID_FILEPATH="/run/lhsmtool_phobos/lhsmtool_phobos.pid"
 
 # xattr field containing object id of file
 TRUSTED_HSM_FUID_FIELD="trusted.hsm_fuid"
+
+LD_PRELOAD="/usr/lib64/libcoordinatool_client.so"
