@@ -16,6 +16,24 @@
       "message": "I\u0027m OK with this modification. But I\u0027m wondering if the idea was not to try to remove this PRELOAD configuration from the sysconfig to set this into the coordinatool/copytool conf ?",
       "revId": "2c02bb33d1e455302ca296a01eaed7d9f5a182ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be84bacf_bd551450",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-02-23T12:04:49Z",
+      "side": 1,
+      "message": "I don\u0027t think, LD_PRELOAD needs to be set before launching the command",
+      "parentUuid": "d1c9706a_bfaa03c8",
+      "revId": "2c02bb33d1e455302ca296a01eaed7d9f5a182ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
