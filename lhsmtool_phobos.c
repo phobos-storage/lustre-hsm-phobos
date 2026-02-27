@@ -564,6 +564,8 @@ static int phobos_op_put(const struct lu_fid *fid,
                     goto free_xfer;
             } else if (!strcmp(hinttab.hints[i].key, "grouping")) {
                 xfer.xd_params.put.grouping = hinttab.hints[i].value;
+            } else if (!strcmp(hinttab.hints[i].key, "copy_name")) {
+                xfer.xd_params.put.copy_name = hinttab.hints[i].value;
             } else {
                 pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }
@@ -595,6 +597,7 @@ static int phobos_op_get(const struct lu_fid *fid,
 {
     struct pho_xfer_target xtgt = {0};
     struct pho_xfer_desc xfer = {0};
+    struct hinttab hinttab = {0};
     char objid[MAXNAMLEN];
     char *obj = NULL;
     int rc;
@@ -610,6 +613,27 @@ static int phobos_op_get(const struct lu_fid *fid,
     }
 
     xfer.xd_op = PHO_XFER_OP_GET;
+    if (hints->data) {
+        size_t i;
+        int rc;
+
+        pho_verb("hints provided hints='%.*s', len=%lu",
+                 (int)hints->len, hints->data, hints->len);
+        rc = process_hints(hints, &hinttab);
+        if (rc)
+            goto free_xfer;
+
+        for (i = 0 ; i < hinttab.count; i++) {
+            pho_verb("hints #%lu  key='%s' val='%s'",
+                     i, hinttab.hints[i].key, hinttab.hints[i].value);
+            if (!strcmp(hinttab.hints[i].key, "copy_name")) {
+                xfer.xd_params.get.copy_name = hinttab.hints[i].value;
+            } else {
+                pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
+            }
+        }
+    }
+
     xfer.xd_params.get.scope = DSS_OBJ_ALIVE;
     xfer.xd_flags = 0;
     xfer.xd_ntargets = 1;
@@ -618,11 +642,13 @@ static int phobos_op_get(const struct lu_fid *fid,
     xtgt.xt_objid = obj;
 
     rc = phobos_get(&xfer, 1, NULL, NULL);
-
-    pho_xfer_desc_clean(&xfer);
-
     if (rc)
         pho_error(rc, "failed to read '%s' from Phobos", obj);
+
+free_xfer:
+    pho_xfer_desc_clean(&xfer);
+    if (hints->data)
+        hinttab_free(&hinttab);
 
     return rc;
 }
