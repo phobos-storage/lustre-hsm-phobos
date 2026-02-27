@@ -106,6 +106,7 @@ separated key value pairs (`k1=v1,k2=v2`). The supported hints are:
 | `profile`     | Any valid profile defined in the configuration     | Archive         |
 | `tag`         | A printable string of characters                   | Archive         |
 | `grouping`    | A printable string of characters                   | Archive         |
+| `copy_name`   | A printable string of characters                   | Archive/Restore |
 
 **Note:** the alias hint is the old name of the profile hint. As we may remove
 it in a future version of the copytool, please use profile instead.
