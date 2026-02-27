@@ -71,6 +71,7 @@ function phobos_setup()
 
     export PHOBOS_LRS_lock_file="$PHOBOSD_LOCK"
     export PHOBOS_LRS_server_socket="$PHOBOSD_SOCKET"
+    export PHOBOS_LRS_grouping_on_dir=true
     rm -f "$PHOBOSD_LOCK"
 
     echo "Starting phobosd, log file: $PHOBOSD_LOG"
@@ -1043,6 +1044,41 @@ function test_invalid_tag_hint()
     wait_for_event ARCHIVE_ERROR "$file"
 }
 add_test invalid_tag_hint
+
+function test_copy_name_archive_restore()
+{
+    local file="$test_dir/file"
+    local copy_file="$test_dir/copy"
+
+    create_file "$file"
+    cp "$file" "$copy_file"
+    local oid=$(get_oid_from_path "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "copy_name=test_copy" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    local copy=$(phobos copy list -o copy_name "$oid")
+    if [[ "$copy" != "test_copy" ]]
+    then
+        error "Invalid copy_name for '$oid'." \
+              "Expected 'test_copy', got '$copy'"
+    fi
+
+    lfs hsm_release "$file"
+
+    lfs hsm_restore --data "copy_name=toto" "$file"
+    wait_for_event RESTORE_ERROR "$file"
+
+    lfs hsm_restore --data "copy_name=test_copy" "$file"
+    wait_for_event RESTORE_FINISH "$file"
+    wait_for_log_event "phobos_get" "$file" "rc=0"
+
+    check_valid_restore "$copy_file" "$file"
+}
+add_test copy_name_archive_restore
 
 run_tests
 
