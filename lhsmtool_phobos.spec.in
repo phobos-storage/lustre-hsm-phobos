@@ -44,6 +44,10 @@ runs Phobos' LRS daemon (version >= 3.0.0).
 
 %changelog
 
+* Wed Mar 04 2026 - Gauthier Evraerd <gauthier.evraerd@cea.fr> - 1.2.4-1
+- hints: add copy_name
+- add LD_PRELOAD in sysconfig file
+
 * Thu Jun 12 2025 - Patrice Lucas <patrice.lucas@cea.fr> - 1.2.3-1
 - support phobos version 3.0.0 by adding alive objects scope to delete and get
   xfer params
