@@ -339,9 +339,7 @@ function add_event_watch()
 
 function wait_for_event()
 {
-    local fid=$(fid_nobrace "$2")
-
-    wait_for_event_fid "$1" "$fid"
+    wait_for_event_fid "$1" "$2"
 }
 
 function wait_for_event_fid()
@@ -496,7 +494,7 @@ function get_xattr_value()
     local file="$1"
     local key="$2"
 
-    getfattr -n "trusted.$key" "$file" |
+    getfattr --absolute-names -n "trusted.$key" "$file" |
         grep -v "file:" |
         sed "s/trusted.$key=\"\(.*\)\"$/\1/"
 }
