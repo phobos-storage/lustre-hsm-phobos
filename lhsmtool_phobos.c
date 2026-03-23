@@ -790,11 +790,32 @@ static int ct_restore_layout(UNUSED const char *dst,
     return 0;
 }
 
-static int ct_path_lustre(char *buf, int sz, const char *mnt,
+static int ct_path_lustre(char *buf, int _size, const char *mnt,
                           const struct lu_fid *fid)
 {
-    return snprintf(buf, sz, "%s/%s/fid/"DFID_NOBRACE, mnt,
-                    dot_lustre_name, PFID(fid));
+    size_t mount_len = strlen(mnt);
+    char fid_str[FID_LEN];
+    long long recno = 0;
+    int linkno = 0;
+    int size = 0;
+    int rc;
+
+    rc = sprintf(fid_str, DFID_NOBRACE, PFID(fid));
+    if (rc < 0)
+        return -1;
+
+    if (snprintf(&buf[size], _size - size, "%s/", mnt) < 0)
+        return -1;
+
+    size += mount_len + 1;
+    rc = llapi_fid2path(mnt, fid_str, &buf[size], _size - size,
+                        &recno, &linkno);
+    if (rc) {
+        errno = -rc;
+        return -1;
+    }
+
+    return strlen(buf);
 }
 
 static bool ct_is_retryable(int err)
