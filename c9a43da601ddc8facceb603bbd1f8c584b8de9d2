@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f8aadf9_640b2cab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038212
+      },
+      "writtenOn": "2026-03-24T14:36:57Z",
+      "side": 1,
+      "message": "defect: You must change the version in the meson.build root file.",
+      "revId": "c9a43da601ddc8facceb603bbd1f8c584b8de9d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
