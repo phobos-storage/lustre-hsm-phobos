@@ -15,6 +15,7 @@ PHOBOSD_LOG="$LOG_DIR/phobosd.log"
 PHOBOSD_LOCK=/tmp/phobosd.lock
 PHOBOSD_PID=/tmp/phobosd.pid
 PHOBOSD_SOCKET=/tmp/lrs
+LIBRARY_BIS="lib_bis"
 LUSTRE_ROOT=/mnt/lustre
 FSNAME=lustre
 SKIP=77
@@ -85,6 +86,11 @@ function phobos_setup()
         phobos dir format --fs posix --unlock "${dirs[i]}"
         phobos dir update --tags t$i "${dirs[i]}"
     done
+
+    dirs+=($(mktemp -d))
+
+    phobos dir add --library $LIBRARY_BIS "${dirs[3]}"
+    phobos dir format --fs posix --library $LIBRARY_BIS --unlock "${dirs[3]}"
 
     echo '' >> /etc/phobos.conf
     echo '[profile "test_profile"]' >> /etc/phobos.conf
@@ -1077,6 +1083,73 @@ function test_copy_name_archive_restore()
     check_valid_restore "$copy_file" "$file"
 }
 add_test copy_name_archive_restore
+
+function test_wrong_default_library()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool --default-library toto
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_ERROR "$file"
+}
+add_test wrong_default_library
+
+function test_default_library()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool --default-library "$LIBRARY_BIS"
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    phobos extent list -o media_library "$(get_oid_from_path "$file")" |
+        grep "$LIBRARY_BIS"
+}
+add_test default_library
+
+function test_hint_library()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive --data "library=toto" "$file"
+    wait_for_event ARCHIVE_ERROR "$file"
+
+    lfs hsm_archive --data "library=$LIBRARY_BIS" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    phobos extent list -o media_library "$(get_oid_from_path "$file")" |
+        grep "$LIBRARY_BIS"
+}
+add_test hint_library
+
+function test_default_library_with_hint()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool --default-library "toto"
+
+    lfs hsm_archive --data "library=$LIBRARY_BIS" "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+
+    phobos object list -o all "$(get_oid_from_path "$file")"
+    phobos extent list -o media_library "$(get_oid_from_path "$file")" |
+        grep "$LIBRARY_BIS"
+}
+add_test default_library_with_hint
 
 run_tests
 

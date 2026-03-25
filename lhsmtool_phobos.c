@@ -129,6 +129,7 @@ static void usage(int rc)
             "        --dry-run                Don't run, just show what would be done\n"
             "    -f, --event-fifo <path>      Write events stream to fifo\n"
             "    -F, --default-family <name>  Set the default family\n"
+            "    -L, --default-library <name> Set the default library\n"
             "    -q, --quiet                  Produce less verbose output\n"
             "    -x, --fuid-xattr             Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
@@ -201,9 +202,9 @@ static int parse_archive_id(const char *archive_value, GArray *archive_ids)
 }
 
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
-#define GETOPTS_STRING "A:b:c:f:F:hqx:vl"
+#define GETOPTS_STRING "A:b:c:f:F:hL:qx:vl"
 #else
-#define GETOPTS_STRING "A:b:c:f:F:hqx:v"
+#define GETOPTS_STRING "A:b:c:f:F:hL:qx:v"
 #endif
 
 static int ct_parseopts(int argc, char * const *argv)
@@ -229,6 +230,8 @@ static int ct_parseopts(int argc, char * const *argv)
         { .val = 'F',    .name = "default-family",
             .has_arg = required_argument },
         { .val = 'F',    .name = "default_family",
+            .has_arg = required_argument },
+        { .val = 'L',    .name = "default-library",
             .has_arg = required_argument },
         { .val = 1,    .name = "dry-run",
             .has_arg = no_argument,
@@ -281,6 +284,9 @@ static int ct_parseopts(int argc, char * const *argv)
             /* free the array since usage will call exit */
             g_array_free(opt.o_archive_ids, true);
             usage(0);
+            break;
+        case 'L':
+            opt.o_default_library = optarg;
             break;
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
         case 'l':
@@ -496,6 +502,9 @@ static int phobos_op_put(const struct lu_fid *fid,
     /* Using default family (can be amended later by a hint) */
     xfer.xd_params.put.family = opt.o_default_family;
 
+    /* Using default library (can be amended later by a hint) */
+    xfer.xd_params.put.library = opt.o_default_library;
+
     /* Use content of hints to modify fields in xfer_desc */
     if (hints->data) {
         size_t i;
@@ -536,10 +545,16 @@ static int phobos_op_put(const struct lu_fid *fid,
                 rc = pho_xfer_add_tag(&xfer, hinttab.hints[i].value);
                 if (rc)
                     goto free_xfer;
+
             } else if (!strcmp(hinttab.hints[i].key, "grouping")) {
                 xfer.xd_params.put.grouping = hinttab.hints[i].value;
+
             } else if (!strcmp(hinttab.hints[i].key, "copy_name")) {
                 xfer.xd_params.put.copy_name = hinttab.hints[i].value;
+
+            } else if (!strcmp(hinttab.hints[i].key, "library")) {
+                xfer.xd_params.put.library = hinttab.hints[i].value;
+
             } else {
                 pho_warn("unknown hint '%s'",  hinttab.hints[i].key);
             }
