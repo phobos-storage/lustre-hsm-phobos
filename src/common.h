@@ -22,6 +22,7 @@ struct options {
     enum rsc_family  o_default_family;
     bool             o_restore_lov;
     const char      *o_pid_file;
+    char            *o_default_library;
 };
 
 /**
