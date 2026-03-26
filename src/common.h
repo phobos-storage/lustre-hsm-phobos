@@ -23,6 +23,7 @@ struct options {
     bool             o_restore_lov;
     const char      *o_pid_file;
     char            *o_default_library;
+    int              o_ping_interval;
 };
 
 /**

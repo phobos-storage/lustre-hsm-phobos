@@ -59,9 +59,25 @@ function start_phobosd()
         error "Failed to start phobosd"
 }
 
+function wait_kill_phobosd()
+{
+    local count=0
+
+    while pgrep phobosd
+    do
+        sleep 0.1
+        ((count++))
+        if ((count > 50))
+        then
+            error "Phobosd not stopped after 5s"
+        fi
+    done
+}
+
 function stop_phobosd()
 {
     kill $(pgrep phobosd)
+    wait_kill_phobosd
 }
 
 function phobos_setup()
@@ -484,6 +500,7 @@ function start_copytool()
             --default-family dir    \
             --event-fifo "$FIFO"    \
             "$LUSTRE_ROOT"
+        wait_for_copytool
     else
         systemctl daemon-reload
         systemctl start lhsmtool_phobos@mnt-lustre
@@ -1132,6 +1149,77 @@ function test_hint_library()
         grep "$LIBRARY_BIS"
 }
 add_test hint_library
+
+function test_start_ping_lrs()
+{
+    stop_phobosd
+    $VALGRIND "$__lhsmtool_phobos" "$VERBOSE" "$LUSTRE_ROOT" &&
+        error "Copytool should have failed to start"
+
+    start_phobosd
+    start_copytool
+}
+add_test start_ping_lrs
+
+function check_ping_count()
+{
+    local expected=$1
+    local count
+
+    count=$(grep -ac "Try to ping phobosd" "$EVENTS")
+    [[ $count -eq $expected ]] ||
+        error "Unexpected ping count (got: $count, expected: $expected)"
+}
+
+function test_ping_interval()
+{
+    local file1="$test_dir/file1"
+    local file2="$test_dir/file2"
+    local file3="$test_dir/file3"
+
+    create_file "$file1"
+    create_file "$file2"
+    create_file "$file3"
+
+    add_event_watch
+    start_copytool --ping-interval 2
+
+    lfs hsm_archive "$file1"
+    wait_for_event ARCHIVE_FINISH "$file1"
+    check_ping_count 0
+
+    lfs hsm_archive "$file2"
+    wait_for_event ARCHIVE_FINISH "$file2"
+    check_ping_count 1
+
+    lfs hsm_archive "$file3"
+    wait_for_event ARCHIVE_FINISH "$file3"
+    check_ping_count 1
+}
+add_test ping_interval
+
+function test_ping_error()
+{
+    local file="$test_dir/file"
+
+    create_file "$file"
+
+    add_event_watch
+    start_copytool --ping-interval 1
+
+    stop_phobosd
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_ERROR "$file"
+    ! grep -B 1 -a "phobos_put" "$EVENTS" | grep -a "$(fid_nobrace "$file")" ||
+        error "Unexpected phobos_put log event"
+    check_ping_count 1
+
+    start_phobosd
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
+    check_ping_count 2
+}
+add_test ping_error
 
 run_tests
 
