@@ -63,6 +63,7 @@
 
 /* Phobos headers */
 #include "phobos_store.h"
+#include "phobos_admin.h"
 #include "pho_common.h"
 
 #include "layout.h"
@@ -82,6 +83,7 @@ struct options opt = {
     .o_verbose         = LLAPI_MSG_INFO,
     .o_default_family  = PHO_RSC_INVAL,
     .o_restore_lov     = false,
+    .o_ping_interval   = 50,
 };
 
 /*
@@ -130,6 +132,7 @@ static void usage(int rc)
             "    -f, --event-fifo <path>      Write events stream to fifo\n"
             "    -F, --default-family <name>  Set the default family\n"
             "    -L, --default-library <name> Set the default library\n"
+            "    -p, --ping-interval <#>      Send a ping to Phobosd every <#> received requests\n"
             "    -q, --quiet                  Produce less verbose output\n"
             "    -x, --fuid-xattr             Change value of xattr for restore\n"
             "    -v, --verbose                Produce more verbose output\n"
@@ -202,9 +205,9 @@ static int parse_archive_id(const char *archive_value, GArray *archive_ids)
 }
 
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
-#define GETOPTS_STRING "A:b:c:f:F:hL:qx:vl"
+#define GETOPTS_STRING "A:b:c:f:F:hLp:qx:vl"
 #else
-#define GETOPTS_STRING "A:b:c:f:F:hL:qx:v"
+#define GETOPTS_STRING "A:b:c:f:F:hLp:qx:v"
 #endif
 
 static int ct_parseopts(int argc, char * const *argv)
@@ -238,6 +241,8 @@ static int ct_parseopts(int argc, char * const *argv)
             .flag = &opt.o_dry_run },
         { .val = 'h',    .name = "help",
             .has_arg = no_argument },
+        { .val = 'p',    .name = "ping-interval",
+            .has_arg = required_argument },
         { .val = 'P',    .name = "pid-file",
             .has_arg = required_argument },
 #ifdef HAVE_LLAPI_LAYOUT_SET_BY_FD
@@ -295,6 +300,9 @@ static int ct_parseopts(int argc, char * const *argv)
 #endif
         case 'q':
              opt.o_verbose--;
+             break;
+        case 'p':
+             opt.o_ping_interval = atoi(optarg);
              break;
         case 'P':
              opt.o_pid_file = optarg;
@@ -1326,10 +1334,50 @@ static void create_pid_file(void)
                   opt.o_pid_file);
 }
 
+static void wait_for_phobosd(struct admin_handle *adm)
+{
+    const unsigned int max_retry_delay = 30;
+    unsigned int retry_delay = 1;
+    int rc;
+
+    while (true) {
+        sleep(retry_delay);
+
+        rc = phobos_admin_init(adm, true, phobos_context());
+        if (!rc)
+            break;
+
+        retry_delay *= 2;
+        if (retry_delay > max_retry_delay)
+            retry_delay = max_retry_delay;
+        pho_error(rc, "Failed to contact Phobosd, will retry in %d seconds",
+                  retry_delay);
+    }
+}
+
+static void ping_phobosd(struct admin_handle *adm, bool *ping_failed,
+                         int *nb_request_since_last_ping)
+{
+    int rc;
+
+    pho_debug("Try to ping phobosd");
+    rc = phobos_admin_ping_lrs(adm);
+    if (rc) {
+        pho_error(rc, "Failed to ping phobosd");
+        *ping_failed = true;
+        phobos_admin_fini(adm);
+    }
+
+    *nb_request_since_last_ping = 0;
+}
+
 /* Daemon waits for messages from the kernel; run it in the background. */
 static int ct_run(void)
 {
+    int nb_request_since_last_ping = 0;
     struct sigaction cleanup_sigaction;
+    bool ping_failed = false;
+    struct admin_handle adm;
     int archive_ids_count;
     int *archive_ids;
     int rc;
@@ -1348,10 +1396,17 @@ static int ct_run(void)
 
     setbuf(stdout, NULL);
 
+    rc = phobos_admin_init(&adm, true, phobos_context());
+    if (rc) {
+        pho_error(rc, "Failed to contact Phobosd");
+        return -rc;
+    }
+
     if (opt.o_event_fifo != NULL) {
         rc = llapi_hsm_register_event_fifo(opt.o_event_fifo);
         if (rc < 0) {
             pho_error(rc, "failed to register event fifo");
+            phobos_admin_fini(&adm);
             return rc;
         }
         // llapi_error_callback_set(llapi_hsm_log_error);
@@ -1363,6 +1418,7 @@ static int ct_run(void)
     g_array_free(opt.o_archive_ids, true);
     if (rc < 0) {
         pho_error(rc, "failed to register service as a copytool");
+        phobos_admin_fini(&adm);
         return rc;
     }
 
@@ -1416,22 +1472,41 @@ static int ct_run(void)
                 err_major++;
                 break;
             }
-            rc = ct_process_item_async(hai, hal->hal_flags);
-            if (rc < 0)
-                pho_error(rc, "error while processing '"DFID"'",
-                          PFID(&hai->hai_fid));
-            if (opt.o_abort_on_error && err_major)
-                break;
+
+            nb_request_since_last_ping++;
+            if (nb_request_since_last_ping >= opt.o_ping_interval)
+                ping_phobosd(&adm, &ping_failed, &nb_request_since_last_ping);
+
+            if (!ping_failed) {
+                rc = ct_process_item_async(hai, hal->hal_flags);
+                if (rc < 0)
+                    pho_error(rc, "error while processing '"DFID"'",
+                              PFID(&hai->hai_fid));
+                if (opt.o_abort_on_error && err_major)
+                    break;
+            } else {
+                /* Tell Lustre to retry later */
+                hal->hal_flags |= HP_FLAG_RETRY;
+                ct_fini(NULL, hai, hal->hal_flags, -ETIMEDOUT);
+            }
+
             hai = hai_next(hai);
         }
 
         if (opt.o_abort_on_error && err_major)
             break;
+
+        if (ping_failed) {
+            wait_for_phobosd(&adm);
+            ping_failed = false;
+        }
     }
 
     llapi_hsm_copytool_unregister(&ctdata);
     if (opt.o_event_fifo != NULL)
         llapi_hsm_unregister_event_fifo(opt.o_event_fifo);
+
+    phobos_admin_fini(&adm);
 
     return rc;
 }
