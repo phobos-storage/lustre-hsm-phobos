@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8669b32c_e6bbad57",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 1122,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-03-30T09:49:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caa6e401_8c5f5c41",
+      "range": {
+        "startLine": 1122,
+        "startChar": 4,
+        "endLine": 1122,
+        "endChar": 18
+      },
+      "revId": "86404191307f2e2c67e677d5143452f54cf954fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aab91987_6e3a0a12",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-03-27T10:18:20Z",
       "side": 1,
       "message": "minor: the underscore version could be discarded for new options.",
+      "range": {
+        "startLine": 236,
+        "startChar": 8,
+        "endLine": 237,
+        "endChar": 43
+      },
+      "revId": "86404191307f2e2c67e677d5143452f54cf954fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c22ac186_59320401",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-03-30T09:49:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aab91987_6e3a0a12",
       "range": {
         "startLine": 236,
         "startChar": 8,
