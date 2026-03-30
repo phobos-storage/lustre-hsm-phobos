@@ -44,6 +44,9 @@ runs Phobos' LRS daemon (version >= 3.0.0).
 
 %changelog
 
+* Mon Mar 30 2026 - Gauthier Evraerd <gauthier.evraerd@cea.fr> - 1.2.6-1
+- add --default-library option
+
 * Mon Mar 23 2026 - Yoann Valeri <yoann.valeri@cea.fr> - 1.2.5-1
 - store file's real path in Phobos object's metadata instead of FID path
 
