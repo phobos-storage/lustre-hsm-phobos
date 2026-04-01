@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "034d84ce_f415ed68",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1102,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-04-01T12:34:29Z",
+      "side": 1,
+      "message": "minor: \"should have failed\"",
+      "range": {
+        "startLine": 1102,
+        "startChar": 31,
+        "endLine": 1102,
+        "endChar": 37
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13a41012_6acbf917",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-04-01T12:34:29Z",
+      "side": 1,
+      "message": "minor: no failure handling",
+      "range": {
+        "startLine": 300,
+        "startChar": 35,
+        "endLine": 300,
+        "endChar": 47
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fce2ddf0_cb5fc52f",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1439,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-04-01T12:34:29Z",
+      "side": 1,
+      "message": "suggest:\n```\nif (!rc)\n    break;\n\nretry_delay...\n....\n```",
+      "range": {
+        "startLine": 1430,
+        "startChar": 12,
+        "endLine": 1439,
+        "endChar": 13
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
