@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44054c94_788aa5ab",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "minor: I don\u0027t think this needs to be a global variable. It could be definied only in ct_run.",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 31
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "13a41012_6acbf917",
         "filename": "lhsmtool_phobos.c",
         "patchSetId": 2
@@ -49,6 +72,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "250e32fc_f45849a7",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1368,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "major: a single recv call can contain multiple HSM requests.",
+      "range": {
+        "startLine": 1368,
+        "startChar": 8,
+        "endLine": 1368,
+        "endChar": 34
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a70ca6e_d7d22f29",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1385,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "minor: verbose. If the ping fails, we sill see the error in the logs. I\u0027m tempted to even put this in debug.",
+      "range": {
+        "startLine": 1385,
+        "startChar": 16,
+        "endLine": 1385,
+        "endChar": 20
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed70412b_67ee1d9d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "suggest: put this in a function `wait_for_phobosd`",
+      "range": {
+        "startLine": 1426,
+        "startChar": 8,
+        "endLine": 1426,
+        "endChar": 29
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "477bd2d4_a5fa55af",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1435,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "This is not a ping. You could write instead: Failed to contact Phobosd, ...",
+      "range": {
+        "startLine": 1435,
+        "startChar": 35,
+        "endLine": 1435,
+        "endChar": 49
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fce2ddf0_cb5fc52f",
         "filename": "lhsmtool_phobos.c",
         "patchSetId": 2
@@ -65,6 +180,29 @@
         "startChar": 12,
         "endLine": 1439,
         "endChar": 13
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15c980b4_3a3478ec",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-04-02T11:41:14Z",
+      "side": 1,
+      "message": "This could be initialized in ct_run to avoid a global variable.",
+      "range": {
+        "startLine": 1501,
+        "startChar": 10,
+        "endLine": 1501,
+        "endChar": 26
       },
       "revId": "c04a581329141c357baced76dd4da3a9728314d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
