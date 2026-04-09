@@ -64,7 +64,7 @@ runs Phobos' LRS daemon (version >= 3.0.0).
 - hints: add grouping
 - phobos: add path/username to object metadata
 
-* Wed Sep 09 2024 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.2.1-1
+* Mon Sep 09 2024 - Guillaume Courrier <guillaume.courrier@cea.fr> - 1.2.1-1
 - support phobos version 1.95.1
 - support GCC 11.4.1
 
