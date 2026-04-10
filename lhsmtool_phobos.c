@@ -1231,10 +1231,13 @@ static void *ct_thread(void *data)
     struct ct_th_data *cttd = data;
     int rc;
 
+    phobos_init();
+
     rc = ct_process_item(cttd->hai, cttd->hal_flags);
 
     free(cttd->hai);
     free(cttd);
+    phobos_fini();
     pthread_exit((void *)(intptr_t)rc);
 }
 
