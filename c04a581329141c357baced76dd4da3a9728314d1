@@ -47,6 +47,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3d48d3e_bf8853bc",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44054c94_788aa5ab",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 31
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13a41012_6acbf917",
@@ -60,6 +84,30 @@
       "writtenOn": "2026-04-01T12:34:29Z",
       "side": 1,
       "message": "minor: no failure handling",
+      "range": {
+        "startLine": 300,
+        "startChar": 35,
+        "endLine": 300,
+        "endChar": 47
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5a88491_f7120d0f",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "`atoi` doesn\u0027t return an error, the return value is just zero if the string is invalid but we can\u0027t know if the string was \"0\" or \"aa\"",
+      "parentUuid": "13a41012_6acbf917",
       "range": {
         "startLine": 300,
         "startChar": 35,
@@ -93,6 +141,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bace9cd_7acfc9dc",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1368,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "250e32fc_f45849a7",
+      "range": {
+        "startLine": 1368,
+        "startChar": 8,
+        "endLine": 1368,
+        "endChar": 34
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a70ca6e_d7d22f29",
@@ -106,6 +178,30 @@
       "writtenOn": "2026-04-02T11:41:14Z",
       "side": 1,
       "message": "minor: verbose. If the ping fails, we sill see the error in the logs. I\u0027m tempted to even put this in debug.",
+      "range": {
+        "startLine": 1385,
+        "startChar": 16,
+        "endLine": 1385,
+        "endChar": 20
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e36d4b5e_5896093e",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1385,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a70ca6e_d7d22f29",
       "range": {
         "startLine": 1385,
         "startChar": 16,
@@ -139,6 +235,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "112ac8fd_7d14499b",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed70412b_67ee1d9d",
+      "range": {
+        "startLine": 1426,
+        "startChar": 8,
+        "endLine": 1426,
+        "endChar": 29
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "477bd2d4_a5fa55af",
@@ -152,6 +272,30 @@
       "writtenOn": "2026-04-02T11:41:14Z",
       "side": 1,
       "message": "This is not a ping. You could write instead: Failed to contact Phobosd, ...",
+      "range": {
+        "startLine": 1435,
+        "startChar": 35,
+        "endLine": 1435,
+        "endChar": 49
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fa307d8_74c45984",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1435,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "477bd2d4_a5fa55af",
       "range": {
         "startLine": 1435,
         "startChar": 35,
@@ -185,6 +329,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "929e0ed0_cf6ba526",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1439,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fce2ddf0_cb5fc52f",
+      "range": {
+        "startLine": 1430,
+        "startChar": 12,
+        "endLine": 1439,
+        "endChar": 13
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15c980b4_3a3478ec",
@@ -198,6 +366,30 @@
       "writtenOn": "2026-04-02T11:41:14Z",
       "side": 1,
       "message": "This could be initialized in ct_run to avoid a global variable.",
+      "range": {
+        "startLine": 1501,
+        "startChar": 10,
+        "endLine": 1501,
+        "endChar": 26
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e3ed5c6_d6e68230",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-13T11:27:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15c980b4_3a3478ec",
       "range": {
         "startLine": 1501,
         "startChar": 10,
