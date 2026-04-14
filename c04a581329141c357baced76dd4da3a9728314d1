@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ea9e66d6_269ddc9d",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1102,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-04-14T07:33:25Z",
+      "side": 1,
+      "message": "ping",
+      "parentUuid": "034d84ce_f415ed68",
+      "range": {
+        "startLine": 1102,
+        "startChar": 31,
+        "endLine": 1102,
+        "endChar": 37
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "44054c94_788aa5ab",
         "filename": "lhsmtool_phobos.c",
         "patchSetId": 2
@@ -108,6 +132,30 @@
       "side": 1,
       "message": "`atoi` doesn\u0027t return an error, the return value is just zero if the string is invalid but we can\u0027t know if the string was \"0\" or \"aa\"",
       "parentUuid": "13a41012_6acbf917",
+      "range": {
+        "startLine": 300,
+        "startChar": 35,
+        "endLine": 300,
+        "endChar": 47
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68aa78dd_ad18241d",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-04-14T07:33:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f5a88491_f7120d0f",
       "range": {
         "startLine": 300,
         "startChar": 35,
