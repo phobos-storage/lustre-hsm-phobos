@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99f863bf_3fa321c1",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1102,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-04-14T07:41:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea9e66d6_269ddc9d",
+      "range": {
+        "startLine": 1102,
+        "startChar": 31,
+        "endLine": 1102,
+        "endChar": 37
+      },
+      "revId": "c04a581329141c357baced76dd4da3a9728314d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44054c94_788aa5ab",
