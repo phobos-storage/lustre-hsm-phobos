@@ -21,7 +21,7 @@ FSNAME=lustre
 SKIP=77
 COPYTOOL_PID=
 declare -a dirs
-if [ ! -z ${VALGRIND+x} ]
+if [ -z ${VALGRIND+x} ]
 then
     VALGRIND=${VALGRIND:-valgrind --leak-check=full --show-leak-kinds=all \
 --track-origins=yes --error-exitcode=1 \
@@ -454,7 +454,7 @@ function trap_add()
 __lhsmtool_phobos=$(PATH="$PWD:$PWD/build:$PATH" which lhsmtool_phobos)
 function ct_phobos()
 {
-    $VALGRIND "$__lhsmtool_phobos" "$@" &
+    "$__lhsmtool_phobos" "$@" &
     COPYTOOL_PID=$!
 }
 
@@ -462,6 +462,12 @@ __hsm_import=$(PATH="$PWD:$PWD/build:$PATH" which hsm-import)
 function hsm_import()
 {
     "$__hsm_import" "$@"
+}
+
+__lhsmtool_recover=$(PATH="$PWD:$PWD/build:$PATH" which lhsmtool_recover)
+function ct_recover()
+{
+    $VALGRIND "$__lhsmtool_recover" "$@"
 }
 
 function kill_copytool()
@@ -1220,6 +1226,59 @@ function test_ping_error()
     check_ping_count 2
 }
 add_test ping_error
+
+function test_recover()
+{
+    local file1="$test_dir/file1"
+    local file2="$test_dir/file2"
+    local file3="$test_dir/file3"
+    local fid1=$(create_file "$file1")
+    local fid2=$(create_file "$file2")
+    local fid3=$(create_file "$file3")
+
+    groupadd tasty
+    # usermod -a -G tasty root
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive "$file1"
+    wait_for_event ARCHIVE_FINISH "$file1"
+    rm "$file1"
+
+    lfs hsm_archive "$file2"
+    wait_for_event ARCHIVE_FINISH "$file2"
+    rm "$file2"
+
+    lfs hsm_archive "$file3"
+    wait_for_event ARCHIVE_FINISH "$file3"
+    rm "$file3"
+
+    ct_recover "$test_dir" "$fid1" ||
+        error "Recovering should have succeeded for '$file1'"
+    ls -g "$file1" | grep "root" ||
+        error "'$file1' group should not have been changed"
+    ct_recover -g tasty "$test_dir" "$fid2" ||
+        error "Recovering should have succeeded for '$file2'"
+    ls -g "$file2" | grep "tasty" ||
+        error "'$file2' group should have been changed"
+    ct_recover -p "$test_dir/newfile" "$test_dir" "$fid3" ||
+        error "Recovering should have succeeded for '$file3'"
+    ls "$file3" &&
+        error "'$file3' recovering should have changed its path"
+    ls -g "$test_dir/newfile" | grep "root" ||
+        error "'$file3' group should not have been changed"
+
+    groupdel tasty
+
+}
+add_test recover
+
+## need to add some tests:
+## - group does not exist
+## - the path is already taken for another file
+## - the file is not removed
+## - check dry-run behavior
 
 run_tests
 

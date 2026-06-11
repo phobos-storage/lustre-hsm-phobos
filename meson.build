@@ -85,6 +85,21 @@ executable(
     install: true,
 )
 
+executable(
+    'lhsmtool_recover',
+    sources: [
+        'src/cmd/recover.c',
+    ],
+    dependencies: [
+        phobos_store,
+        phobos_core,
+        glib2,
+        lustre,
+    ],
+    include_directories: include_directories('.'),
+    install: true,
+)
+
 specfile = configuration_data()
 specfile.set('version', meson.project_version())
 configure_file(
