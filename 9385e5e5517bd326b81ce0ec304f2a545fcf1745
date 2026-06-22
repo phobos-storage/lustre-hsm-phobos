@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c80b9f43_f05de890",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-06-22T12:59:16Z",
+      "side": 1,
+      "message": "The three upcoming patches (phobos_init(), phobos pakage update, and this one, needs to be \"merged\" into one common patch before being integrated to master.",
+      "revId": "9385e5e5517bd326b81ce0ec304f2a545fcf1745",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
