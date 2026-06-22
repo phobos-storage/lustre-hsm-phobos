@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3a51661_26b94393",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-06-22T12:58:53Z",
+      "side": 1,
+      "message": "The three upcoming patches (phobos_init(), phobos pakage update, and this one, needs to be \"merged\" into one common patch before being integrated to master.",
+      "revId": "a44c20a6a3cf1dde95ae04a2ad5ddd5fa625afff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6da3360_ab67b7bd",
+        "filename": "lhsmtool_phobos.spec.in",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-06-22T12:58:53Z",
+      "side": 1,
+      "message": "major: I think we need to target a newer version of Phobos ?",
+      "range": {
+        "startLine": 11,
+        "startChar": 20,
+        "endLine": 11,
+        "endChar": 25
+      },
+      "revId": "a44c20a6a3cf1dde95ae04a2ad5ddd5fa625afff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
