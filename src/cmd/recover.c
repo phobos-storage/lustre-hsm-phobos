@@ -8,6 +8,7 @@
 #include <error.h>
 #include <getopt.h>
 #include <grp.h>
+#include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,6 +60,7 @@ static int ct_recover(const char *fid, const char *newpath,
     struct stat inode = {
         .st_mode = 00640,
     };
+    const char *username;
     const char *path;
     char *endptr;
     int rc = 0;
@@ -109,6 +111,15 @@ static int ct_recover(const char *fid, const char *newpath,
             pho_error(rc, "'fullpath' is not registered in user_md of '%s'", fid);
             return rc;
         }
+    }
+
+    username = pho_attr_get(&xtgt.xt_attrs, "username");
+    if (username) {
+        struct passwd *pwd;
+
+        pwd = getpwnam(username);
+        if (pwd != NULL)
+            inode.st_uid = pwd->pw_uid;
     }
 
     rc = llapi_hsm_import(path, 0, &inode,

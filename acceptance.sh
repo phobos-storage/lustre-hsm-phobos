@@ -1237,30 +1237,34 @@ function test_recover()
     local fid3=$(create_file "$file3")
 
     groupadd tasty
+    useradd -g tasty -MN crousty
+
+    chown crousty $file2
 
     add_event_watch
     start_copytool
 
-    lfs hsm_archive "$file1"
-    wait_for_event ARCHIVE_FINISH "$file1"
-    rm "$file1"
+    for file in "$file1 $file2 $file3"; do
+        lfs hsm_archive $file
+        wait_for_event ARCHIVE_FINISH $file
+        rm $file
+    done
 
-    lfs hsm_archive "$file2"
-    wait_for_event ARCHIVE_FINISH "$file2"
-    rm "$file2"
-
-    lfs hsm_archive "$file3"
-    wait_for_event ARCHIVE_FINISH "$file3"
-    rm "$file3"
-
+    # Basic recover
     ct_recover "$test_dir" "$fid1" ||
         error "Recovering should have succeeded for '$file1'"
     ls -g "$file1" | grep "root" ||
         error "'$file1' group should not have been changed"
+
+    # Recover with new group
     ct_recover -g tasty "$test_dir" "$fid2" ||
         error "Recovering should have succeeded for '$file2'"
     ls -g "$file2" | grep "tasty" ||
         error "'$file2' group should have been changed"
+    ls -o "$file2" | grep "crousty" ||
+        error "'$file2' user should have been correctly retrieved"
+
+    # Recover with new path
     ct_recover -p "$test_dir/newfile" "$test_dir" "$fid3" ||
         error "Recovering should have succeeded for '$file3'"
     ls "$file3" &&
@@ -1268,6 +1272,7 @@ function test_recover()
     ls -g "$test_dir/newfile" | grep "root" ||
         error "'$file3' group should not have been changed"
 
+    userdel crousty
     groupdel tasty
 
 }
