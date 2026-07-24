@@ -30,6 +30,7 @@
     "Options:\n"                                                     \
     "    --dry-run      Simulate recovery without making changes.\n" \
     "    -p <new_path>  Specify a new path for the object.\n"        \
+    "    -u <user>      Specify an owner for the object.\n"          \
     "    -g <group>     Specify a group for the object owner.\n"     \
     "Help:\n"                                                        \
     "    -h, --help     Print this message.\n"                       \
@@ -50,7 +51,7 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
 }
 
 static int ct_recover(const char *fid, const char *newpath,
-                      const char *groupname)
+                      const char *newuser, const char *newgroup)
 {
     struct pho_xfer_target xtgt = {};
     struct pho_xfer_desc xfer = {};
@@ -77,14 +78,14 @@ static int ct_recover(const char *fid, const char *newpath,
         return rc;
     }
 
-    if (groupname && groupname[0] != '\0') {
+    if (newgroup && newgroup[0] != '\0') {
         struct group *grp;
 
         errno = 0;
-        grp = getgrnam(groupname);
+        grp = getgrnam(newgroup);
         if (!grp) {
             rc = -errno;
-            pho_error(rc, "failed to retrieve group id '%s'", groupname);
+            pho_error(rc, "failed to retrieve group id '%s'", newgroup);
             return rc;
         }
         inode.st_gid = grp->gr_gid;
@@ -113,13 +114,20 @@ static int ct_recover(const char *fid, const char *newpath,
         }
     }
 
-    username = pho_attr_get(&xtgt.xt_attrs, "username");
+    if (newuser && newuser[0] != '\0')
+        username = newuser;
+    else
+        username = pho_attr_get(&xtgt.xt_attrs, "username");
+
     if (username) {
         struct passwd *pwd;
 
         pwd = getpwnam(username);
         if (pwd != NULL)
             inode.st_uid = pwd->pw_uid;
+        else
+            pho_info("user '%s' was not found, will use 'root' instead",
+                     username);
     }
 
     rc = llapi_hsm_import(path, 0, &inode,
@@ -138,18 +146,19 @@ void print_version(const char *prog_name) {
     fprintf(stderr, "%s v%s\n", prog_name, VERSION);
 }
 
-void recover_object(int dry_run, char *new_path, char *group, char *object_id) {
+void recover_object(int dry_run, char *new_path, char *user, char *group,
+                    char *object_id) {
     if (dry_run) {
         printf("[DRY RUN] Would recover object %s", object_id);
         if (new_path) printf(" to path %s", new_path);
-        if (group) printf(" with group %s", group);
+        if (group) printf(" with user:group %s:%s", user, group);
         printf(".\n");
     } else {
         printf("Recovering object %s", object_id);
         if (new_path) printf(" to path %s", new_path);
-        if (group) printf(" with group %s", group);
+        if (group) printf(" with user:group %s:%s", user, group);
         printf(".\n");
-        ct_recover(object_id, new_path, group);
+        ct_recover(object_id, new_path, user, group);
     }
 }
 
@@ -158,6 +167,7 @@ int main(int argc, char *argv[]) {
     char *mount_pt = NULL;
     char *new_path = NULL;
     char *group = NULL;
+    char *user = NULL;
     int dry_run = 0;
     int opt;
     int rc;
@@ -189,7 +199,7 @@ int main(int argc, char *argv[]) {
     atexit(phobos_fini);
 #endif
 
-    while ((opt = getopt_long(argc, argv, "dg:hp:v", longopts, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "dg:hp:u:v", longopts, NULL)) != -1) {
         switch (opt) {
             case 'd':
                 dry_run = 1;
@@ -202,6 +212,9 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_SUCCESS);
             case 'p':
                 new_path = optarg;
+                break;
+            case 'u':
+                user = optarg;
                 break;
             case 'v':
                 print_version(argv[0]);
@@ -228,7 +241,7 @@ int main(int argc, char *argv[]) {
         return rc;
     }
 
-    recover_object(dry_run, new_path, group, object_id);
+    recover_object(dry_run, new_path, user, group, object_id);
 
     return EXIT_SUCCESS;
 }
