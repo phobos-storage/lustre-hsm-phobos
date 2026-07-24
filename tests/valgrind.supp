@@ -7,12 +7,20 @@
    obj:/usr/lib64/ld-*.so
 }
 {
+    <_dl_open>
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    ...
+    fun:_dl_open
+    ...
+}
+{
    <gss_acquire_cred>
    Memcheck:Leak
    match-leak-kinds: reachable
    ...
    obj:/usr/lib64/libgssapi_krb5.so*
-   fun:gss_acquire_cred
+   fun:gss_acquire_cred*
    ...
 }
 {
