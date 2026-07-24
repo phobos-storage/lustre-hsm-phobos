@@ -1232,9 +1232,11 @@ function test_recover()
     local file1="$test_dir/file1"
     local file2="$test_dir/file2"
     local file3="$test_dir/file3"
+    local file4="$test_dir/file4"
     local fid1=$(create_file "$file1")
     local fid2=$(create_file "$file2")
     local fid3=$(create_file "$file3")
+    local fid4=$(create_file "$file4")
 
     groupadd tasty
     useradd -g tasty -MN crousty
@@ -1244,7 +1246,7 @@ function test_recover()
     add_event_watch
     start_copytool
 
-    for file in "$file1 $file2 $file3"; do
+    for file in "$file1 $file2 $file3 $file4"; do
         lfs hsm_archive $file
         wait_for_event ARCHIVE_FINISH $file
         rm $file
@@ -1272,7 +1274,13 @@ function test_recover()
     ls -g "$test_dir/newfile" | grep "root" ||
         error "'$file3' group should not have been changed"
 
-    userdel crousty
+    # Recover with new user
+    ct_recover -u crousty "$test_dir" "$fid4" ||
+        error "Recovering should have succeeded for '$file4'"
+    ls -o "$file4" | grep "crousty" ||
+        error "'$file4' user should have been changed"
+
+    userdel -r crousty 2>/dev/null
     groupdel tasty
 
 }
