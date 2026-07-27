@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a35f0b3_ed3fc403",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-27T07:31:02Z",
+      "side": 1,
+      "message": "question: where does this come from ?",
+      "range": {
+        "startLine": 83,
+        "startChar": 15,
+        "endLine": 83,
+        "endChar": 24
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "511e5a73_f53a9a42",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-27T07:31:02Z",
+      "side": 1,
+      "message": "question: doesn\u0027t \"llapi_fid_parse\" already check this ?",
+      "range": {
+        "startLine": 94,
+        "startChar": 34,
+        "endLine": 94,
+        "endChar": 55
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7c9ed2e_599dee1c",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-27T07:31:02Z",
+      "side": 1,
+      "message": "question: do you plan on adding recover of deprecated objects ?",
+      "range": {
+        "startLine": 119,
+        "startChar": 4,
+        "endLine": 119,
+        "endChar": 45
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06d631d2_345fc842",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-27T07:31:02Z",
+      "side": 1,
+      "message": "suggest:\n```\nif (dry_run)\n    printf [DRY RUN]...\nelse\n    printf Recovering...\n    \nif (new_path)\n    printf ...\n    \n\nif (group)\n    printf ...\n    \n\nprintf .\\n\n\nif (!dry_run)\n    ct_recover...\n```",
+      "range": {
+        "startLine": 158,
+        "startChar": 4,
+        "endLine": 170,
+        "endChar": 1
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
