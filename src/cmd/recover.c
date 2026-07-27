@@ -50,19 +50,10 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
     return rc < 0 ? rc : 0;
 }
 
-static int ct_recover(const char *fid, const char *newpath,
-                      const char *newuser, const char *newgroup)
+static int retrieve_usermd(const char *fid, struct pho_xfer_desc *xfer)
 {
-    struct pho_xfer_target xtgt = {};
-    struct pho_xfer_desc xfer = {};
     char objid[MAXNAMLEN];
-    struct lu_fid newfid;
     struct lu_fid lu_fid;
-    struct stat inode = {
-        .st_mode = 00640,
-    };
-    const char *username;
-    const char *path;
     char *endptr;
     int rc = 0;
 
@@ -78,6 +69,36 @@ static int ct_recover(const char *fid, const char *newpath,
         return rc;
     }
 
+    xfer->xd_op = PHO_XFER_OP_GETMD;
+    xfer->xd_params.get.scope = DSS_OBJ_ALIVE;
+    xfer->xd_flags = 0;
+    xfer->xd_ntargets = 1;
+    xfer->xd_targets[0].xt_objid = objid;
+
+    rc = phobos_getmd(xfer, 1, NULL, NULL);
+    if (rc) {
+        pho_error(rc, "user_md retrieval for fid '%s' failed\n", fid);
+        return rc;
+    }
+
+    return 0;
+}
+
+static int ct_recover(const char *fid, const char *newpath,
+                      const char *newuser, const char *newgroup)
+{
+    struct pho_xfer_target xtgt = {};
+    struct pho_xfer_desc xfer = {};
+    struct lu_fid newfid;
+    struct stat inode = {
+        .st_mode = 00640,
+    };
+    const char *username;
+    const char *path;
+    int rc;
+
+    xfer.xd_targets = &xtgt;
+
     if (newgroup && newgroup[0] != '\0') {
         struct group *grp;
 
@@ -86,23 +107,14 @@ static int ct_recover(const char *fid, const char *newpath,
         if (!grp) {
             rc = -errno;
             pho_error(rc, "failed to retrieve group id '%s'", newgroup);
-            return rc;
+            return rc ? rc : -EINVAL;
         }
         inode.st_gid = grp->gr_gid;
     }
 
-    xfer.xd_op = PHO_XFER_OP_GETMD;
-    xfer.xd_params.get.scope = DSS_OBJ_ALIVE;
-    xfer.xd_flags = 0;
-    xfer.xd_ntargets = 1;
-    xfer.xd_targets = &xtgt;
-    xtgt.xt_objid = objid;
-
-    rc = phobos_getmd(&xfer, 1, NULL, NULL);
-    if (rc) {
-        pho_error(rc, "user_md retrieval for fid '%s' failed\n", fid);
+    rc = retrieve_usermd(fid, &xfer);
+    if (rc)
         return rc;
-    }
 
     if (newpath && newpath[0] != '\0') {
         path = newpath;
@@ -146,19 +158,20 @@ void print_version(const char *prog_name) {
     fprintf(stderr, "%s v%s\n", prog_name, VERSION);
 }
 
-void recover_object(int dry_run, char *new_path, char *user, char *group,
-                    char *object_id) {
+int recover_object(int dry_run, char *new_path, char *user, char *group,
+                   char *object_id) {
     if (dry_run) {
         printf("[DRY RUN] Would recover object %s", object_id);
         if (new_path) printf(" to path %s", new_path);
         if (group) printf(" with user:group %s:%s", user, group);
         printf(".\n");
+        return 0;
     } else {
         printf("Recovering object %s", object_id);
         if (new_path) printf(" to path %s", new_path);
         if (group) printf(" with user:group %s:%s", user, group);
         printf(".\n");
-        ct_recover(object_id, new_path, user, group);
+        return ct_recover(object_id, new_path, user, group);
     }
 }
 
@@ -241,7 +254,7 @@ int main(int argc, char *argv[]) {
         return rc;
     }
 
-    recover_object(dry_run, new_path, user, group, object_id);
+    rc = recover_object(dry_run, new_path, user, group, object_id);
 
-    return EXIT_SUCCESS;
+    return rc ? rc : EXIT_SUCCESS;
 }
