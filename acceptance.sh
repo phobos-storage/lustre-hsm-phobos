@@ -1286,10 +1286,45 @@ function test_recover()
 }
 add_test recover
 
+function test_bad_recover()
+{
+    local file1="$test_dir/file1"
+    local fid1=$(create_file "$file1")
+
+    add_event_watch
+    start_copytool
+
+    for file in "$file1"; do
+        lfs hsm_archive $file
+        wait_for_event ARCHIVE_FINISH $file
+    done
+
+    ct_recover "$test_dir" "$fid1" &&
+        error "Recovering should fail because file still exists"
+
+    rm $file
+
+    # Group does not exist
+    echo "==== TEST 1 ===="
+    ct_recover -g tasty "$test_dir" "$fid1" &&
+        error "Recovering should fail because group does not exist"
+
+    # Path points to an existing file
+    echo "==== TEST 2 ===="
+    touch $file1
+    ct_recover "$test_dir" "$fid1" &&
+        error "Recovering should fail because path already exists"
+
+    echo "==== TEST 3 ===="
+    touch "$test_dir/newfile"
+    ct_recover -p "$test_dir/newfile" "$test_dir" "$fid1" &&
+        error "Recovering should fail because (new)path already exists"
+
+    return 0
+}
+add_test bad_recover
+
 ## need to add some tests:
-## - group does not exist
-## - the path is already taken for another file
-## - the file is not removed
 ## - check dry-run behavior
 
 run_tests
