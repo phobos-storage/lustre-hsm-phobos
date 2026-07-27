@@ -84,20 +84,33 @@ static int retrieve_usermd(const char *fid, struct pho_xfer_desc *xfer)
     return 0;
 }
 
-static int ct_recover(const char *fid, const char *newpath,
-                      const char *newuser, const char *newgroup)
+static int retrieve_user(struct stat *inode, struct pho_xfer_desc *xfer,
+                         const char *newuser)
 {
-    struct pho_xfer_target xtgt = {};
-    struct pho_xfer_desc xfer = {};
-    struct lu_fid newfid;
-    struct stat inode = {
-        .st_mode = 00640,
-    };
     const char *username;
-    const char *path;
-    int rc;
 
-    xfer.xd_targets = &xtgt;
+    if (newuser && newuser[0] != '\0')
+        username = newuser;
+    else
+        username = pho_attr_get(&xfer->xd_targets[0].xt_attrs, "username");
+
+    if (username) {
+        struct passwd *pwd;
+
+        pwd = getpwnam(username);
+        if (pwd)
+            inode->st_uid = pwd->pw_uid;
+        else
+            pho_info("user '%s' was not found, will use 'root' instead",
+                     username);
+    }
+
+    return 0;
+}
+
+static int retrieve_group(struct stat *inode, const char *newgroup)
+{
+    int rc;
 
     if (newgroup && newgroup[0] != '\0') {
         struct group *grp;
@@ -109,43 +122,37 @@ static int ct_recover(const char *fid, const char *newpath,
             pho_error(rc, "failed to retrieve group id '%s'", newgroup);
             return rc ? rc : -EINVAL;
         }
-        inode.st_gid = grp->gr_gid;
+        inode->st_gid = grp->gr_gid;
     }
 
-    rc = retrieve_usermd(fid, &xfer);
-    if (rc)
-        return rc;
+    return 0;
+}
 
+static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
+                         const char *newpath)
+{
     if (newpath && newpath[0] != '\0') {
-        path = newpath;
+        *path = newpath;
     } else {
-        path = pho_attr_get(&xtgt.xt_attrs, "fullpath");
+        *path = pho_attr_get(&xfer->xd_targets[0].xt_attrs, "fullpath");
         if (!*path) {
-            pho_error(rc, "'fullpath' is not registered in user_md of '%s'", fid);
-            return rc;
+            pho_error(-EINVAL, "'fullpath' is not registered in user_md");
+            return -EINVAL;
         }
     }
 
-    if (newuser && newuser[0] != '\0')
-        username = newuser;
-    else
-        username = pho_attr_get(&xtgt.xt_attrs, "username");
+    return 0;
+}
 
-    if (username) {
-        struct passwd *pwd;
+static int ct_recover(const char *path,
+                      __attribute__((unused))struct pho_xfer_desc *xfer,
+                      struct stat *inode)
+{
+    struct lu_fid newfid;
+    int rc;
 
-        pwd = getpwnam(username);
-        if (pwd != NULL)
-            inode.st_uid = pwd->pw_uid;
-        else
-            pho_info("user '%s' was not found, will use 'root' instead",
-                     username);
-    }
-
-    rc = llapi_hsm_import(path, 0, &inode,
+    rc = llapi_hsm_import(path, 0, inode,
                           0, -1, 0, 0, NULL, &newfid);
-
-    pho_xfer_desc_clean(&xfer);
 
     return rc;
 }
@@ -160,19 +167,45 @@ void print_version(const char *prog_name) {
 
 int recover_object(int dry_run, char *new_path, char *user, char *group,
                    char *object_id) {
-    if (dry_run) {
-        printf("[DRY RUN] Would recover object %s", object_id);
-        if (new_path) printf(" to path %s", new_path);
-        if (group) printf(" with user:group %s:%s", user, group);
-        printf(".\n");
-        return 0;
-    } else {
-        printf("Recovering object %s", object_id);
-        if (new_path) printf(" to path %s", new_path);
-        if (group) printf(" with user:group %s:%s", user, group);
-        printf(".\n");
-        return ct_recover(object_id, new_path, user, group);
-    }
+    struct pho_xfer_target xtgt = {};
+    struct pho_xfer_desc xfer = {};
+    struct stat inode = {
+        .st_mode = 00640,
+    };
+    const char *path;
+    int rc;
+
+    xfer.xd_targets = &xtgt;
+    rc = retrieve_usermd(object_id, &xfer);
+    if (rc)
+        return rc;
+
+    rc = retrieve_user(&inode, &xfer, user);
+    if (rc)
+        return rc;
+
+    rc = retrieve_group(&inode, group);
+    if (rc)
+        return rc;
+
+    rc = retrieve_path(&path, &xfer, new_path);
+    if (rc)
+        return rc;
+
+    if (dry_run)
+        printf("[DRY RUN] would recover ");
+    else
+        printf("recovering ");
+
+    printf("object '%s' to path '%s' ", object_id, path);
+    printf("(user: %u, group: %u)\n", inode.st_uid, inode.st_gid);
+
+    if (!dry_run)
+        rc = ct_recover(path, &xfer, &inode);
+
+    pho_xfer_desc_clean(&xfer);
+
+    return rc;
 }
 
 int main(int argc, char *argv[]) {
