@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "780432ac_3cfc364f",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 1247,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2026-07-28T13:00:44Z",
+      "side": 1,
+      "message": "Thanks, done.",
+      "parentUuid": "3e925b32_5b67320b",
+      "range": {
+        "startLine": 1247,
+        "startChar": 16,
+        "endLine": 1247,
+        "endChar": 38
+      },
+      "revId": "e749511a32b11f66c58b53f114f87057166ddc44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f5a4ea0_e5b3cc01",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-28T07:36:41Z",
       "side": 1,
       "message": "question: no error message like for the fullpath ? If the user registered doesn\u0027t exists, that seems a big issue to me",
+      "range": {
+        "startLine": 121,
+        "startChar": 7,
+        "endLine": 121,
+        "endChar": 24
+      },
+      "revId": "e749511a32b11f66c58b53f114f87057166ddc44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15f0662e_5cf12998",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2026-07-28T13:00:44Z",
+      "side": 1,
+      "message": "Yes, because instead of group, the username was only retrieved from metadata, and we decided with Guillaume that in a best effort way, putting root as owner is sufficient. For group, the name comes from the command line, thus it indicates the name given by the admin is incorrect, which I consider more important.\n\nFor the fullpath, we do not have any other choice than asking to the admin, so this is an error.\n\nA log is added in a later patch for the user, which at least informs the admin the retrieval did not succeed. Maybe I should change the log level in this one, in case the bad username is the one given by the admin.",
+      "parentUuid": "3f5a4ea0_e5b3cc01",
       "range": {
         "startLine": 121,
         "startChar": 7,
