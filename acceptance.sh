@@ -1324,9 +1324,38 @@ function test_bad_recover()
 }
 add_test bad_recover
 
+function test_recover_and_undelete()
+{
+    local file="$test_dir/file"
+    local fid=$(create_file "$file")
+
+    add_event_watch
+    start_copytool
+
+    lfs hsm_archive $file
+    wait_for_event ARCHIVE_FINISH $file
+    rm $file
+
+    oid=$(phobos object list)
+    phobos delete $oid
+
+    phobos object list --deprecated --output all
+
+    phobos object list --deprecated-only | grep $oid ||
+        error "Object should be deprecated after deletion"
+
+    ct_recover "$test_dir" "$fid" ||
+        error "Recovering should have succeeded for '$file'"
+
+    phobos object list | grep $oid ||
+        error "Object should be alive again after recover"
+}
+add_test recover_and_undelete
+
 ## need to add some tests:
 ## - check dry-run behavior
 
+TESTS="recover_and_undelete"
 run_tests
 
 exit $FAILURES

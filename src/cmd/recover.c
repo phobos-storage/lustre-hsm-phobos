@@ -20,6 +20,7 @@
 #include <linux/lustre/lustre_fid.h>
 #include <lustre/lustreapi.h>
 #include <phobos_store.h>
+#include <pho_common.h>
 
 #define VERSION "0.0.1"
 
@@ -50,9 +51,9 @@ static int fid2objid(const struct lu_fid *fid, char *objid)
     return rc < 0 ? rc : 0;
 }
 
-static int retrieve_usermd(const char *fid, struct pho_xfer_desc *xfer)
+static int retrieve_usermd(struct pho_xfer_desc *xfer, char *objid,
+                           const char *fid)
 {
-    char objid[MAXNAMLEN];
     struct lu_fid lu_fid;
     char *endptr;
     int rc = 0;
@@ -72,12 +73,19 @@ static int retrieve_usermd(const char *fid, struct pho_xfer_desc *xfer)
     xfer->xd_op = PHO_XFER_OP_GETMD;
     xfer->xd_params.get.scope = DSS_OBJ_ALIVE;
     xfer->xd_flags = 0;
-    xfer->xd_ntargets = 1;
-    xfer->xd_targets[0].xt_objid = objid;
 
-    rc = phobos_getmd(xfer, 1, NULL, NULL);
+    rc = phobos_getmd(xfer, 1);
+    if (!rc)
+        return rc;
+
+    pho_info("user_md retrieval for alive fid '%s' failed, "
+             "will attempt deprecated", fid);
+
+    xfer->xd_params.get.scope = DSS_OBJ_DEPRECATED;
+
+    rc = phobos_getmd(xfer, 1);
     if (rc) {
-        pho_error(rc, "user_md retrieval for fid '%s' failed\n", fid);
+        pho_error(rc, "user_md retrieval for fid '%s' failed", fid);
         return rc;
     }
 
@@ -92,7 +100,7 @@ static int retrieve_user(struct stat *inode, struct pho_xfer_desc *xfer,
     if (newuser && newuser[0] != '\0')
         username = newuser;
     else
-        username = pho_attr_get(&xfer->xd_targets[0].xt_attrs, "username");
+        username = pho_attr_get(&xfer->xd_targets->xt_attrs, "username");
 
     if (username) {
         struct passwd *pwd;
@@ -134,7 +142,7 @@ static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
     if (newpath && newpath[0] != '\0') {
         *path = newpath;
     } else {
-        *path = pho_attr_get(&xfer->xd_targets[0].xt_attrs, "fullpath");
+        *path = pho_attr_get(&xfer->xd_targets->xt_attrs, "fullpath");
         if (!*path) {
             pho_error(-EINVAL, "'fullpath' is not registered in user_md");
             return -EINVAL;
@@ -144,8 +152,7 @@ static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
     return 0;
 }
 
-static int ct_recover(const char *path,
-                      __attribute__((unused))struct pho_xfer_desc *xfer,
+static int ct_recover(const char *path, struct pho_xfer_desc *xfer,
                       struct stat *inode)
 {
     struct lu_fid newfid;
@@ -153,7 +160,23 @@ static int ct_recover(const char *path,
 
     rc = llapi_hsm_import(path, 0, inode,
                           0, -1, 0, 0, NULL, &newfid);
+    if (rc) {
+        pho_error(rc, "llapi_hsm_import failed");
+        return rc;
+    }
 
+    if (xfer->xd_params.get.scope != DSS_OBJ_DEPRECATED)
+        return rc;
+
+    pho_info("will undelete '%s':'%s'@%d",
+             xfer->xd_targets->xt_objid,
+             xfer->xd_targets->xt_objuuid,
+             xfer->xd_targets->xt_version);
+
+    rc = phobos_undelete(xfer, 1);
+
+    if (rc)
+        pho_warn("object undelete failed (rc=%d)", rc);
     return rc;
 }
 
@@ -169,14 +192,17 @@ int recover_object(int dry_run, char *new_path, char *user, char *group,
                    char *object_id) {
     struct pho_xfer_target xtgt = {};
     struct pho_xfer_desc xfer = {};
+    char objid[MAXNAMLEN];
     struct stat inode = {
         .st_mode = 00640,
     };
     const char *path;
     int rc;
 
+    xtgt.xt_objid = objid;
     xfer.xd_targets = &xtgt;
-    rc = retrieve_usermd(object_id, &xfer);
+    xfer.xd_ntargets = 1;
+    rc = retrieve_usermd(&xfer, objid, object_id);
     if (rc)
         return rc;
 
