@@ -400,16 +400,13 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     xfer.xd_params.delete.scope = DSS_OBJ_ALIVE;
     xfer.xd_ntargets = 1;
     xfer.xd_targets = &xtgt;
-    xtgt.xt_objid = strdup(obj);
-    if (!xtgt.xt_objid)
-        return -errno;
+    xtgt.xt_objid = obj;
 
     rc = phobos_delete(&xfer, 1);
     if (rc)
         pho_error(rc, "Failed to delete '%s' from Phobos", obj);
 
     /* Cleanup and exit */
-    free(xtgt.xt_objid);
     pho_xfer_desc_clean(&xfer);
 
 free_hints:
@@ -704,7 +701,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
     xfer.xd_targets = &xtgt;
     xtgt.xt_objid = obj;
 
-    rc = phobos_getmd(&xfer, 1, NULL, NULL);
+    rc = phobos_getmd(&xfer, 1);
     if (rc) {
         pho_error(rc, "failed to get metadata of '%s' from Phobos", obj);
         return rc;
