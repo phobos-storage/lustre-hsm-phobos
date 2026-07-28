@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab90cdfb_84f47a22",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-28T07:22:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e4d3c600_74177534",
+      "range": {
+        "startLine": 83,
+        "startChar": 15,
+        "endLine": 83,
+        "endChar": 24
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "511e5a73_f53a9a42",
@@ -142,6 +166,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2148b28_c8d5fa49",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-28T07:22:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a388efdb_a71770cd",
+      "range": {
+        "startLine": 119,
+        "startChar": 4,
+        "endLine": 119,
+        "endChar": 45
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06d631d2_345fc842",
@@ -179,6 +227,30 @@
       "side": 1,
       "message": "I improved this part of the code in a later patch. I followed your recommendations.",
       "parentUuid": "06d631d2_345fc842",
+      "range": {
+        "startLine": 158,
+        "startChar": 4,
+        "endLine": 170,
+        "endChar": 1
+      },
+      "revId": "ba54c7a7ac03e13c3fe3080ead40ff8af6b44c9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0da0484e_b2309157",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-28T07:22:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4da8dca4_f7db8331",
       "range": {
         "startLine": 158,
         "startChar": 4,
