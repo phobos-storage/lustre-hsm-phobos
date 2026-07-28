@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc391e2c_4733c21a",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 1342,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2026-07-28T13:03:45Z",
+      "side": 1,
+      "message": "nit: to remove",
+      "revId": "3e7a7d0d5fa41a176b99ae2da83e42a2ed9cbeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "280d705b_9b01da09",
+        "filename": "acceptance.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 1358,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2026-07-28T13:03:45Z",
+      "side": 1,
+      "message": "defect: to remove",
+      "revId": "3e7a7d0d5fa41a176b99ae2da83e42a2ed9cbeab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
