@@ -93,6 +93,30 @@
       },
       "revId": "e749511a32b11f66c58b53f114f87057166ddc44",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44196219_ee46920c",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-07-29T07:38:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "15f0662e_5cf12998",
+      "range": {
+        "startLine": 121,
+        "startChar": 7,
+        "endLine": 121,
+        "endChar": 24
+      },
+      "revId": "e749511a32b11f66c58b53f114f87057166ddc44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
