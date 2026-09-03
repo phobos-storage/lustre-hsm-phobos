@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4737347d_f45ea59b",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-09-03T07:12:37Z",
+      "side": 1,
+      "message": "minor: user can be set without group and group can be set without user",
+      "revId": "b1afdc0a666fedd4ef07da6a638eee9586a055c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
