@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4e0eba5_ae0c0a53",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1340,
+      "author": {
+        "id": 1037727
+      },
+      "writtenOn": "2026-09-03T08:49:35Z",
+      "side": 1,
+      "message": "sugest: use lfs hsm_remove",
+      "range": {
+        "startLine": 1339,
+        "startChar": 3,
+        "endLine": 1340,
+        "endChar": 22
+      },
+      "revId": "8fa2ed10a721a3f2a2b182bac72c921b1dc61f76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
