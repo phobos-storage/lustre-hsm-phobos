@@ -409,7 +409,7 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
         pho_error(rc, "Failed to delete '%s' from Phobos", obj);
 
     /* Cleanup and exit */
-    free(xtgt.xt_objid);
+    free((void *)xtgt.xt_objid);
     pho_xfer_desc_clean(&xfer);
 
 free_hints:
