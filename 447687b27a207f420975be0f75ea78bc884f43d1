@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d405d8ee_c2c47673",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1008040
+      },
+      "writtenOn": "2026-09-08T09:47:58Z",
+      "side": 1,
+      "message": "Il y avait un oubli de montée de version dans le meson.build.",
+      "revId": "447687b27a207f420975be0f75ea78bc884f43d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
