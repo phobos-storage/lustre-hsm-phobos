@@ -1,0 +1,326 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91e9bbff_638b3512",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "Why remove valgrind support?",
+      "range": {
+        "startLine": 457,
+        "startChar": 4,
+        "endLine": 457,
+        "endChar": 31
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ec18ef5_57a8ead6",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "major: group is not cleared on test failure. Use trap_add to cleanup the group automatically",
+      "range": {
+        "startLine": 1239,
+        "startChar": 4,
+        "endLine": 1239,
+        "endChar": 18
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b78f52b7_a2af4252",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "major: I\u0027d rather give it a more generic name as we might add commands in the futur (like for the HPSS copytool).\nAlso, this does not contain \"phobos\". Maybe `lhsm-phobos recover`?",
+      "range": {
+        "startLine": 89,
+        "startChar": 14,
+        "endLine": 89,
+        "endChar": 21
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6903bee6_ea9dcee9",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "minor: I find it easier to navigate the source code when the file containing the main entry point of a command has the same name. If we change the name of the tool, maybe `src/lhsm-phobos/recover.c`?",
+      "range": {
+        "startLine": 91,
+        "startChar": 17,
+        "endLine": 91,
+        "endChar": 24
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "894e69aa_0032ef02",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "Is there a version macro taken from the meson config? I\u0027d rather have only one source of truth for the version.",
+      "range": {
+        "startLine": 23,
+        "startChar": 8,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a41e0468_85660a6e",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "minor: add a short description of what the tool does",
+      "range": {
+        "startLine": 26,
+        "startChar": 5,
+        "endLine": 26,
+        "endChar": 11
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d9baa14_7b77eb28",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "nit: maybe add an empty line for readablity before sections?",
+      "range": {
+        "startLine": 28,
+        "startChar": 4,
+        "endLine": 28,
+        "endChar": 10
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63973358_21184f1d",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "There is also a -d option",
+      "range": {
+        "startLine": 30,
+        "startChar": 9,
+        "endLine": 30,
+        "endChar": 17
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc998b31_ade379a8",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "No long options for path and group?",
+      "range": {
+        "startLine": 31,
+        "startChar": 9,
+        "endLine": 31,
+        "endChar": 11
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acc16c75_49afee73",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "there is also a -v option",
+      "range": {
+        "startLine": 35,
+        "startChar": 9,
+        "endLine": 35,
+        "endChar": 19
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "026f5690_3a6d1c35",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "It would be nice to reuse code between lhsmtool_phobos and this command.",
+      "range": {
+        "startLine": 39,
+        "startChar": 11,
+        "endLine": 39,
+        "endChar": 20
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d31f7dfe_7d274227",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "nit: failed to parse fid \u0027%s\u0027 ?",
+      "range": {
+        "startLine": 68,
+        "startChar": 28,
+        "endLine": 68,
+        "endChar": 35
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cbcc37a_729fd050",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "suggest: add suggestion in the error message. Also, use the object ID as this is what will allow admins to query the DB when this error happens:\n\n```\n\u0027fullpath\u0027 not found in user_md of \u0027{objid}\u0027. Use --path|-p to specify the destination.\n```",
+      "range": {
+        "startLine": 109,
+        "startChar": 27,
+        "endLine": 109,
+        "endChar": 37
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9461abcc_0ac0e710",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-08T14:42:54Z",
+      "side": 1,
+      "message": "nit: you could move this where the USAGE macro is (and add a macro for the short options) so that everything is in one place. This would make it clear to developers that they should update the helper when they modify the arguments.",
+      "range": {
+        "startLine": 154,
+        "startChar": 18,
+        "endLine": 154,
+        "endChar": 26
+      },
+      "revId": "29f41886e00c5bb0c0d3668c753bc566d571f376",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
