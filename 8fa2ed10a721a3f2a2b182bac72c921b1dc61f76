@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "db8fe128_f4e4a709",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T09:47:46Z",
+      "side": 1,
+      "message": "nit: quotes",
+      "range": {
+        "startLine": 1335,
+        "startChar": 20,
+        "endLine": 1335,
+        "endChar": 25
+      },
+      "revId": "8fa2ed10a721a3f2a2b182bac72c921b1dc61f76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4e0eba5_ae0c0a53",
         "filename": "acceptance.sh",
         "patchSetId": 2
@@ -14,6 +37,30 @@
       "writtenOn": "2026-09-03T08:49:35Z",
       "side": 1,
       "message": "sugest: use lfs hsm_remove",
+      "range": {
+        "startLine": 1339,
+        "startChar": 3,
+        "endLine": 1340,
+        "endChar": 22
+      },
+      "revId": "8fa2ed10a721a3f2a2b182bac72c921b1dc61f76",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b0da7bb_cec99100",
+        "filename": "acceptance.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1340,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T09:47:46Z",
+      "side": 1,
+      "message": "+1 This would test the actual use case: the file was removed from Lustre then removed by robinhood (after 30 days usually) using HSM remove.",
+      "parentUuid": "f4e0eba5_ae0c0a53",
       "range": {
         "startLine": 1339,
         "startChar": 3,
