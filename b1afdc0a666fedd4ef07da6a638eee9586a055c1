@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "40ec3d92_b13b6750",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T06:58:23Z",
+      "side": 1,
+      "message": "nit: make the user not found message consistent with the group one",
+      "range": {
+        "startLine": 129,
+        "startChar": 12,
+        "endLine": 129,
+        "endChar": 24
+      },
+      "revId": "b1afdc0a666fedd4ef07da6a638eee9586a055c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4737347d_f45ea59b",
         "filename": "src/cmd/recover.c",
         "patchSetId": 2
