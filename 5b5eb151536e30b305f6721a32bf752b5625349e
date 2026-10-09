@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd3a4b86_efb69c82",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T09:43:04Z",
+      "side": 1,
+      "message": "nit: this has nothing to do with this patch but maybe it would be nice do document why we handle username and group differently. One could wonder why we don\u0027t also store the group in the user_md to have the same behavior. It would be nice to add a comment saying something like this: `we don\u0027t store the group in the database to save some disk space in the database. This is why we don\u0027t retrieve it from the user_md like the username.`",
+      "range": {
+        "startLine": 111,
+        "startChar": 11,
+        "endLine": 111,
+        "endChar": 25
+      },
+      "revId": "5b5eb151536e30b305f6721a32bf752b5625349e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "67272efc_a82748f0",
         "filename": "src/cmd/recover.c",
         "patchSetId": 2
@@ -19,6 +42,53 @@
         "startChar": 8,
         "endLine": 116,
         "endChar": 16
+      },
+      "revId": "5b5eb151536e30b305f6721a32bf752b5625349e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "252f2b1b_30a77aef",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T09:43:04Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "67272efc_a82748f0",
+      "range": {
+        "startLine": 116,
+        "startChar": 8,
+        "endLine": 116,
+        "endChar": 16
+      },
+      "revId": "5b5eb151536e30b305f6721a32bf752b5625349e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4c1196f_781ca799",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1019142
+      },
+      "writtenOn": "2026-10-09T09:43:04Z",
+      "side": 1,
+      "message": "minor: as a fallback we could use the parent directory\u0027s group and if it doesn\u0027t exist, the user\u0027s main group as a second fallback.",
+      "range": {
+        "startLine": 122,
+        "startChar": 8,
+        "endLine": 122,
+        "endChar": 20
       },
       "revId": "5b5eb151536e30b305f6721a32bf752b5625349e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
