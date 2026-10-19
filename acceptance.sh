@@ -464,10 +464,10 @@ function hsm_import()
     "$__hsm_import" "$@"
 }
 
-__lhsmtool_recover=$(PATH="$PWD:$PWD/build:$PATH" which lhsmtool_recover)
+__lhsm_phobos=$(PATH="$PWD:$PWD/build:$PATH" which lhsm-phobos)
 function ct_recover()
 {
-    $VALGRIND "$__lhsmtool_recover" "$@"
+    $VALGRIND "$__lhsm_phobos" "$@"
 }
 
 function kill_copytool()
@@ -992,7 +992,9 @@ function test_invalid_archive_id()
     local EINVAL=22
     local rc
 
-    timeout --preserve-status 1 \
+    # the copytool startup (dynamic linking + phobos_init + DB connection)
+    # exceeds 1s under valgrind
+    timeout --preserve-status 10 \
         $VALGRIND "$__lhsmtool_phobos" -A 1 -A "$arg" "$LUSTRE_ROOT"
     rc=$?
     echo $rc
@@ -1240,16 +1242,18 @@ function test_recover()
 
     groupadd tasty
     useradd -g tasty -MN crousty
+    trap_add "userdel crousty"
+    trap_add "groupdel tasty"
 
-    chown crousty $file2
+    chown crousty "$file2"
 
     add_event_watch
     start_copytool
 
-    for file in $file1 $file2 $file3 $file4; do
-        lfs hsm_archive $file
-        wait_for_event ARCHIVE_FINISH $file
-        rm $file
+    for file in "$file1" "$file2" "$file3" "$file4"; do
+        lfs hsm_archive "$file"
+        wait_for_event ARCHIVE_FINISH "$file"
+        rm "$file"
     done
 
     # Basic recover
@@ -1279,10 +1283,6 @@ function test_recover()
         error "Recovering should have succeeded for '$file4'"
     ls -o "$file4" | grep "crousty" ||
         error "'$file4' user should have been changed"
-
-    userdel -r crousty 2>/dev/null
-    groupdel tasty
-
 }
 add_test recover
 
@@ -1295,14 +1295,14 @@ function test_bad_recover()
     start_copytool
 
     for file in "$file1"; do
-        lfs hsm_archive $file
-        wait_for_event ARCHIVE_FINISH $file
+        lfs hsm_archive "$file"
+        wait_for_event ARCHIVE_FINISH "$file"
     done
 
     ct_recover "$test_dir" "$fid1" &&
         error "Recovering should fail because file still exists"
 
-    rm $file
+    rm "$file"
 
     # Group does not exist
     echo "==== TEST 1 ===="
@@ -1311,7 +1311,7 @@ function test_bad_recover()
 
     # Path points to an existing file
     echo "==== TEST 2 ===="
-    touch $file1
+    touch "$file1"
     ct_recover "$test_dir" "$fid1" &&
         error "Recovering should fail because path already exists"
 
@@ -1328,24 +1328,29 @@ function test_recover_and_undelete()
 {
     local file="$test_dir/file"
     local fid=$(create_file "$file")
+    local oid="${FSNAME}:${fid}"
 
     add_event_watch
     start_copytool
 
-    lfs hsm_archive $file
-    wait_for_event ARCHIVE_FINISH $file
-    rm $file
+    lfs hsm_archive "$file"
+    wait_for_event ARCHIVE_FINISH "$file"
 
-    oid=$(phobos object list)
-    phobos delete $oid
+    lfs hsm_remove "$file"
+    wait_for_event REMOVE_FINISH "$file"
 
-    phobos object list --deprecated-only | grep $oid ||
+    phobos object list --deprecated-only | grep "$oid" ||
         error "Object should be deprecated after deletion"
+
+    phobos object list --deprecated -o all
+
+    # hsm_remove does not unlink the file, remove it explicitly
+    rm "$file"
 
     ct_recover "$test_dir" "$fid" ||
         error "Recovering should have succeeded for '$file'"
 
-    phobos object list | grep $oid ||
+    phobos object list | grep "$oid" ||
         error "Object should be alive again after recover"
 }
 add_test recover_and_undelete

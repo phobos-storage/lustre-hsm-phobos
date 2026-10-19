@@ -44,6 +44,7 @@ have_layout_set_by_fd = cc.has_function(
 config = configuration_data()
 config.set('HAVE_LLAPI_LAYOUT_SET_BY_FD', have_layout_set_by_fd)
 config.set('HAVE_PHOBOS_INIT', have_phobos_init)
+config.set_quoted('VERSION', meson.project_version())
 
 configure_file(
     input: 'config.h.in',
@@ -58,6 +59,7 @@ libcopytool = static_library(
         'src/hints.c',
         'src/log.c',
         'src/phobos.c',
+        'src/utils.c',
     ],
     dependencies: [
         phobos_store,
@@ -86,9 +88,10 @@ executable(
 )
 
 executable(
-    'lhsmtool_recover',
+    'lhsm-phobos',
     sources: [
-        'src/cmd/recover.c',
+        'src/lhsm-phobos/recover.c',
+        'src/utils.c',
     ],
     dependencies: [
         phobos_store,
@@ -96,7 +99,7 @@ executable(
         glib2,
         lustre,
     ],
-    include_directories: include_directories('.'),
+    include_directories: include_directories('.', 'src'),
     install: true,
 )
 

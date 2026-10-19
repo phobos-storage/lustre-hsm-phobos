@@ -22,34 +22,68 @@
 #include <phobos_store.h>
 #include <pho_common.h>
 
-#define VERSION "0.0.1"
+#include "utils.h"
 
-#define USAGE                                                        \
-    "Usage: %s [option] <src>\n"                                     \
-    "Arguments:\n"                                                   \
-    "    <src>          Object ID to recover.\n"                     \
-    "Options:\n"                                                     \
-    "    --dry-run      Simulate recovery without making changes.\n" \
-    "    -p <new_path>  Specify a new path for the object.\n"        \
-    "    -u <user>      Specify an owner for the object.\n"          \
-    "    -g <group>     Specify a group for the object owner.\n"     \
-    "Help:\n"                                                        \
-    "    -h, --help     Print this message.\n"                       \
-    "    --version      Print version information.\n"
+#define USAGE                                                                \
+    "Usage: %s [option] <src>\n"                                             \
+    "    Tool which recovers a file from the backend to Lustre.\n"           \
+    "\n"                                                                     \
+    "Arguments:\n"                                                           \
+    "    <src>                   Object ID to recover.\n"                    \
+    "\n"                                                                     \
+    "Options:\n"                                                             \
+    "    -d, --dry-run          Simulate recovery without making changes.\n" \
+    "    -p, --path <new_path>  Specify a new path for the object.\n"        \
+    "    -u, --user <user>      Specify an owner for the object.\n"          \
+    "    -g, --group <group>    Specify a group for the object owner.\n"     \
+    "\n"                                                                     \
+    "Help:\n"                                                                \
+    "    -h, --help             Print this message.\n"                       \
+    "    -v, --version          Print version information.\n"
+
+#define SHORTOPTS "dg:hp:u:v"
+
+static struct option longopts[] = {
+    {
+        .name = "dry-run",
+        .has_arg = no_argument,
+        .flag = 0,
+        .val = 'd',
+    },
+    {
+        .name = "group",
+        .has_arg = required_argument,
+        .flag = 0,
+        .val = 'g',
+    },
+    {
+        .name = "help",
+        .has_arg = no_argument,
+        .flag = 0,
+        .val = 'h',
+    },
+    {
+        .name = "path",
+        .has_arg = required_argument,
+        .flag = 0,
+        .val = 'p',
+    },
+    {
+        .name = "user",
+        .has_arg = required_argument,
+        .flag = 0,
+        .val = 'u',
+    },
+    {
+        .name = "version",
+        .has_arg = no_argument,
+        .flag = 0,
+        .val = 'v',
+    },
+    {0},
+};
 
 static char fs_name[MAX_OBD_NAME + 1];
-
-static int fid2objid(const struct lu_fid *fid, char *objid)
-{
-    int rc;
-
-    if (!objid || !fid)
-        return -EINVAL;
-
-    rc = sprintf(objid, "%s:"DFID_NOBRACE, fs_name, PFID(fid));
-
-    return rc < 0 ? rc : 0;
-}
 
 static int retrieve_usermd(struct pho_xfer_desc *xfer, char *objid,
                            const char *fid)
@@ -60,11 +94,11 @@ static int retrieve_usermd(struct pho_xfer_desc *xfer, char *objid,
 
     rc = llapi_fid_parse(fid, &lu_fid, &endptr);
     if (rc || *endptr != '\0') {
-        pho_error(-EINVAL, "invalid fid parsing '%s'", fid);
+        pho_error(-EINVAL, "failed to parse '%s'", fid);
         return -EINVAL;
     }
 
-    rc = fid2objid(&lu_fid, objid);
+    rc = fid2objid(fs_name, &lu_fid, objid);
     if (rc) {
         pho_error(rc, "failed to build object id for '%s'", fid);
         return rc;
@@ -109,19 +143,23 @@ static int retrieve_user(struct stat *inode, struct pho_xfer_desc *xfer,
         if (pwd)
             inode->st_uid = pwd->pw_uid;
         else
-            pho_info("user '%s' was not found, will use 'root' instead",
+            pho_info("failed to retrieve user '%s', will use 'root' instead",
                      username);
     }
 
     return 0;
 }
 
+/**
+ * We don't store the group in the database to save some disk space.
+ * This is why we don't retrieve it from the user_md, like the username.
+ */
 static int retrieve_group(struct stat *inode, const char *newgroup)
 {
     struct group *grp;
     int rc;
 
-    if (newgroup || newgroup[0] == '\0')
+    if (!newgroup || newgroup[0] == '\0')
         return 0;
 
     errno = 0;
@@ -144,7 +182,10 @@ static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
     } else {
         *path = pho_attr_get(&xfer->xd_targets->xt_attrs, "fullpath");
         if (!*path) {
-            pho_error(-EINVAL, "'fullpath' is not registered in user_md");
+            pho_error(-EINVAL,
+                      "'fullpath' not found in user_md of '%s',"
+                      "use --path|-p to specify the destination",
+                      xfer->xd_targets->xt_objid);
             return -EINVAL;
         }
     }
@@ -244,34 +285,12 @@ int main(int argc, char *argv[]) {
     int opt;
     int rc;
 
-    struct option longopts[] = {
-        {
-            .name = "dry-run",
-            .has_arg = no_argument,
-            .flag = 0,
-            .val = 'd',
-        },
-        {
-            .name = "version",
-            .has_arg = no_argument,
-            .flag = 0,
-            .val = 'v',
-        },
-        {
-            .name = "help",
-            .has_arg = no_argument,
-            .flag = 0,
-            .val = 'h',
-        },
-        {0},
-    };
-
 #ifdef HAVE_PHOBOS_INIT
     phobos_init();
     atexit(phobos_fini);
 #endif
 
-    while ((opt = getopt_long(argc, argv, "dg:hp:u:v", longopts, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1) {
         switch (opt) {
             case 'd':
                 dry_run = 1;
@@ -310,10 +329,10 @@ int main(int argc, char *argv[]) {
     if (rc < 0) {
         pho_error(rc, "cannot find a Lustre filesystem mounted at '%s'",
                   mount_pt);
-        return rc;
+        return -rc;
     }
 
     rc = recover_object(dry_run, new_path, user, group, object_id);
 
-    return rc ? rc : EXIT_SUCCESS;
+    return rc ? -rc : EXIT_SUCCESS;
 }
