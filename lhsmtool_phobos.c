@@ -68,6 +68,7 @@
 
 #include "layout.h"
 #include "common.h"
+#include "utils.h"
 
 #define LL_HSM_ORIGIN_MAX_ARCHIVE (sizeof(__u32) * 8)
 #define XATTR_TRUSTED_PREFIX      "trusted."
@@ -343,15 +344,6 @@ static int ct_parseopts(int argc, char * const *argv)
 /*
  * Phobos functions
  */
-static int fid2objid(const struct lu_fid *fid, char *objid)
-{
-    if (!objid || !fid)
-        return -EINVAL;
-
-    /* object id is "fsname:fid" */
-    return sprintf(objid, "%s:"DFID_NOBRACE, fs_name, PFID(fid));
-}
-
 static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
 {
     struct pho_xfer_target xtgt = {0};
@@ -386,7 +378,7 @@ static int phobos_op_del(const struct lu_fid *fid, const struct buf *hints)
     }
 
     if (!objset) {
-        rc = fid2objid(fid, objid);
+        rc = fid2objid(fs_name, fid, objid);
         if (rc < 0) {
             pho_error(rc, "failed to build object id for "DFID, PFID(fid));
             goto free_hints;
@@ -474,7 +466,7 @@ static int phobos_op_put(const struct lu_fid *fid,
     char *pwd_buf;
     int rc;
 
-    rc = fid2objid(fid, objid);
+    rc = fid2objid(fs_name, fid, objid);
     if (rc < 0)
         return rc;
 
@@ -627,7 +619,7 @@ static int phobos_op_get(const struct lu_fid *fid,
     if (altobjid) {
         obj = altobjid;
     } else {
-        rc = fid2objid(fid, objid);
+        rc = fid2objid(fs_name, fid, objid);
         if (rc < 0)
             return rc;
         obj = objid;
@@ -689,7 +681,7 @@ static int phobos_op_getlayout(const struct lu_fid *fid,
     if (altobjid)
         obj = altobjid;
     else {
-        rc = fid2objid(fid, objid);
+        rc = fid2objid(fs_name, fid, objid);
         if (rc < 0)
             return rc;
         obj = objid;

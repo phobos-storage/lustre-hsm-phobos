@@ -41,7 +41,7 @@ runs Phobos' LRS daemon (version >= 3.4).
 %{_bindir}/lhsmtool_phobos
 %{_unitdir}/lhsmtool_phobos@.service
 %config(noreplace) %{_sysconfdir}/sysconfig/lhsmtool_phobos.sysconfig
-%{_bindir}/lhsmtool_recover
+%{_bindir}/lhsm-phobos
 
 %changelog
 

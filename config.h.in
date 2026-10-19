@@ -4,3 +4,4 @@
 
 #mesondefine HAVE_PHOBOS_INIT
 #mesondefine HAVE_LLAPI_LAYOUT_SET_BY_FD
+#mesondefine VERSION
