@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c940cae5_f4cc660a",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017196
+      },
+      "writtenOn": "2026-10-29T08:58:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40ec3d92_b13b6750",
+      "range": {
+        "startLine": 129,
+        "startChar": 12,
+        "endLine": 129,
+        "endChar": 24
+      },
+      "revId": "b1afdc0a666fedd4ef07da6a638eee9586a055c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4737347d_f45ea59b",
