@@ -1245,18 +1245,26 @@ function test_recover()
     local file5="$test_dir/dir5/file5"
     local fid5=$(create_file "$file5")
 
+    local dir6="$test_dir/dir6"
+    mkdir "$dir6"
+    local file6="$test_dir/dir6/file6"
+    local fid6=$(create_file "$file6")
+
     groupadd tasty
+    groupadd tacos
     useradd -g tasty -MN crousty
     trap_add "userdel crousty"
     trap_add "groupdel tasty"
 
     chown crousty "$file2"
+    chown crousty "$file6"
     chgrp tasty "$dir5"
+    chgrp tacos "$dir6"
 
     add_event_watch
     start_copytool
 
-    for file in "$file1" "$file2" "$file3" "$file4" "$file5"; do
+    for file in "$file1" "$file2" "$file3" "$file4" "$file5" "$file6"; do
         lfs hsm_archive "$file"
         wait_for_event ARCHIVE_FINISH "$file"
         rm "$file"
@@ -1282,6 +1290,14 @@ function test_recover()
     ls -g "$file5" | grep "tasty" ||
         error "'$file5' group should have been changed"
 
+    # Recover with invalid new group and no parent directory, fallback to
+    # the primary group of the file owner
+    rmdir "$dir6"
+    ct_recover -g crousty "$test_dir" "$fid6" ||
+        error "Recovering should have succeeded for '$file6'"
+    ls -g "$file6" | grep "tasty" ||
+        error "'$file6' group should be the primary group of its owner"
+
     # Recover with new path
     ct_recover -p "$test_dir/newfile" "$test_dir" "$fid3" ||
         error "Recovering should have succeeded for '$file3'"
@@ -1303,38 +1319,24 @@ function test_bad_recover()
     local file1="$test_dir/file1"
     local fid1=$(create_file "$file1")
 
-    local dir2="$test_dir/dir2"
-    mkdir "$dir2"
-    local file2="$test_dir/dir2/file2"
-    local fid2=$(create_file "$file2")
-
     add_event_watch
     start_copytool
 
-    for file in "$file1" "$file2"; do
-        lfs hsm_archive "$file"
-        wait_for_event ARCHIVE_FINISH "$file"
-    done
+    lfs hsm_archive "$file1"
+    wait_for_event ARCHIVE_FINISH "$file1"
 
     ct_recover "$test_dir" "$fid1" &&
         error "Recovering should fail because file still exists"
 
     rm "$file1"
-    rm "$file2"
-    rmdir "$dir2"
-
-    # Group does not exist and parent path does not exist
-    echo "==== TEST 1 ===="
-    ct_recover -g tasty "$test_dir" "$fid2" &&
-        error "Recovering should fail because group does not exist"
 
     # Path points to an existing file
-    echo "==== TEST 2 ===="
+    echo "==== TEST 1 ===="
     touch "$file1"
     ct_recover "$test_dir" "$fid1" &&
         error "Recovering should fail because path already exists"
 
-    echo "==== TEST 3 ===="
+    echo "==== TEST 2 ===="
     touch "$test_dir/newfile"
     ct_recover -p "$test_dir/newfile" "$test_dir" "$fid1" &&
         error "Recovering should fail because (new)path already exists"

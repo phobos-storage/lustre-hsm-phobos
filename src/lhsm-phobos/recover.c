@@ -5,6 +5,7 @@
 #endif
 
 #include <dirent.h>
+#include <errno.h>
 #include <error.h>
 #include <getopt.h>
 #include <grp.h>
@@ -14,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -159,6 +161,7 @@ static int retrieve_group(const char *path, struct stat *inode,
 {
     struct stat p_stat;
     struct group *grp;
+    struct passwd *pwd;
     char *dup_path;
     char *cur_str;
     int rc;
@@ -178,10 +181,10 @@ static int retrieve_group(const char *path, struct stat *inode,
     dup_path = strdup(path);
     cur_str = strrchr(dup_path, '/');
     if (!cur_str) {
-        rc = -errno;
+        rc = -ENOENT;
     } else {
         *cur_str = '\0';
-        rc = stat(dup_path, &p_stat);
+        rc = stat(dup_path, &p_stat) < 0 ? -errno : 0;
     }
     free(dup_path);
     if (!rc) {
@@ -189,9 +192,21 @@ static int retrieve_group(const char *path, struct stat *inode,
         return 0;
     }
 
-    pho_error(-rc, "failed to retrieve parent group id of '%s'", path);
+    pho_warn("failed to retrieve parent group id of '%s' (%s), "
+             "fallback to the primary group of the file owner",
+             path, strerror(-rc));
 
-    return rc ? rc : -EINVAL;
+    pwd = getpwuid(inode->st_uid);
+    if (!pwd) {
+        pho_error(-ENOENT, "failed to retrieve the primary group of the "
+                           "owner of '%s' (user id '%u')",
+                  path, inode->st_uid);
+        return -ENOENT;
+    }
+
+    inode->st_gid = pwd->pw_gid;
+
+    return 0;
 }
 
 static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
@@ -213,11 +228,43 @@ static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
     return 0;
 }
 
+/**
+ * llapi_hsm_import() requires the parent directory of the destination path
+ * to exist, so create the missing ones, like mkdir -p.
+ */
+static int make_parent_dirs(const char *path)
+{
+    char *dup_path;
+    char *cur;
+    int rc = 0;
+
+    dup_path = strdup(path);
+    if (!dup_path)
+        return -ENOMEM;
+
+    for (cur = strchr(dup_path + 1, '/'); cur; cur = strchr(cur + 1, '/')) {
+        *cur = '\0';
+        if (mkdir(dup_path, 0755) == -1 && errno != EEXIST) {
+            rc = -errno;
+            pho_error(rc, "failed to create directory '%s'", dup_path);
+            break;
+        }
+        *cur = '/';
+    }
+
+    free(dup_path);
+    return rc;
+}
+
 static int ct_recover(const char *path, struct pho_xfer_desc *xfer,
                       struct stat *inode)
 {
     struct lu_fid newfid;
     int rc;
+
+    rc = make_parent_dirs(path);
+    if (rc)
+        return rc;
 
     rc = llapi_hsm_import(path, 0, inode,
                           0, -1, 0, 0, NULL, &newfid);
