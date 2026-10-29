@@ -1240,6 +1240,9 @@ function test_recover()
     local fid3=$(create_file "$file3")
     local fid4=$(create_file "$file4")
 
+    local file7="$test_dir/file7"
+    local fid7=$(create_file "$file7")
+
     local dir5="$test_dir/dir5"
     mkdir "$dir5"
     local file5="$test_dir/dir5/file5"
@@ -1264,7 +1267,7 @@ function test_recover()
     add_event_watch
     start_copytool
 
-    for file in "$file1" "$file2" "$file3" "$file4" "$file5" "$file6"; do
+    for file in "$file1" "$file2" "$file3" "$file4" "$file5" "$file6" "$file7"; do
         lfs hsm_archive "$file"
         wait_for_event ARCHIVE_FINISH "$file"
         rm "$file"
@@ -1275,6 +1278,14 @@ function test_recover()
         error "Recovering should have succeeded for '$file1'"
     ls -g "$file1" | grep "root" ||
         error "'$file1' group should not have been changed"
+    get_xattr_value "$file1" hsm_fuid | grep -F "${FSNAME}:${fid1}" ||
+        error "'$file1' object id should be stored in 'trusted.hsm_fuid'"
+
+    # Recover with a custom fuid xattr name
+    ct_recover -x trusted.test_xattr "$test_dir" "$fid7" ||
+        error "Recovering should have succeeded for '$file7'"
+    get_xattr_value "$file7" test_xattr | grep -F "${FSNAME}:${fid7}" ||
+        error "'$file7' object id should be stored in 'trusted.test_xattr'"
 
     # Recover with new group
     ct_recover -g tasty "$test_dir" "$fid2" ||

@@ -17,6 +17,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/xattr.h>
 #include <unistd.h>
 
 #include <linux/lustre/lustre_fid.h>
@@ -26,24 +27,29 @@
 
 #include "utils.h"
 
-#define USAGE                                                                \
-    "Usage: %s [option] <src>\n"                                             \
-    "    Tool which recovers a file from the backend to Lustre.\n"           \
-    "\n"                                                                     \
-    "Arguments:\n"                                                           \
-    "    <src>                   Object ID to recover.\n"                    \
-    "\n"                                                                     \
-    "Options:\n"                                                             \
-    "    -d, --dry-run          Simulate recovery without making changes.\n" \
-    "    -p, --path <new_path>  Specify a new path for the object.\n"        \
-    "    -u, --user <user>      Specify an owner for the object.\n"          \
-    "    -g, --group <group>    Specify a group for the object owner.\n"     \
-    "\n"                                                                     \
-    "Help:\n"                                                                \
-    "    -h, --help             Print this message.\n"                       \
-    "    -v, --version          Print version information.\n"
+/* the default matches the copytool daemon, which reads this xattr at
+ * restore time to find the phobos object (see its --fuid-xattr option) */
+#define XATTR_TRUSTED_FUID_XATTR_DEFAULT "trusted.hsm_fuid"
 
-#define SHORTOPTS "dg:hp:u:v"
+#define USAGE                                                                 \
+    "Usage: %s [option] <src>\n"                                              \
+    "    Tool which recovers a file from the backend to Lustre.\n"            \
+    "\n"                                                                      \
+    "Arguments:\n"                                                            \
+    "    <src>                   Object ID to recover.\n"                     \
+    "\n"                                                                      \
+    "Options:\n"                                                              \
+    "    -d, --dry-run           Simulate recovery without making changes.\n" \
+    "    -p, --path <new_path>   Specify a new path for the object.\n"        \
+    "    -u, --user <user>       Specify an owner for the object.\n"          \
+    "    -g, --group <group>     Specify a group for the object owner.\n"     \
+    "    -x, --fuid-xattr <name> Specify the xattr storing the object id.\n"  \
+    "\n"                                                                      \
+    "Help:\n"                                                                 \
+    "    -h, --help              Print this message.\n"                       \
+    "    -v, --version           Print version information.\n"
+
+#define SHORTOPTS "dg:hp:u:vx:"
 
 static struct option longopts[] = {
     {
@@ -51,6 +57,12 @@ static struct option longopts[] = {
         .has_arg = no_argument,
         .flag = 0,
         .val = 'd',
+    },
+    {
+        .name = "fuid-xattr",
+        .has_arg = required_argument,
+        .flag = 0,
+        .val = 'x',
     },
     {
         .name = "group",
@@ -86,6 +98,7 @@ static struct option longopts[] = {
 };
 
 static char fs_name[MAX_OBD_NAME + 1];
+static char trusted_fuid_xattr[MAXNAMLEN];
 
 static int retrieve_usermd(struct pho_xfer_desc *xfer, char *objid,
                            const char *fid)
@@ -273,6 +286,15 @@ static int ct_recover(const char *path, struct pho_xfer_desc *xfer,
         return rc;
     }
 
+    rc = setxattr(path, trusted_fuid_xattr, xfer->xd_targets->xt_objid,
+                  strlen(xfer->xd_targets->xt_objid), XATTR_CREATE);
+    if (rc) {
+        rc = -errno;
+        pho_error(rc, "failed to set '%s' to '%s'",
+                  trusted_fuid_xattr, xfer->xd_targets->xt_objid);
+        return rc;
+    }
+
     if (xfer->xd_params.get.scope != DSS_OBJ_DEPRECATED)
         return rc;
 
@@ -357,6 +379,8 @@ int main(int argc, char *argv[]) {
     atexit(phobos_fini);
 #endif
 
+    strncpy(trusted_fuid_xattr, XATTR_TRUSTED_FUID_XATTR_DEFAULT, MAXNAMLEN);
+
     while ((opt = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1) {
         switch (opt) {
             case 'd':
@@ -377,12 +401,23 @@ int main(int argc, char *argv[]) {
             case 'v':
                 print_version(argv[0]);
                 exit(EXIT_SUCCESS);
+            case 'x':
+                rc = snprintf(trusted_fuid_xattr, sizeof(trusted_fuid_xattr),
+                              "%s", optarg);
+                if (rc >= (int)sizeof(trusted_fuid_xattr)) {
+                    rc = -EINVAL;
+                    pho_error(rc, "trusted_fuid_xattr too long");
+                    return -rc;
+                }
+                break;
             default:
                 fprintf(stderr, "Unknown option: %c\n", opt);
                 print_help(argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
+
+    pho_info("trusted_fuid_xattr=%s", trusted_fuid_xattr);
 
     if (optind >= argc) {
         fprintf(stderr, "Error: Missing <mnt> <src>.\n");
