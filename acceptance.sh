@@ -1240,17 +1240,23 @@ function test_recover()
     local fid3=$(create_file "$file3")
     local fid4=$(create_file "$file4")
 
+    local dir5="$test_dir/dir5"
+    mkdir "$dir5"
+    local file5="$test_dir/dir5/file5"
+    local fid5=$(create_file "$file5")
+
     groupadd tasty
     useradd -g tasty -MN crousty
     trap_add "userdel crousty"
     trap_add "groupdel tasty"
 
     chown crousty "$file2"
+    chgrp tasty "$dir5"
 
     add_event_watch
     start_copytool
 
-    for file in "$file1" "$file2" "$file3" "$file4"; do
+    for file in "$file1" "$file2" "$file3" "$file4" "$file5"; do
         lfs hsm_archive "$file"
         wait_for_event ARCHIVE_FINISH "$file"
         rm "$file"
@@ -1269,6 +1275,12 @@ function test_recover()
         error "'$file2' group should have been changed"
     ls -o "$file2" | grep "crousty" ||
         error "'$file2' user should have been correctly retrieved"
+
+    # Recover with invalid new group, fallback to parent group
+    ct_recover -g crousty "$test_dir" "$fid5" ||
+        error "Recovering should have succeeded for '$file5'"
+    ls -g "$file5" | grep "tasty" ||
+        error "'$file5' group should have been changed"
 
     # Recover with new path
     ct_recover -p "$test_dir/newfile" "$test_dir" "$fid3" ||
@@ -1291,10 +1303,15 @@ function test_bad_recover()
     local file1="$test_dir/file1"
     local fid1=$(create_file "$file1")
 
+    local dir2="$test_dir/dir2"
+    mkdir "$dir2"
+    local file2="$test_dir/dir2/file2"
+    local fid2=$(create_file "$file2")
+
     add_event_watch
     start_copytool
 
-    for file in "$file1"; do
+    for file in "$file1" "$file2"; do
         lfs hsm_archive "$file"
         wait_for_event ARCHIVE_FINISH "$file"
     done
@@ -1302,11 +1319,13 @@ function test_bad_recover()
     ct_recover "$test_dir" "$fid1" &&
         error "Recovering should fail because file still exists"
 
-    rm "$file"
+    rm "$file1"
+    rm "$file2"
+    rmdir "$dir2"
 
-    # Group does not exist
+    # Group does not exist and parent path does not exist
     echo "==== TEST 1 ===="
-    ct_recover -g tasty "$test_dir" "$fid1" &&
+    ct_recover -g tasty "$test_dir" "$fid2" &&
         error "Recovering should fail because group does not exist"
 
     # Path points to an existing file

@@ -154,9 +154,13 @@ static int retrieve_user(struct stat *inode, struct pho_xfer_desc *xfer,
  * We don't store the group in the database to save some disk space.
  * This is why we don't retrieve it from the user_md, like the username.
  */
-static int retrieve_group(struct stat *inode, const char *newgroup)
+static int retrieve_group(const char *path, struct stat *inode,
+                          const char *newgroup)
 {
+    struct stat p_stat;
     struct group *grp;
+    char *dup_path;
+    char *cur_str;
     int rc;
 
     if (!newgroup || newgroup[0] == '\0')
@@ -164,14 +168,30 @@ static int retrieve_group(struct stat *inode, const char *newgroup)
 
     errno = 0;
     grp = getgrnam(newgroup);
-    if (!grp) {
-        rc = -errno;
-        pho_error(rc, "failed to retrieve group id '%s'", newgroup);
-        return rc ? rc : -EINVAL;
+    if (grp) {
+        inode->st_gid = grp->gr_gid;
+        return 0;
     }
-    inode->st_gid = grp->gr_gid;
 
-    return 0;
+    pho_warn("failed to retrieve group id '%s', fallback to parent", newgroup);
+
+    dup_path = strdup(path);
+    cur_str = strrchr(dup_path, '/');
+    if (!cur_str) {
+        rc = -errno;
+    } else {
+        *cur_str = '\0';
+        rc = stat(dup_path, &p_stat);
+    }
+    free(dup_path);
+    if (!rc) {
+        inode->st_gid = p_stat.st_gid;
+        return 0;
+    }
+
+    pho_error(-rc, "failed to retrieve parent group id of '%s'", path);
+
+    return rc ? rc : -EINVAL;
 }
 
 static int retrieve_path(const char **path, struct pho_xfer_desc *xfer,
@@ -247,15 +267,15 @@ int recover_object(int dry_run, char *new_path, char *user, char *group,
     if (rc)
         return rc;
 
+    rc = retrieve_path(&path, &xfer, new_path);
+    if (rc)
+        return rc;
+
     rc = retrieve_user(&inode, &xfer, user);
     if (rc)
         return rc;
 
-    rc = retrieve_group(&inode, group);
-    if (rc)
-        return rc;
-
-    rc = retrieve_path(&path, &xfer, new_path);
+    rc = retrieve_group(path, &inode, group);
     if (rc)
         return rc;
 
