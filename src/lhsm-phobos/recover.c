@@ -17,6 +17,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/xattr.h>
 #include <unistd.h>
 
 #include <linux/lustre/lustre_fid.h>
@@ -25,6 +26,10 @@
 #include <pho_common.h>
 
 #include "utils.h"
+
+/* must match the fuid xattr of the copytool daemon (see its --fuid-xattr
+ * option), which reads it at restore time to find the phobos object */
+#define XATTR_TRUSTED_FUID "trusted.hsm_fuid"
 
 #define USAGE                                                                \
     "Usage: %s [option] <src>\n"                                             \
@@ -270,6 +275,15 @@ static int ct_recover(const char *path, struct pho_xfer_desc *xfer,
                           0, -1, 0, 0, NULL, &newfid);
     if (rc) {
         pho_error(rc, "llapi_hsm_import failed");
+        return rc;
+    }
+
+    rc = setxattr(path, XATTR_TRUSTED_FUID, xfer->xd_targets->xt_objid,
+                  strlen(xfer->xd_targets->xt_objid), XATTR_CREATE);
+    if (rc) {
+        rc = -errno;
+        pho_error(rc, "failed to set '%s' to '%s'",
+                  XATTR_TRUSTED_FUID, xfer->xd_targets->xt_objid);
         return rc;
     }
 

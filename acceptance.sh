@@ -1275,6 +1275,8 @@ function test_recover()
         error "Recovering should have succeeded for '$file1'"
     ls -g "$file1" | grep "root" ||
         error "'$file1' group should not have been changed"
+    get_xattr_value "$file1" hsm_fuid | grep -F "${FSNAME}:${fid1}" ||
+        error "'$file1' object id should be stored in 'trusted.hsm_fuid'"
 
     # Recover with new group
     ct_recover -g tasty "$test_dir" "$fid2" ||
