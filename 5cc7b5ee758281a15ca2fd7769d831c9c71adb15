@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85e0c532_21146d83",
+        "filename": "lhsmtool_phobos.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-11-04T08:37:51Z",
+      "side": 1,
+      "message": "question: why add this here ?",
+      "range": {
+        "startLine": 410,
+        "startChar": 0,
+        "endLine": 410,
+        "endChar": 34
+      },
+      "revId": "5cc7b5ee758281a15ca2fd7769d831c9c71adb15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
