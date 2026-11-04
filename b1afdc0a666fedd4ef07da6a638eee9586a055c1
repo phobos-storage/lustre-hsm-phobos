@@ -63,6 +63,24 @@
       "message": "minor: user can be set without group and group can be set without user",
       "revId": "b1afdc0a666fedd4ef07da6a638eee9586a055c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ef406df_36915875",
+        "filename": "src/cmd/recover.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1019048
+      },
+      "writtenOn": "2026-11-04T08:35:38Z",
+      "side": 1,
+      "message": "ping",
+      "parentUuid": "4737347d_f45ea59b",
+      "revId": "b1afdc0a666fedd4ef07da6a638eee9586a055c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
