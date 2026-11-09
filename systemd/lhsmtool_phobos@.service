@@ -1,19 +1,24 @@
 [Unit]
 Description=Lustre HSM Copytool daemon for %I
 After=%i.mount
-Require=%i.mount
+After=phobosd
+Requires=%i.mount
+BindsTo=phobosd
 
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/lhsmtool_phobos.sysconfig
 EnvironmentFile=-/etc/sysconfig/lhsmtool_phobos.%i
 RuntimeDirectory=lhsmtool_phobos
-ExecStart=/bin/sh -c '\
-            LD_PRELOAD=$LD_PRELOAD \
-            LHSMTOOL_PHOBOS_PID_FILEPATH=$LHSMTOOL_PHOBOS_PID_FILEPATH \
-            /usr/bin/lhsmtool_phobos $VERBOSE_LEVEL \
-            --default-family $DEFAULT_FAMILY \
-            --fuid-xattr $TRUSTED_HSM_FUID_FIELD /%I'
+ExecStart=bash -c "\
+    LD_PRELOAD=$LD_PRELOAD \
+    LHSMTOOL_PHOBOS_PID_FILEPATH=$LHSMTOOL_PHOBOS_PID_FILEPATH \
+    exec /usr/bin/lhsmtool_phobos $VERBOSE_LEVEL \
+    {DEFAULT_FAMILY:+--default-family $DEFAULT_FAMILY} \
+    {DEFAULT_LIBRARY:+--default-library $DEFAULT_LIBRARY} \
+    {LHSM_FUID_XATTR:+--fuid-xattr $LHSM_FUID_XATTR} \
+    /%I
+LimitNOFILE=16384
 
 [Install]
 WantedBy=multi-user.target
